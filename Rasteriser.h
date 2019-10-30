@@ -3,11 +3,9 @@
 #include <vector>
 #include "Vertex.h"
 #include "Matrix.h"
+#include "Mesh.h"
 
-//
-// Simple shape alias
-//
-using Shape = std::vector<Vertex>;
+using Vertices = std::vector<Vertex>;
 
 //
 // Rasteriser class for handling drawing and mathematics operations.
@@ -24,17 +22,11 @@ public:
 	const COLORREF GetBackgroundColour() const;
 	const COLORREF GetForegroundColour() const;
 
-	//
-	// Matrix transformations
-	//
-	void Transform(const Matrix& transformMatrix);
-
 protected:
 	//
 	// Shape generation and handling.
 	// 
 	virtual void CreateShape();
-	virtual void DrawShape(const Shape& shape, const HDC& hdc);
 
 	// 
 	// Drawing utils
@@ -42,11 +34,17 @@ protected:
 	void Clear(const COLORREF& colour, const Bitmap& bitmap);
 
 private:
-	// Dynamic sized shape.
-	Shape _shape;
+	// Square shape
+	Mesh _shape;
 
 	// Colours
 	COLORREF _background = RGB(0xFF, 0xFF, 0xFF);
 	COLORREF _shapeColor = RGB(0x00, 0x00, 0xFF);
+
+	// Starting position
+	Point3D<float> _startingPosition = { 0, 0 };
+
+	// Time elapsed
+	float _timeElapsed = 0;
 };
 

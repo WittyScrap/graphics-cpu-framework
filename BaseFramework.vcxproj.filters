@@ -30,6 +30,21 @@
     <ClCompile Include="Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Square.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Polygon3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MD2Loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework.h">
@@ -56,6 +71,24 @@
     <ClInclude Include="Point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Square.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Point3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MD2Loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Rasteriser.ico">
@@ -71,6 +104,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cube.md2" />
+    <None Include="cube.md2">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

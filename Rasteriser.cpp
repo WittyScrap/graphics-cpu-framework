@@ -1,5 +1,7 @@
 #include "Rasteriser.h"
 #include "Point.h"
+#include "MD2Loader.h"
+#include <cmath>
 
 Rasteriser app;
 
@@ -35,7 +37,7 @@ void Rasteriser::Render(const Bitmap& bitmap)
 	HDC hdc = bitmap.GetDC();
 
 	Clear(clearColour, bitmap);
-	DrawShape(_shape, hdc);
+	_shape.Draw(hdc);
 }
 
 //
@@ -43,7 +45,17 @@ void Rasteriser::Render(const Bitmap& bitmap)
 //
 void Rasteriser::Update(const Bitmap& bitmap)
 {
-	Transform(Matrix::TranslationMatrix(1, 1));
+	// Rotate about everything...
+	_shape.Rotate({ .025f, .05f, .025f });
+
+	// Wobbly scale woo...
+	float scaleFactor = std::sin(_timeElapsed * .5f) * 2;
+	_shape.SetScale({ scaleFactor, scaleFactor, scaleFactor * scaleFactor });
+
+	// Move around in circles, all together now
+	_shape.SetPosition({ _startingPosition.X + std::cos(_timeElapsed) * 100, _startingPosition.Y + std::sin(_timeElapsed) * 100, 0 });
+
+	_timeElapsed += 1.f / 60.f;
 }
 
 //
@@ -63,63 +75,19 @@ const COLORREF Rasteriser::GetForegroundColour() const
 }
 
 //
-// Apply a translation matrix to all vertices
-//
-void Rasteriser::Transform(const Matrix& transformMatrix)
-{
-	for (Shape::iterator vertex_it = _shape.begin(); vertex_it != _shape.end(); vertex_it++)
-	{
-		*vertex_it = transformMatrix * *vertex_it;
-	}
-}
-
-//
 // Creates a square shape (default).
 //
 void Rasteriser::CreateShape()
 {
-	Point<float> initialPosition{ 200, 200 };
-	Point<float> initialSize{ 50, 50 };
-
-	_shape.resize(4); // Avoids unnecessarily resizing the buffer each time.
-
-	_shape[0] = Vertex(initialPosition.X, initialPosition.Y, 0);
-	_shape[1] = Vertex(initialPosition.X + initialSize.X, initialPosition.Y, 0);
-	_shape[2] = Vertex(initialPosition.X + initialSize.X, initialPosition.Y + initialSize.Y, 0);
-	_shape[3] = Vertex(initialPosition.X, initialPosition.Y + initialSize.Y, 0);
-}
-
-//
-// Draws the square
-//
-void Rasteriser::DrawShape(const Shape& shape, const HDC& hdc)
-{
-	// Windows event calls could happen before Rasteriser::Initialise() is called.
-	if (shape.size() == 0)
+	if (!MD2Loader::LoadModel("cube.md2", _shape, &Mesh::AddPolygon, &Mesh::AddVertex))
 	{
-		return;
+		throw;
 	}
 
-	HPEN pen = CreatePen(PS_SOLID, 1, GetForegroundColour());
-	HPEN old = static_cast<HPEN>(SelectObject(hdc, pen));
+	_shape.SetColour(GetForegroundColour());
+	_shape.SetPosition({ 300, 300, 0 });
 
-	// Iterator to vertices
-	Shape::const_iterator it = shape.begin();
-	MoveToEx(hdc, static_cast<int>(it->GetX()), static_cast<int>(it->GetY()), NULL);
-
-	// Draw lines to all vertices.
-	while (++it != shape.end())
-	{
-		LineTo(hdc, static_cast<int>(it->GetX()), static_cast<int>(it->GetY()));
-	}
-
-	// Draw last connection...
-	it = shape.begin();
-	LineTo(hdc, static_cast<int>(it->GetX()), static_cast<int>(it->GetY()));
-
-	// Restore old pen, free new pen
-	SelectObject(hdc, old);
-	DeleteObject(pen);
+	_startingPosition = _shape.GetTransform().GetPosition();
 }
 
 //

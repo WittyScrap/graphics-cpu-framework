@@ -39,6 +39,13 @@ protected:
 	//
 	void Clear(const COLORREF& colour, const Bitmap& bitmap);
 
+	//
+	// Input
+	//
+	bool IsKeyHeld(int keyCode);
+	bool IsKeyDown(int keyCode);
+	bool IsKeyUp(int keyCode);
+
 private:
 	// Square shape
 	Mesh _shape;

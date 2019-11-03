@@ -4,7 +4,7 @@
 class Square : public Shape
 {
 public:
-	void CreateModel(const Point3D<float>& location);
+	void CreateModel(const Vector3& location);
 	void Draw(HDC hdc);
 
 private:

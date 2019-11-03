@@ -1,5 +1,6 @@
 #include "Matrix.h"
 #include <cmath>
+#include <exception>
 
 Matrix::Matrix() : _m{ 0 }
 {
@@ -139,7 +140,7 @@ const Matrix Matrix::Inverse() const
 
 	if (determ == 0)
 	{
-		throw;
+		throw std::exception("Matrix does not have a determinant (det=0), cannot be inverted.");
 	}
 
 	float invdet = 1.f / determ;
@@ -171,7 +172,7 @@ const Matrix Matrix::Inverse() const
 //
 // Retrieves the position data stored in this matrix
 //
-const Point3D<float> Matrix::GetPosition() const
+const Vector3 Matrix::GetPosition() const
 {
 	return { _m[0][3], _m[1][3], _m[2][3] };
 }
@@ -179,7 +180,7 @@ const Point3D<float> Matrix::GetPosition() const
 //
 // Retrieves the rotation data stored in this matrix
 //
-const Point3D<float> Matrix::GetRotation() const
+const Vector3 Matrix::GetRotation() const
 {
 	if (_m[0][0] == 1.0f || _m[0][0] == -1)
 	{
@@ -194,7 +195,7 @@ const Point3D<float> Matrix::GetRotation() const
 //
 // Retrieves the scale data stored in this matrix
 //
-const Point3D<float> Matrix::GetScale() const
+const Vector3 Matrix::GetScale() const
 {
 	return { std::sqrt(_m[0][0] * _m[0][0] + _m[0][1] * _m[0][1] + _m[0][2] * _m[0][2]),
 			 std::sqrt(_m[1][0] * _m[1][0] + _m[1][1] * _m[1][1] + _m[1][2] * _m[1][2]),
@@ -230,7 +231,9 @@ Matrix Matrix::TranslationMatrix(const float& translateX, const float& translate
 //
 Matrix Matrix::RotationMatrix(const float& rotationX, const float& rotationY, const float& rotationZ)
 {
-	return Matrix::RotationMatrixX(rotationX) * Matrix::RotationMatrixY(rotationY) * Matrix::RotationMatrixZ(rotationZ);
+	return	Matrix::RotationMatrixX(rotationX) *
+			Matrix::RotationMatrixY(rotationY) *
+			Matrix::RotationMatrixZ(rotationZ);
 }
 
 //
@@ -248,7 +251,7 @@ Matrix Matrix::ScaleMatrix(const float& x, const float& y, const float& z)
 // Translation, Rotation, Scale matrix.
 // Combines all three transformations into one function call.
 //
-Matrix Matrix::TRS(const Point3D<float>& translation, const Point3D<float>& rotation, const Point3D<float>& scale)
+Matrix Matrix::TRS(const Vector3& translation, const Vector3& rotation, const Vector3& scale)
 {
 	return	Matrix::TranslationMatrix(translation.X, translation.Y, translation.Z) *
 			Matrix::RotationMatrix(rotation.X, rotation.Y, rotation.Z) *

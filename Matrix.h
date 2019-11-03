@@ -1,5 +1,5 @@
 #pragma once
-#include "Point3D.h"
+#include "Vector.h"
 #include "Vertex.h"
 
 // Class for a 4 x 4 matrix object.  
@@ -36,9 +36,9 @@ class Matrix
 		//
 		// Information retrival
 		//
-		const Point3D<float> GetPosition() const;
-		const Point3D<float> GetRotation() const;
-		const Point3D<float> GetScale() const;
+		const Vector3 GetPosition() const;
+		const Vector3 GetRotation() const;
+		const Vector3 GetScale() const;
 
 		// Default matrix
 		static Matrix IdentityMatrix();
@@ -52,7 +52,7 @@ class Matrix
 		static Matrix ScaleMatrix (const float& x, const float& y, const float& z);
 
 		// Combined transformation matrix
-		static Matrix TRS(const Point3D<float>& translation, const Point3D<float>& rotation, const Point3D<float>& scale);
+		static Matrix TRS(const Vector3& translation, const Vector3& rotation, const Vector3& scale);
 
 	private:
 		//

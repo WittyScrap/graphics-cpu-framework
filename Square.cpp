@@ -4,7 +4,7 @@
 //
 // Creates a square and immediately transforms it to the position.
 //
-void Square::CreateModel(const Point3D<float>& position)
+void Square::CreateModel(const Vector3& position)
 {
 	// Create four vertices...
 	CreateVertex(Vertex(-_squareWidth, -_squareHeight, 0));

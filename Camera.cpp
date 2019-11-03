@@ -134,7 +134,7 @@ void Camera::SetupProjectionMatrix()
 //
 // Sets the world to camera matrix to a valid initial state.
 //
-void Camera::SetupWorldToCameraMatrix(const Point3D<float>& initialPosition)
+void Camera::SetupWorldToCameraMatrix(const Vector3& initialPosition)
 {
 	_worldToCameraMatrix.SetM(0, 3, -initialPosition.X);
 	_worldToCameraMatrix.SetM(1, 3, -initialPosition.Y);
@@ -144,7 +144,7 @@ void Camera::SetupWorldToCameraMatrix(const Point3D<float>& initialPosition)
 //
 // Allows the camera to be placed in a certain position and rotation.
 //
-void Camera::Transform(const Point3D<float>& position, const Point3D<float>& rotation)
+void Camera::Transform(const Vector3& position, const Vector3& rotation)
 {
 	_worldToCameraMatrix = Matrix::TRS(-position, -rotation, { 1, 1, 1 });
 }

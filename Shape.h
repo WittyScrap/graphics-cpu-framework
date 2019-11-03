@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "Point3D.h"
+#include "Vector.h"
 #include "Vertex.h"
 #include "Matrix.h"
 #include <Windows.h>
@@ -40,18 +40,18 @@ public:
 	// Transformation overrides, these will overwrite
 	// the related current transformation matrices.
 	//
-	void SetPosition(const Point3D<float>& position);
-	void SetRotation(const Point3D<float>& rotation);
-	void SetScale(const Point3D<float>& scale);
+	void SetPosition(const Vector3& position);
+	void SetRotation(const Vector3& rotation);
+	void SetScale(const Vector3& scale);
 
 	//
 	// Transformation alterations, these will multiply
 	// the related current transformation matrices by
 	// the supplied matrices.
 	//
-	void Translate(const Point3D<float>& amount);
-	void Rotate(const Point3D<float>& amount);
-	void Scale(const Point3D<float>& amount);
+	void Translate(const Vector3& amount);
+	void Rotate(const Vector3& amount);
+	void Scale(const Vector3& amount);
 
 private:
 	// Ensures the _shapeData and _transform vectors have the same size.

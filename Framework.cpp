@@ -1,6 +1,6 @@
 #include "Framework.h"
 
-const unsigned int DEFAULT_FRAMERATE = 30;
+const unsigned int DEFAULT_FRAMERATE = 60;
 
 // Reference to ourselves - primarily used to access the message handler correctly
 // This is initialised in the constructor

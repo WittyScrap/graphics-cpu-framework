@@ -167,7 +167,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelLoadingException.h" />
     <ClInclude Include="Point.h" />
-    <ClInclude Include="Point3D.h" />
+    <ClInclude Include="Vector.h" />
     <ClInclude Include="Polygon3D.h" />
     <ClInclude Include="Rasteriser.h" />
     <ClInclude Include="Resource.h" />

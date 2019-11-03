@@ -83,9 +83,6 @@
     <ClInclude Include="Square.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Point3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Polygon3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -99,6 +96,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModelLoadingException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

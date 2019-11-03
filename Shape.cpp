@@ -142,7 +142,7 @@ const Matrix Shape::GetTransform() const
 //
 // Updates the position matrix.
 //
-void Shape::SetPosition(const Point3D<float>& position)
+void Shape::SetPosition(const Vector3& position)
 {
 	_position = Matrix::TranslationMatrix(position.X, position.Y, position.Z);
 }
@@ -150,7 +150,7 @@ void Shape::SetPosition(const Point3D<float>& position)
 //
 // Updates the rotation matrix.
 //
-void Shape::SetRotation(const Point3D<float>& rotation)
+void Shape::SetRotation(const Vector3& rotation)
 {
 	_rotation = Matrix::RotationMatrix(rotation.X, rotation.Y, rotation.Z);
 }
@@ -158,7 +158,7 @@ void Shape::SetRotation(const Point3D<float>& rotation)
 //
 // Updates the scale matrix.
 //
-void Shape::SetScale(const Point3D<float>& scale)
+void Shape::SetScale(const Vector3& scale)
 {
 	_scale = Matrix::ScaleMatrix(scale.X, scale.Y, scale.Z);
 }
@@ -166,7 +166,7 @@ void Shape::SetScale(const Point3D<float>& scale)
 //
 // Translates the shape by a given amount.
 //
-void Shape::Translate(const Point3D<float>& amount)
+void Shape::Translate(const Vector3& amount)
 {
 	Matrix translation = _position * Matrix::TranslationMatrix(amount.X, amount.Y, amount.Z);
 	_position = translation;
@@ -175,7 +175,7 @@ void Shape::Translate(const Point3D<float>& amount)
 //
 // Rotates the shape by a given amount.
 //
-void Shape::Rotate(const Point3D<float>& amount)
+void Shape::Rotate(const Vector3& amount)
 {
 	Matrix rotation = _rotation * Matrix::RotationMatrix(amount.X, amount.Y, amount.Z);
 	_rotation = rotation;
@@ -184,7 +184,7 @@ void Shape::Rotate(const Point3D<float>& amount)
 //
 // Scales the shape by a given amount.
 //
-void Shape::Scale(const Point3D<float>& amount)
+void Shape::Scale(const Vector3& amount)
 {
 	Matrix scale = _scale * Matrix::ScaleMatrix(amount.X, amount.Y, amount.Z);
 	_scale = scale;

@@ -58,6 +58,34 @@ void Rasteriser::Update(const Bitmap& bitmap, const float& deltaTime)
 	_shape.SetPosition({ std::cos(_timeElapsed) * 100, std::sin(_timeElapsed * 2) * 100, 0 });
 
 	_timeElapsed += deltaTime;
+
+	// Move the camera, hurray!
+	Vector3 cameraMovement{ 0, 0, 0 };
+
+	if (IsKeyHeld(VK_LEFT))
+	{
+		cameraMovement.X -= 10.f;
+	}
+
+	if (IsKeyHeld(VK_RIGHT))
+	{
+		cameraMovement.X += 10.f;
+	}
+
+	if (IsKeyHeld(VK_UP))
+	{
+		cameraMovement.Y -= 10.f;
+	}
+
+	if (IsKeyHeld(VK_DOWN))
+	{
+		cameraMovement.Y += 10.f;
+	}
+
+	Vector3 cameraPosition = _camera.GetCameraToWorldMatrix().GetPosition();
+	cameraPosition = cameraPosition + cameraMovement;
+
+	_camera.Transform(cameraPosition, { 0, 0, 0 });
 }
 
 //
@@ -128,4 +156,35 @@ void Rasteriser::Clear(const COLORREF& colour, const Bitmap& bitmap)
 	HBRUSH brush = CreateSolidBrush(colour);
 	FillRect(hdc, &fillRect, brush);
 	DeleteObject(brush);
+}
+
+//
+// Returns true if the given key code is currently held down.
+//
+bool Rasteriser::IsKeyHeld(int keyCode)
+{
+	SHORT keyState = GetKeyState(keyCode);
+	return keyState & 0x8000;
+}
+
+//
+// Returns true if the given key has just been pressed.
+//
+bool Rasteriser::IsKeyDown(int keyCode)
+{
+	SHORT keyState = GetKeyState(keyCode);
+	return keyState & (0x8000 | 1);
+}
+
+bool Rasteriser::IsKeyUp(int keyCode)
+{
+	SHORT keyState = GetKeyState(keyCode);
+	if (!(keyState & 0x8000))
+	{
+		return keyState & 1;
+	}
+	else
+	{
+		return false;
+	}
 }

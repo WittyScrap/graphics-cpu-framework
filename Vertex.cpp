@@ -73,7 +73,7 @@ const Vertex Vertex::operator+(const Vertex& rhs) const
 	return sum;
 }
 
-const Point<float> Vertex::AsPoint()
+const Vector3 Vertex::AsPoint()
 {
 	return { _x, _y };
 }

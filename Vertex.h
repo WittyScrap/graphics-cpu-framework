@@ -1,5 +1,5 @@
 #pragma once
-#include "Point.h"
+#include "Vector.h"
 
 class Vertex
 {
@@ -22,7 +22,7 @@ public:
 	const Vertex& operator=(const Vertex& rhs);
 	const Vertex operator+(const Vertex& rhs) const;
 
-	const Point<float> AsPoint();
+	const Vector3 AsPoint();
 private:
 	float _x;
 	float _y;

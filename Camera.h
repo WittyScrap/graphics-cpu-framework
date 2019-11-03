@@ -1,6 +1,6 @@
 #pragma once
 #include "Matrix.h"
-#include "Point3D.h"
+#include "Vector.h"
 
 //
 // Scene camera.
@@ -36,7 +36,7 @@ public:
 	//
 	// Allows the camera to be placed in a certain position and rotation
 	//
-	void Transform(const Point3D<float>& position, const Point3D<float>& rotation);
+	void Transform(const Vector3& position, const Vector3& rotation);
 
 	//
 	// Main camera
@@ -49,7 +49,7 @@ private:
 	// Sets up the projection matrix to a valid initial state.
 	//
 	void SetupProjectionMatrix();
-	void SetupWorldToCameraMatrix(const Point3D<float>& initialPosition);
+	void SetupWorldToCameraMatrix(const Vector3& initialPosition);
 
 private:
 	//

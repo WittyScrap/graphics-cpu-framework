@@ -13,7 +13,7 @@ void Square::CreateModel(const Point3D<float>& position)
 	CreateVertex(Vertex(-_squareWidth,  _squareHeight, 0));
 
 	// Transform them by the position
-	Transform(Matrix::TranslationMatrix(position.X, position.Y, 0));
+	SetPosition({ position.X, position.Y, 0 });
 }
 
 //

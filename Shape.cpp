@@ -1,9 +1,13 @@
 #include "Shape.h"
+#include "Camera.h"
 
 //
 // Default constructor
 //
-Shape::Shape() : _translation(Matrix::IdentityMatrix()), _rotation(Matrix::IdentityMatrix()), _scale(Matrix::IdentityMatrix()), _shapeColor(RGB(0, 0, 0))
+Shape::Shape() : _position(Matrix::IdentityMatrix()),
+				 _rotation(Matrix::IdentityMatrix()),
+				 _scale(Matrix::IdentityMatrix()),
+				 _shapeColor(RGB(0, 0, 0))
 { }
 
 //
@@ -15,50 +19,45 @@ Shape::~Shape()
 }
 
 //
-// Saves a transformation matrix.
-//
-void Shape::Transform(const Matrix& transformationMatrix)
-{
-	Matrix translation = _translation * transformationMatrix;
-	Matrix rotation = _rotation * transformationMatrix;
-	Matrix scale = _scale * transformationMatrix;
-
-	_translation = translation;
-	_rotation = rotation;
-	_scale = scale;
-}
-
-//
-// Resets the transformation matrix to the identity matrix.
-//
-void Shape::ResetAll()
-{
-	_translation = Matrix::IdentityMatrix();
-	_rotation = Matrix::IdentityMatrix();
-	_scale = Matrix::IdentityMatrix();
-}
-
-//
 // Returns a vertex group containing every vertex in the internal shape, transformed by the matrix.
 //
 const std::vector<Vertex>& Shape::GetShape()
 {
-	if (_shapeData.size() != _transform.size())
+	if (_shapeData.size() != _transformedShape.size())
 	{
 		Realign();
 	}
 
-	Matrix transformationMatrix = GetTransform();
+	Matrix MVP = GetMVP();
 
 	for (size_t vertex = 0; vertex < _shapeData.size(); ++vertex)
 	{
 		Vertex currentVertex = _shapeData[vertex];
-		Vertex transformed = transformationMatrix * currentVertex;
+		Vertex transformed = MVP * currentVertex;
 
-		_transform[vertex] = transformed;
+		// Save vertex
+		_transformedShape[vertex] = transformed;
 	}
 
-	return _transform;
+	return _transformedShape;
+}
+
+//
+// Model, View, Projection matrix.
+//
+const Matrix Shape::GetMVP() const
+{
+	Matrix M = GetTransform();
+
+	if (Camera::GetMainCamera())
+	{
+		Matrix V = Camera::GetMainCamera()->GetWorldToCameraMatrix();
+		Matrix P = Camera::GetMainCamera()->GetProjectionMatrix();
+
+		return P * V * M;
+	}
+
+	return M;
 }
 
 //
@@ -67,12 +66,12 @@ const std::vector<Vertex>& Shape::GetShape()
 //
 void Shape::Realign()
 {
-	_transform.clear();
-	_transform.resize(_shapeData.size());
+	_transformedShape.clear();
+	_transformedShape.resize(_shapeData.size());
 
 	for (size_t i = 0; i < _shapeData.size(); ++i)
 	{
-		_transform[i] = _shapeData[i];
+		_transformedShape[i] = _shapeData[i];
 	}
 }
 
@@ -137,7 +136,7 @@ void Shape::SetColour(const COLORREF& colour)
 //
 const Matrix Shape::GetTransform() const
 {
-	return _translation * _rotation * _scale;
+	return _position * _rotation * _scale;
 }
 
 //
@@ -145,7 +144,7 @@ const Matrix Shape::GetTransform() const
 //
 void Shape::SetPosition(const Point3D<float>& position)
 {
-	_translation = Matrix::TranslationMatrix(position.X, position.Y, position.Z);
+	_position = Matrix::TranslationMatrix(position.X, position.Y, position.Z);
 }
 
 //
@@ -169,8 +168,8 @@ void Shape::SetScale(const Point3D<float>& scale)
 //
 void Shape::Translate(const Point3D<float>& amount)
 {
-	Matrix translation = _translation * Matrix::TranslationMatrix(amount.X, amount.Y, amount.Z);
-	_translation = translation;
+	Matrix translation = _position * Matrix::TranslationMatrix(amount.X, amount.Y, amount.Z);
+	_position = translation;
 }
 
 //

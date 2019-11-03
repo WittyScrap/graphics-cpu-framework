@@ -101,11 +101,71 @@ const Vertex Matrix::operator*(const Vertex &p) const
 {
 	Vertex newVertex(p);
 
-	newVertex.SetX(_m[0][0] * p.GetX() + _m[0][1] * p.GetY() + _m[0][2] * p.GetZ() + _m[0][3] * p.GetW());
-	newVertex.SetY(_m[1][0] * p.GetX() + _m[1][1] * p.GetY() + _m[1][2] * p.GetZ() + _m[1][3] * p.GetW());
-	newVertex.SetZ(_m[2][0] * p.GetX() + _m[2][1] * p.GetY() + _m[2][2] * p.GetZ() + _m[2][3] * p.GetW());
-	newVertex.SetW(_m[3][0] * p.GetX() + _m[3][1] * p.GetY() + _m[3][2] * p.GetZ() + _m[3][3] * p.GetW());
+	newVertex.SetX(_m[0][0] * p.GetX() + _m[0][1] * p.GetY() + _m[0][2] * p.GetZ() + _m[0][3]);
+	newVertex.SetY(_m[1][0] * p.GetX() + _m[1][1] * p.GetY() + _m[1][2] * p.GetZ() + _m[1][3]);
+	newVertex.SetZ(_m[2][0] * p.GetX() + _m[2][1] * p.GetY() + _m[2][2] * p.GetZ() + _m[2][3]);
+	float w =	  (_m[3][0] * p.GetX() + _m[3][1] * p.GetY() + _m[3][2] * p.GetZ() + _m[3][3]);
+
+	if (w != 1)
+	{
+		newVertex.SetX(newVertex.GetX() / w);
+		newVertex.SetY(newVertex.GetY() / w);
+		newVertex.SetZ(newVertex.GetZ() / w);
+	}
+
 	return newVertex;
+}
+
+//
+// Returns the inverse of this matrix.
+//
+const Matrix Matrix::Inverse() const
+{
+	float s0 = _m[0][0] * _m[1][1] - _m[1][0] * _m[0][1];
+	float s1 = _m[0][0] * _m[1][2] - _m[1][0] * _m[0][2];
+	float s2 = _m[0][0] * _m[1][3] - _m[1][0] * _m[0][3];
+	float s3 = _m[0][1] * _m[1][2] - _m[1][1] * _m[0][2];
+	float s4 = _m[0][1] * _m[1][3] - _m[1][1] * _m[0][3];
+	float s5 = _m[0][2] * _m[1][3] - _m[1][2] * _m[0][3];
+
+	float c5 = _m[2][2] * _m[3][3] - _m[3][2] * _m[2][3];
+	float c4 = _m[2][1] * _m[3][3] - _m[3][1] * _m[2][3];
+	float c3 = _m[2][1] * _m[3][2] - _m[3][1] * _m[2][2];
+	float c2 = _m[2][0] * _m[3][3] - _m[3][0] * _m[2][3];
+	float c1 = _m[2][0] * _m[3][2] - _m[3][0] * _m[2][2];
+	float c0 = _m[2][0] * _m[3][1] - _m[3][0] * _m[2][1];
+
+	float determ = (s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0);
+
+	if (determ == 0)
+	{
+		throw;
+	}
+
+	float invdet = 1.f / determ;
+	Matrix inverted;
+
+	inverted._m[0][0] = (_m[1][1] * c5 - _m[1][2] * c4 + _m[1][3] * c3) * invdet;
+	inverted._m[0][1] = (-_m[0][1] * c5 + _m[0][2] * c4 - _m[0][3] * c3) * invdet;
+	inverted._m[0][2] = (_m[3][1] * s5 - _m[3][2] * s4 + _m[3][3] * s3) * invdet;
+	inverted._m[0][3] = (-_m[2][1] * s5 + _m[2][2] * s4 - _m[2][3] * s3) * invdet;
+
+	inverted._m[1][0] = (-_m[1][0] * c5 + _m[1][2] * c2 - _m[1][3] * c1) * invdet;
+	inverted._m[1][1] = (_m[0][0] * c5 - _m[0][2] * c2 + _m[0][3] * c1) * invdet;
+	inverted._m[1][2] = (-_m[3][0] * s5 + _m[3][2] * s2 - _m[3][3] * s1) * invdet;
+	inverted._m[1][3] = (_m[2][0] * s5 - _m[2][2] * s2 + _m[2][3] * s1) * invdet;
+
+	inverted._m[2][0] = (_m[1][0] * c4 - _m[1][1] * c2 + _m[1][3] * c0) * invdet;
+	inverted._m[2][1] = (-_m[0][0] * c4 + _m[0][1] * c2 - _m[0][3] * c0) * invdet;
+	inverted._m[2][2] = (_m[3][0] * s4 - _m[3][1] * s2 + _m[3][3] * s0) * invdet;
+	inverted._m[2][3] = (-_m[2][0] * s4 + _m[2][1] * s2 - _m[2][3] * s0) * invdet;
+
+	inverted._m[3][0] = (-_m[1][0] * c3 + _m[1][1] * c1 - _m[1][2] * c0) * invdet;
+	inverted._m[3][1] = (_m[0][0] * c3 - _m[0][1] * c1 + _m[0][2] * c0) * invdet;
+	inverted._m[3][2] = (-_m[3][0] * s3 + _m[3][1] * s1 - _m[3][2] * s0) * invdet;
+	inverted._m[3][3] = (_m[2][0] * s3 - _m[2][1] * s1 + _m[2][2] * s0) * invdet;
+
+	return inverted;
 }
 
 //
@@ -149,6 +209,11 @@ Matrix Matrix::IdentityMatrix()
 				   0, 0, 0, 1 };
 }
 
+Matrix Matrix::ZeroMatrix()
+{
+	return Matrix();
+}
+
 //
 // Matrix to translate all vertices of a model by a translation amount
 //
@@ -185,9 +250,9 @@ Matrix Matrix::ScaleMatrix(const float& x, const float& y, const float& z)
 //
 Matrix Matrix::TRS(const Point3D<float>& translation, const Point3D<float>& rotation, const Point3D<float>& scale)
 {
-	return Matrix::TranslationMatrix(translation.X, translation.Y, translation.Z) *
-		   Matrix::RotationMatrix(rotation.X, rotation.Y, rotation.Z) *
-		   Matrix::ScaleMatrix(scale.X, scale.Y, scale.Z);
+	return	Matrix::TranslationMatrix(translation.X, translation.Y, translation.Z) *
+			Matrix::RotationMatrix(rotation.X, rotation.Y, rotation.Z) *
+			Matrix::ScaleMatrix(scale.X, scale.Y, scale.Z);
 }
 
 //

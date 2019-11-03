@@ -87,7 +87,7 @@ int Framework::MainLoop()
 			QueryPerformanceCounter(&currentTime);
 			_timeSpan = (currentTime.QuadPart - lastTime.QuadPart) * timeFactor;
 			lastTime = currentTime;
-			Update(_bitmap);
+			Update(_bitmap, static_cast<float>(_timeSpan));
 			updateFlag = false;
 		}
 		QueryPerformanceCounter(&currentTime);
@@ -137,7 +137,7 @@ bool Framework::Initialise()
 //
 // This should be overridden
 
-void Framework::Update(const Bitmap &bitmap)
+void Framework::Update(const Bitmap &bitmap, const float& deltaTime)
 {
 	// Default update method does nothing
 }
@@ -250,7 +250,7 @@ LRESULT Framework::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			// Delete any existing bitmap and create a new one of the required size.
 			_bitmap.Create(hWnd, LOWORD(lParam), HIWORD(lParam));
 			// Now render to the resized bitmap
-			Update(_bitmap);
+			Update(_bitmap, 0);
 			Render(_bitmap);
 			InvalidateRect(hWnd, NULL, FALSE);
 			break;

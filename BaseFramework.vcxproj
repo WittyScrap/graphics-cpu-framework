@@ -146,10 +146,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MD2Loader.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ModelLoadingException.cpp" />
     <ClCompile Include="Polygon3D.cpp" />
     <ClCompile Include="Rasteriser.cpp" />
     <ClCompile Include="Shape.cpp" />
@@ -158,10 +160,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MD2Loader.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ModelLoadingException.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Point3D.h" />
     <ClInclude Include="Polygon3D.h" />

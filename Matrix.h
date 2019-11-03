@@ -31,6 +31,8 @@ class Matrix
 		const Matrix operator*(const Matrix &other) const;
 		const Vertex operator*(const Vertex &other) const;
 
+		const Matrix Inverse() const;
+
 		//
 		// Information retrival
 		//
@@ -40,6 +42,7 @@ class Matrix
 
 		// Default matrix
 		static Matrix IdentityMatrix();
+		static Matrix ZeroMatrix();
 
 		//
 		// Transformation matrices

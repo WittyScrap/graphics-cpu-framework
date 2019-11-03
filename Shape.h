@@ -4,6 +4,7 @@
 #include "Vertex.h"
 #include "Matrix.h"
 #include <Windows.h>
+#include <stack>
 
 //
 // Base shape class (abstract).
@@ -15,15 +16,8 @@ public:
 	virtual ~Shape();
 
 	//
-	// Transformation
+	// Draws the shape (abstract).
 	//
-	virtual void Transform(const Matrix& transformationMatrix);
-	virtual void ResetAll();
-
-	//
-	// World-space vertices (read-only).
-	//
-	virtual const std::vector<Vertex>& GetShape();
 	virtual void Draw(HDC hdc) = 0;
 
 	//
@@ -68,17 +62,23 @@ protected:
 	void CreateVertices(const std::vector<Vertex>& vertices);
 	void ClearVertices();
 
+	//
+	// World-space vertices (read-only).
+	//
+	virtual const std::vector<Vertex>& GetShape();
+	const Matrix GetMVP() const;
+
 private:
-	std::vector<Vertex> _shapeData;	// Where the model-space vertices will be stored.
-	std::vector<Vertex> _transform; // Where the world-space vertices will be stored and updated.
+	COLORREF _shapeColor; // The colour of the shape.
+
+	std::vector<Vertex> _shapeData;			// Where the model-space vertices will be stored.
+	std::vector<Vertex> _transformedShape;	// Where the world-space vertices will be stored and updated.
 
 	//
 	// Transformation matrices
 	//
-	Matrix _translation;
+	Matrix _position;
 	Matrix _rotation;
 	Matrix _scale;
-
-	COLORREF _shapeColor;			// The colour of the shape.
 };
 

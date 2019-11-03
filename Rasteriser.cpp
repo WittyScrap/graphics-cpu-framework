@@ -19,8 +19,10 @@ bool Rasteriser::Initialise()
 		// Everything went well (hopefully)...
 		exitCode = true;
 	}
-	catch(...)
+	catch (ModelLoadingException& e)
 	{
+		Log(e.what());
+
 		// Everything went disastrously wrong (expected behaviour).
 		exitCode = false;
 	}
@@ -43,7 +45,7 @@ void Rasteriser::Render(const Bitmap& bitmap)
 //
 // Handles moving the square about
 //
-void Rasteriser::Update(const Bitmap& bitmap)
+void Rasteriser::Update(const Bitmap& bitmap, const float& deltaTime)
 {
 	// Rotate about everything...
 	_shape.Rotate({ .025f, .05f, .025f });
@@ -53,9 +55,9 @@ void Rasteriser::Update(const Bitmap& bitmap)
 	_shape.SetScale({ scaleFactor, scaleFactor, scaleFactor * scaleFactor });
 
 	// Move around in circles, all together now
-	_shape.SetPosition({ _startingPosition.X + std::cos(_timeElapsed) * 100, _startingPosition.Y + std::sin(_timeElapsed) * 100, 0 });
+	_shape.SetPosition({ std::cos(_timeElapsed) * 100, std::sin(_timeElapsed * 2) * 100, 0 });
 
-	_timeElapsed += 1.f / 60.f;
+	_timeElapsed += deltaTime;
 }
 
 //
@@ -75,19 +77,35 @@ const COLORREF Rasteriser::GetForegroundColour() const
 }
 
 //
+// Logs a message to the output console (Visual Studio only).
+//
+void Rasteriser::Log(const char* const message) const
+{
+	std::ostringstream ss;
+	ss << message;
+	ss << '\n';
+
+	OutputDebugStringA(ss.str().c_str());
+}
+
+//
 // Creates a square shape (default).
 //
 void Rasteriser::CreateShape()
 {
 	if (!MD2Loader::LoadModel("cube.md2", _shape, &Mesh::AddPolygon, &Mesh::AddVertex))
 	{
-		throw;
+		throw ModelLoadingException("cube.md2");
 	}
 
 	_shape.SetColour(GetForegroundColour());
-	_shape.SetPosition({ 300, 300, 0 });
 
-	_startingPosition = _shape.GetTransform().GetPosition();
+	// Set the internal camera as main
+	_camera.SetMain();
+	_camera.Transform({ -400, -300, 0 }, { 0 });
+	
+	// Disable projection until it actually works
+	_camera.SetPerspective(false);
 }
 
 //

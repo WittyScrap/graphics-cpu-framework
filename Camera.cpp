@@ -12,7 +12,7 @@ Camera* Camera::_mainCamera;
 //
 Camera::Camera() : _worldToCameraMatrix(Matrix::IdentityMatrix())
 {
-	SetupWorldToCameraMatrix({ 0.f, 0.f, 0.f });
+	SetupMatrices(Matrix::IdentityMatrix());
 }
 
 //
@@ -88,6 +88,42 @@ const Matrix Camera::GetCameraToWorldMatrix() const
 }
 
 //
+// Matrix to transform coordinates from camera space to screen space.
+//
+const Matrix Camera::GetCameraToScreenMatrix() const
+{
+	Matrix cameraToScreenMatrix;
+
+	/*
+	 *	 w/2  0   0  w/2
+	 *	  0 -h/2  0  h/2
+	 *	  0   0  d/2 d/2
+	 *	  0	  0   0   1
+	 */
+	float d = 1 / std::tan((_fieldOfView * static_cast<float>(M_PI) / 180.f) / 2);
+	float width = static_cast<float>(Bitmap::GetActive()->GetWidth());
+	float height = static_cast<float>(Bitmap::GetActive()->GetHeight());
+
+	cameraToScreenMatrix.SetM(0, 0, width / 2);
+	cameraToScreenMatrix.SetM(0, 3, width / 2);
+	cameraToScreenMatrix.SetM(1, 1, -height / 2);
+	cameraToScreenMatrix.SetM(1, 3, height / 2);
+	cameraToScreenMatrix.SetM(2, 2, d / 2);
+	cameraToScreenMatrix.SetM(2, 3, d / 2);
+	cameraToScreenMatrix.SetM(3, 3, 1);
+
+	return cameraToScreenMatrix;
+}
+
+//
+// Matrix to transform coordinates from screen space to camera space.
+//
+const Matrix Camera::GetScreenToCameraMatrix() const
+{
+	return GetCameraToScreenMatrix().Inverse();
+}
+
+//
 // The field of view
 //
 const float Camera::GetFieldOfView() const
@@ -123,11 +159,9 @@ void Camera::SetPerspective(const bool& toggle)
 //
 // Sets the world to camera matrix to a valid initial state.
 //
-void Camera::SetupWorldToCameraMatrix(const Vector3& initialPosition)
+void Camera::SetupMatrices(const Matrix& initialTransform)
 {
-	_worldToCameraMatrix.SetM(0, 3, -initialPosition.X);
-	_worldToCameraMatrix.SetM(1, 3, -initialPosition.Y);
-	_worldToCameraMatrix.SetM(2, 3, -initialPosition.Z);
+	_worldToCameraMatrix = initialTransform;
 }
 
 //

@@ -131,7 +131,64 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cube.md2">
+    <None Include="Meshes\car.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\cartman.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\chef.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\cheff.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\cow.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\cube.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\fighter.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\generator.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\helicopter.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\hheli.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\hummer.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\kenny.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\marvin.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\marvin2.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\megaman.MD2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\policecar.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\teapot.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\trafficlight1.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\TRIS.MD2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Meshes\van.md2">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -37,19 +37,17 @@ const std::vector<Vertex>& Shape::GetShape()
 		Realign();
 	}
 
-	Matrix mv = GetMVP(MV);
-	Camera* const mainCamera = Camera::GetMainCamera();
+	Matrix mvp = GetMVP(MVP);
+	Matrix cameraToScreen = Camera::GetMainCamera() ? Camera::GetMainCamera()->GetCameraToScreenMatrix() : Matrix::IdentityMatrix();
 
 	for (size_t vertex = 0; vertex < _shapeData.size(); ++vertex)
 	{
 		Vertex currentVertex = _shapeData[vertex];
-		Vertex transformed = mv * currentVertex;
+		Vertex transformed = mvp * currentVertex;
 
-		if (mainCamera)
-		{
-			transformed = mainCamera->GetProjectionMatrix() * transformed;
-			transformed.Dehomogenise();
-		}
+		// Convert coordinates to screen-space.
+		transformed = cameraToScreen * transformed;
+
 
 		// Save vertex
 		_transformedShape[vertex] = transformed;

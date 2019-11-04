@@ -90,6 +90,9 @@ void Rasteriser::Log(const char* const message) const
 //
 void Rasteriser::InitialiseComponents(const Bitmap& bitmap)
 {
+	// Set the internal camera as main
+	_camera.SetMain();
+
 	// Add default scene object
 	CreateSceneObject<DefaultObject>();
 
@@ -97,10 +100,6 @@ void Rasteriser::InitialiseComponents(const Bitmap& bitmap)
 	{
 		sceneObject->OnInit();
 	}
-
-	// Set the internal camera as main
-	_camera.SetMain();
-	_camera.Transform({ -1000, -1000, -50 }, { 0 });
 }
 
 //

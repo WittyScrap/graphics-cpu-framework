@@ -21,6 +21,8 @@ public:
 	const Matrix  GetProjectionMatrix() const;
 	const Matrix& GetWorldToCameraMatrix() const;
 	const Matrix  GetCameraToWorldMatrix() const;
+	const Matrix  GetCameraToScreenMatrix() const;
+	const Matrix  GetScreenToCameraMatrix() const;
 
 	//
 	// Field of view accessors.
@@ -49,11 +51,11 @@ private:
 	//
 	// Sets up the view matrix to a valid initial state.
 	//
-	void SetupWorldToCameraMatrix(const Vector3& initialPosition);
+	void SetupMatrices(const Matrix& initialTransform);
 
 private:
 	//
-	// View matrix
+	// View and screen matrix
 	//
 	Matrix _worldToCameraMatrix;
 

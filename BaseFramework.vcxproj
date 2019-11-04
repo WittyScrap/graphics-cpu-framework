@@ -190,7 +190,26 @@
     <ResourceCompile Include="Rasteriser.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cube.md2" />
+    <None Include="Meshes\car.md2" />
+    <None Include="Meshes\cartman.md2" />
+    <None Include="Meshes\chef.md2" />
+    <None Include="Meshes\cheff.md2" />
+    <None Include="Meshes\cow.md2" />
+    <None Include="Meshes\cube.md2" />
+    <None Include="Meshes\fighter.md2" />
+    <None Include="Meshes\generator.md2" />
+    <None Include="Meshes\helicopter.md2" />
+    <None Include="Meshes\hheli.md2" />
+    <None Include="Meshes\hummer.md2" />
+    <None Include="Meshes\kenny.md2" />
+    <None Include="Meshes\marvin.md2" />
+    <None Include="Meshes\marvin2.md2" />
+    <None Include="Meshes\megaman.MD2" />
+    <None Include="Meshes\policecar.md2" />
+    <None Include="Meshes\teapot.md2" />
+    <None Include="Meshes\trafficlight1.md2" />
+    <None Include="Meshes\TRIS.MD2" />
+    <None Include="Meshes\van.md2" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

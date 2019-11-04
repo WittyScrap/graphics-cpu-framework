@@ -1,57 +1,36 @@
 #pragma once
 #include "Point.h"
 
-template<typename TNumeric>
-struct Vector3D
+struct Vector3
 {
-	TNumeric X;
-	TNumeric Y;
-	TNumeric Z;
+public:
+	//
+	// Main member variables are exposed for easier initialisation
+	// and because they are simple holders that do not need any kind
+	// of explicit getter/setter and can be set to any valid float
+	// value without any repercussions.
+	//
+	float X;
+	float Y;
+	float Z;
 
-	// Multiply
-	inline Vector3D<TNumeric> operator*(const Vector3D<TNumeric>& rhs) const
-	{
-		return {
-			X * rhs.X,
-			Y * rhs.Y,
-			Z * rhs.Z
-		};
-	}
-
-	// Multiply by point
-	inline Vector3D<TNumeric> operator*(const TNumeric& rhs) const
-	{
-		return {
-			X * rhs,
-			Y * rhs,
-			Z * rhs
-		};
-	}
-
-	// Negate
-	inline Vector3D<TNumeric> operator-() const
-	{
-		return *this * -1;
-	}
-
-	// Addition
-	inline Vector3D<TNumeric> operator+(const Vector3D<TNumeric>& rhs) const
-	{
-		return {
-			X + rhs.X,
-			Y + rhs.Y,
-			Z + rhs.Z
-		};
-	}
-
-	// Concatenation / addition
-	inline Vector3D<TNumeric> operator+=(const Vector3D<TNumeric>& rhs) const
-	{
-		return *this + rhs;
-	}
+	//
+	// Mathematics operators
+	//
+	Vector3& operator= (const Vector3& rhs);
+	Vector3  operator+ (const Vector3& rhs) const;
+	Vector3  operator- (const Vector3& rhs) const;
+	Vector3  operator* (const Vector3& rhs) const;
+	Vector3  operator/ (const Vector3& rhs) const;
+	Vector3  operator+=(const Vector3& rhs) const;
+	Vector3  operator-=(const Vector3& rhs) const;
+	Vector3  operator*=(const Vector3& rhs) const;
+	Vector3  operator/=(const Vector3& rhs) const;
+	Vector3  operator- () const;
+	
+	//
+	// Comparison operators
+	//
+	bool operator==(const Vector3& rhs) const;
+	bool operator!=(const Vector3& rhs) const;
 };
-
-//
-// Standard definition of 3D vector.
-//
-using Vector3 = Vector3D<float>;

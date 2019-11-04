@@ -69,7 +69,7 @@ protected:
 	const Matrix GetMVP() const;
 
 private:
-	COLORREF _shapeColor; // The colour of the shape.
+	COLORREF _shapeColour; // The colour of the shape.
 
 	std::vector<Vertex> _shapeData;			// Where the model-space vertices will be stored.
 	std::vector<Vertex> _transformedShape;	// Where the world-space vertices will be stored and updated.

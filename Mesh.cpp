@@ -1,4 +1,6 @@
 #include "Mesh.h"
+#include "ModelLoadingException.h"
+#include "MD2Loader.h"
 
 //
 // Default constructor.
@@ -11,6 +13,17 @@ Mesh::Mesh() : _previousPen { 0 }
 //
 Mesh::~Mesh()
 { }
+
+//
+// Loads the mesh data from a file.
+//
+void Mesh::LoadFromFile(const char* const fileName)
+{
+	if (!MD2Loader::LoadModel(fileName, *this, &Mesh::AddPolygon, &Mesh::AddVertex))
+	{
+		throw ModelLoadingException(fileName);
+	}
+}
 
 //
 // Returns a constant, read-only reference to the list of polygons.

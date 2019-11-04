@@ -12,6 +12,9 @@ public:
 	Mesh();
 	~Mesh();
 
+	// Loads the mesh data from a file.
+	void LoadFromFile(const char* const fileName);
+
 	//
 	// Accessors
 	//

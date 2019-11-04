@@ -5,7 +5,7 @@
 #include <cmath>
 
 // Definition for static member
-const Camera* Camera::_mainCamera;
+Camera* Camera::_mainCamera;
 
 //
 // Default constructor
@@ -152,7 +152,7 @@ void Camera::Transform(const Vector3& position, const Vector3& rotation)
 //
 // Returns the main camera
 //
-const Camera* const Camera::GetMainCamera()
+Camera* const Camera::GetMainCamera()
 {
 	return _mainCamera;
 }
@@ -160,7 +160,7 @@ const Camera* const Camera::GetMainCamera()
 //
 // Sets this camera as the main camera.
 //
-void Camera::SetMain() const
+void Camera::SetMain()
 {
 	_mainCamera = this;
 }

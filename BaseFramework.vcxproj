@@ -103,6 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DefaultObject.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MD2Loader.cpp" />
@@ -154,22 +156,26 @@
     <ClCompile Include="ModelLoadingException.cpp" />
     <ClCompile Include="Polygon3D.cpp" />
     <ClCompile Include="Rasteriser.cpp" />
+    <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Square.cpp" />
+    <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DefaultObject.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MD2Loader.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelLoadingException.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="Rasteriser.h" />
+    <ClInclude Include="SceneObject.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Polygon3D.h" />
-    <ClInclude Include="Rasteriser.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Square.h" />

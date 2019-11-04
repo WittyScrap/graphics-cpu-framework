@@ -7,7 +7,7 @@
 Shape::Shape() : _position(Matrix::IdentityMatrix()),
 				 _rotation(Matrix::IdentityMatrix()),
 				 _scale(Matrix::IdentityMatrix()),
-				 _shapeColor(RGB(0, 0, 0))
+				 _shapeColour(RGB(0, 0, 0))
 { }
 
 //
@@ -120,7 +120,7 @@ const size_t Shape::GetVerticesCount() const
 //
 const COLORREF& Shape::GetColour() const
 {
-	return _shapeColor;
+	return _shapeColour;
 }
 
 //
@@ -128,7 +128,7 @@ const COLORREF& Shape::GetColour() const
 //
 void Shape::SetColour(const COLORREF& colour)
 {
-	_shapeColor = colour;
+	_shapeColour = colour;
 }
 
 //

@@ -1,7 +1,7 @@
 #include "Rasteriser.h"
-#include "Point.h"
-#include "MD2Loader.h"
+#include "DefaultObject.h"
 #include <cmath>
+#include <algorithm>
 
 Rasteriser app;
 
@@ -14,7 +14,7 @@ bool Rasteriser::Initialise()
 
 	try
 	{
-		CreateShape();
+		InitialiseComponents();
 
 		// Everything went well (hopefully)...
 		exitCode = true;
@@ -39,53 +39,24 @@ void Rasteriser::Render(const Bitmap& bitmap)
 	HDC hdc = bitmap.GetDC();
 
 	Clear(clearColour, bitmap);
-	_shape.Draw(hdc);
+
+	for (auto& sceneObject : _sceneObjects)
+	{
+		sceneObject->Draw(hdc);
+	}
 }
 
 //
 // Handles moving the square about
 //
-void Rasteriser::Update(const Bitmap& bitmap, const float& deltaTime)
+void Rasteriser::Tick(const Bitmap& bitmap, const float& deltaTime)
 {
-	// Rotate about everything...
-	_shape.Rotate({ .025f, .05f, .025f });
-
-	// Wobbly scale woo...
-	float scaleFactor = std::sin(_timeElapsed * .5f) * 2;
-	_shape.SetScale({ scaleFactor, scaleFactor, scaleFactor * scaleFactor });
-
-	// Move around in circles, all together now
-	_shape.SetPosition({ std::cos(_timeElapsed) * 100, std::sin(_timeElapsed * 2) * 100, 0 });
-
 	_timeElapsed += deltaTime;
 
-	// Move the camera, hurray!
-	Vector3 cameraMovement{ 0, 0, 0 };
-
-	if (IsKeyHeld(VK_LEFT))
+	for (auto& sceneObject : _sceneObjects)
 	{
-		cameraMovement.X -= 10.f;
+		sceneObject->OnTick(deltaTime);
 	}
-
-	if (IsKeyHeld(VK_RIGHT))
-	{
-		cameraMovement.X += 10.f;
-	}
-
-	if (IsKeyHeld(VK_UP))
-	{
-		cameraMovement.Y -= 10.f;
-	}
-
-	if (IsKeyHeld(VK_DOWN))
-	{
-		cameraMovement.Y += 10.f;
-	}
-
-	Vector3 cameraPosition = _camera.GetCameraToWorldMatrix().GetPosition();
-	cameraPosition = cameraPosition + cameraMovement;
-
-	_camera.Transform(cameraPosition, { 0, 0, 0 });
 }
 
 //
@@ -94,14 +65,6 @@ void Rasteriser::Update(const Bitmap& bitmap, const float& deltaTime)
 const COLORREF Rasteriser::GetBackgroundColour() const
 {
 	return _background;
-}
-
-//
-// The colour for the shapes wireframe.
-//
-const COLORREF Rasteriser::GetForegroundColour() const
-{
-	return _shapeColor;
 }
 
 //
@@ -119,14 +82,15 @@ void Rasteriser::Log(const char* const message) const
 //
 // Creates a square shape (default).
 //
-void Rasteriser::CreateShape()
+void Rasteriser::InitialiseComponents()
 {
-	if (!MD2Loader::LoadModel("cube.md2", _shape, &Mesh::AddPolygon, &Mesh::AddVertex))
-	{
-		throw ModelLoadingException("cube.md2");
-	}
+	// Add default scene object
+	CreateSceneObject<DefaultObject>();
 
-	_shape.SetColour(GetForegroundColour());
+	for (auto& sceneObject : _sceneObjects)
+	{
+		sceneObject->OnInit();
+	}
 
 	// Set the internal camera as main
 	_camera.SetMain();
@@ -187,4 +151,32 @@ bool Rasteriser::IsKeyUp(int keyCode)
 	{
 		return false;
 	}
+}
+
+//
+// The time elapsed since the initialisation of this rasteriser.
+//
+const float& Rasteriser::GetTimeElapsed() const
+{
+	return _timeElapsed;
+}
+
+//
+// Deletes an object from the scene.
+//
+void Rasteriser::DeleteSceneObject(const SceneObject& object)
+{
+	auto searchFunction = [&object](const std::unique_ptr<SceneObject>& obj) -> bool {
+		return *obj == object;
+	};
+
+	auto obj_ptr = std::find_if(_sceneObjects.begin(), _sceneObjects.end(), searchFunction);
+
+	if (obj_ptr == _sceneObjects.end())
+	{
+		throw std::exception("The object that is being deleted does not exist.");
+	}
+
+	(*obj_ptr)->OnDelete();
+	_sceneObjects.erase(obj_ptr);
 }

@@ -41,8 +41,8 @@ public:
 	//
 	// Main camera
 	//
-	static const Camera* const GetMainCamera();
-	void SetMain() const;
+	static Camera* const GetMainCamera();
+	void SetMain();
 
 private:
 	//
@@ -61,7 +61,7 @@ private:
 	//
 	// The main camera object
 	//
-	static const Camera* _mainCamera;
+	static Camera* _mainCamera;
 
 	//
 	// Clip planes

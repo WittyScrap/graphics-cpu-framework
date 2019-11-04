@@ -14,12 +14,18 @@ public:
 	void			Clear(HBRUSH hBrush) const;
 	void			Clear(COLORREF colour) const;
 
+	void					   MakeActive() const;
+	static const Bitmap* const GetActive();
+
 private:
 	HBITMAP			_hBitmap{ 0 };
 	HBITMAP			_hOldBitmap{ 0 };
 	HDC				_hMemDC{ 0 };
 	unsigned int	_width{ 0 };
 	unsigned int	_height{ 0 };
+
+	// Active bitmap
+	static const Bitmap* _activeBitmap;
 
 	void DeleteBitmap();
 };

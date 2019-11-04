@@ -23,6 +23,7 @@ public:
 	const Vertex operator+(const Vertex& rhs) const;
 
 	const Vector3 AsPoint();
+	void Dehomogenise();
 private:
 	float _x;
 	float _y;

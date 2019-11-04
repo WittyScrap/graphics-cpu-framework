@@ -15,7 +15,7 @@ class Rasteriser : public Framework
 {
 public:
 	// Initialises the square corners.
-	virtual bool Initialise() override;
+	virtual bool Initialise(const Bitmap& bitmap) override;
 
 	virtual void Render(const Bitmap& bitmap) override;
 	virtual void Tick(const Bitmap& bitmap, const float& deltaTime) override;
@@ -44,7 +44,7 @@ protected:
 	//
 	// Shape generation and handling.
 	// 
-	virtual void InitialiseComponents();
+	virtual void InitialiseComponents(const Bitmap& bitmap);
 
 	// 
 	// Drawing utils

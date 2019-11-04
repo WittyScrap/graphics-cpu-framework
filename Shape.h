@@ -66,7 +66,7 @@ protected:
 	// World-space vertices (read-only).
 	//
 	virtual const std::vector<Vertex>& GetShape();
-	const Matrix GetMVP() const;
+	const Matrix GetMVP(const char& type) const;
 
 private:
 	COLORREF _shapeColour; // The colour of the shape.

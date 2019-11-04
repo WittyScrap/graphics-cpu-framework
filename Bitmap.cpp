@@ -1,5 +1,7 @@
 #include "Bitmap.h"
 
+const Bitmap* Bitmap::_activeBitmap;
+
 Bitmap::Bitmap()
 {
 }
@@ -108,4 +110,14 @@ void Bitmap::Clear(COLORREF colour) const
 	HBRUSH brush = CreateSolidBrush(colour);
 	Clear(brush);
 	DeleteObject(brush);
+}
+
+void Bitmap::MakeActive() const
+{
+	_activeBitmap = this;
+}
+
+const Bitmap* const Bitmap::GetActive()
+{
+	return _activeBitmap;
 }

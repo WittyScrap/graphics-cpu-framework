@@ -77,3 +77,11 @@ const Vector3 Vertex::AsPoint()
 {
 	return { _x, _y };
 }
+
+void Vertex::Dehomogenise()
+{
+	_x /= _w;
+	_y /= _w;
+	_z /= _w;
+	_w = 1; /* w/w = 1 */
+}

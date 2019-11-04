@@ -50,7 +50,7 @@ int Framework::Run(HINSTANCE hInstance, int nCmdShow)
 	{
 		return -1;
 	}
-	if (!Initialise())
+	if (!Initialise(_bitmap))
 	{
 		return -1;
 	}
@@ -127,7 +127,7 @@ int Framework::MainLoop()
 //
 // Return false if the application cannot be initialised.
 
-bool Framework::Initialise()
+bool Framework::Initialise(const Bitmap& bitmap)
 {
 	return true;
 }
@@ -210,6 +210,7 @@ bool Framework::InitialiseMainWindow(int nCmdShow)
 	RECT clientArea;
 	GetClientRect(_hWnd, &clientArea);
 	_bitmap.Create(_hWnd, clientArea.right - clientArea.left, clientArea.bottom - clientArea.top);
+	_bitmap.MakeActive();
 	return true;
 }
 

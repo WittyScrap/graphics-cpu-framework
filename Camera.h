@@ -1,6 +1,7 @@
 #pragma once
 #include "Matrix.h"
 #include "Vector.h"
+#include "Bitmap.h"
 
 //
 // Scene camera.
@@ -17,7 +18,7 @@ public:
 	//
 	// Transformation matrices
 	//
-	const Matrix& GetProjectionMatrix() const;
+	const Matrix  GetProjectionMatrix() const;
 	const Matrix& GetWorldToCameraMatrix() const;
 	const Matrix  GetCameraToWorldMatrix() const;
 
@@ -46,16 +47,14 @@ public:
 
 private:
 	//
-	// Sets up the projection matrix to a valid initial state.
+	// Sets up the view matrix to a valid initial state.
 	//
-	void SetupProjectionMatrix();
 	void SetupWorldToCameraMatrix(const Vector3& initialPosition);
 
 private:
 	//
-	// Internal matrices
+	// View matrix
 	//
-	Matrix _projectionMatrix;
 	Matrix _worldToCameraMatrix;
 
 	//
@@ -64,22 +63,9 @@ private:
 	static Camera* _mainCamera;
 
 	//
-	// Clip planes
+	// Field of view and projection parameters
 	//
-	float _far	= 0;
-	float _near = 0;
-
-	//
-	// Offset
-	//
-	float _left		=  .01f;
-	float _right	= -.01f;
-	float _top		=  .01f;
-	float _bottom	= -.01f;
-
-	//
-	// Options
-	//
+	float _fieldOfView = 90.f;
 	bool _isPerspective = true;
 };
 

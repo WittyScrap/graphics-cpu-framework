@@ -8,13 +8,13 @@ Rasteriser app;
 //
 // Initialises the class and the shape vertices.
 //
-bool Rasteriser::Initialise()
+bool Rasteriser::Initialise(const Bitmap& bitmap)
 {
 	bool exitCode;
 
 	try
 	{
-		InitialiseComponents();
+		InitialiseComponents(bitmap);
 
 		// Everything went well (hopefully)...
 		exitCode = true;
@@ -35,6 +35,12 @@ bool Rasteriser::Initialise()
 //
 void Rasteriser::Render(const Bitmap& bitmap)
 {
+	// No active bitmap = not yet fully ready to draw.
+	if (!Bitmap::GetActive())
+	{
+		return;
+	}
+
 	COLORREF clearColour = GetBackgroundColour();
 	HDC hdc = bitmap.GetDC();
 
@@ -82,7 +88,7 @@ void Rasteriser::Log(const char* const message) const
 //
 // Creates a square shape (default).
 //
-void Rasteriser::InitialiseComponents()
+void Rasteriser::InitialiseComponents(const Bitmap& bitmap)
 {
 	// Add default scene object
 	CreateSceneObject<DefaultObject>();
@@ -94,10 +100,7 @@ void Rasteriser::InitialiseComponents()
 
 	// Set the internal camera as main
 	_camera.SetMain();
-	_camera.Transform({ -400, -300, 0 }, { 0 });
-	
-	// Disable projection until it actually works
-	_camera.SetPerspective(false);
+	_camera.Transform({ -1000, -1000, -50 }, { 0 });
 }
 
 //

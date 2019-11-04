@@ -10,10 +10,8 @@ Camera* Camera::_mainCamera;
 //
 // Default constructor
 //
-Camera::Camera() : _projectionMatrix (Matrix::ZeroMatrix()), _worldToCameraMatrix(Matrix::IdentityMatrix()), _near(.1f), _far(1000.f)
+Camera::Camera() : _worldToCameraMatrix(Matrix::IdentityMatrix())
 {
-	// Initial matrix setup
-	SetupProjectionMatrix();
 	SetupWorldToCameraMatrix({ 0.f, 0.f, 0.f });
 }
 
@@ -28,16 +26,49 @@ Camera::~Camera()
 //
 Camera::Camera(const Camera& other)
 {
-	_projectionMatrix = other._projectionMatrix;
 	_worldToCameraMatrix = other._worldToCameraMatrix;
 }
 
 //
 // The projection matrix.
 //
-const Matrix& Camera::GetProjectionMatrix() const
+const Matrix Camera::GetProjectionMatrix() const
 {
-	return _projectionMatrix;
+	Matrix projectionMatrix;
+	float d = 1 / std::tan((_fieldOfView * static_cast<float>(M_PI) / 180.f) / 2);
+
+	if (!_isPerspective)
+	{
+		/*
+		 *	1  0  0  0
+		 *  0  1  0  0
+		 *  0  0  0  d
+		 *  0  0  0  1
+		 */
+
+		projectionMatrix = Matrix::IdentityMatrix();
+		projectionMatrix.SetM(2, 2, 0);
+		projectionMatrix.SetM(2, 3, d);
+	}
+	else // ^^^^^ Orthographic projection ^^^^^ / vvvvv Perspective projection vvvvv
+	{
+		/*
+		 * d/a 0  0  0
+		 *  0  d  0  0	Where:
+		 *  0  0  d  0	  - a = width / height
+		 *  0  0  1  0
+		 */
+
+		float aspect = static_cast<float>(Bitmap::GetActive()->GetWidth()) / static_cast<float>(Bitmap::GetActive()->GetHeight());
+		projectionMatrix = Matrix::IdentityMatrix();
+		projectionMatrix.SetM(0, 0, d / aspect);
+		projectionMatrix.SetM(1, 1, d);
+		projectionMatrix.SetM(2, 2, d);
+		projectionMatrix.SetM(3, 3, 0);
+		projectionMatrix.SetM(3, 2, 1);
+	}
+
+	return projectionMatrix;
 }
 
 //
@@ -61,9 +92,8 @@ const Matrix Camera::GetCameraToWorldMatrix() const
 //
 const float Camera::GetFieldOfView() const
 {
-	float t = _projectionMatrix.GetM(1, 1);
-	const float radToDegrees = 180.f / static_cast<float>(M_PI);
-	return std::atan(1.f / t) * 2.f * radToDegrees;
+	// To redo!
+	return 360.f; // I'm a spider.
 }
 
 //
@@ -71,10 +101,7 @@ const float Camera::GetFieldOfView() const
 //
 void Camera::SetFieldOfView(const float& fieldOfView)
 {
-	float scale = 1.f / tan(fieldOfView * 0.5f * static_cast<float>(M_PI) / 180.f);
-
-	_projectionMatrix.SetM(0, 0, scale); // scale the x coordinates of the projected point 
-	_projectionMatrix.SetM(1, 1, scale); // scale the y coordinates of the projected point
+	// To redo!
 }
 
 //
@@ -90,45 +117,7 @@ const bool& Camera::IsPerspective() const
 //
 void Camera::SetPerspective(const bool& toggle)
 {
-	if (_isPerspective && !toggle)
-	{
-		_projectionMatrix = Matrix::IdentityMatrix();
-	}
-	
-	if (!_isPerspective && toggle)
-	{
-		SetupProjectionMatrix();
-	}
-
 	_isPerspective = toggle;
-}
-
-//
-// Sets up the projection matrix to a valid initial state.
-//
-void Camera::SetupProjectionMatrix()
-{
-	/*
-	 ( x  0  a  0 )       x = 2*near/(right-left)          y = 2*near/(top-bottom)
-	 ( 0  y  b  0 )       a = (right+left)/(right-left)    b = (top+bottom)/(top-bottom)
-	 ( 0  0  c  d )       c = -(far+near)/(far-near)       d = -(2*far*near)/(far-near)
-	 ( 0  0  e  0 )       e = 1
-	*/
-
-	float x = 2 * _near / (_right - _left);
-	float y = 2 * _near / (_top - _bottom);
-	float a = (_right + _left) / (_right - _left);
-	float b = (_top + _bottom) / (_top - _bottom);
-	float c = -(_far - _near) / (_far - _near);
-	float d = -(2 * _far * _near) / (_far - _near);
-	float e = -1;
-
-	_projectionMatrix.SetM(0, 0, x);
-	_projectionMatrix.SetM(1, 1, y);
-	_projectionMatrix.SetM(0, 2, a);
-	_projectionMatrix.SetM(1, 2, b);
-	_projectionMatrix.SetM(2, 2, c);
-	_projectionMatrix.SetM(3, 2, e);
 }
 
 //

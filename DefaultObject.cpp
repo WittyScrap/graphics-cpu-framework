@@ -23,6 +23,9 @@ void DefaultObject::OnInit()
 //
 void DefaultObject::OnTick(const float& deltaTime)
 {
+	// Deal with this later...
+	return;
+
 	// Rotate about everything...
 	Rotate({ .025f, .05f, .025f });
 

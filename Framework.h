@@ -16,7 +16,7 @@ public:
 
 	LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	virtual bool Initialise();
+	virtual bool Initialise(const Bitmap& bitmap);
 	virtual void Tick(const Bitmap &bitmap, const float& deltaTime);
 	virtual void Render(const Bitmap &bitmap);
 	virtual void Shutdown();

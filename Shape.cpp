@@ -1,6 +1,15 @@
 #include "Shape.h"
 #include "Camera.h"
 
+#define M	0b00000001
+#define V	0b00000010
+#define P	0b00000100
+
+#define MV	M | V
+#define MP	M | P
+#define VP	V | P
+#define MVP M | V | P
+
 //
 // Default constructor
 //
@@ -28,12 +37,19 @@ const std::vector<Vertex>& Shape::GetShape()
 		Realign();
 	}
 
-	Matrix MVP = GetMVP();
+	Matrix mv = GetMVP(MV);
+	Camera* const mainCamera = Camera::GetMainCamera();
 
 	for (size_t vertex = 0; vertex < _shapeData.size(); ++vertex)
 	{
 		Vertex currentVertex = _shapeData[vertex];
-		Vertex transformed = MVP * currentVertex;
+		Vertex transformed = mv * currentVertex;
+
+		if (mainCamera)
+		{
+			transformed = mainCamera->GetProjectionMatrix() * transformed;
+			transformed.Dehomogenise();
+		}
 
 		// Save vertex
 		_transformedShape[vertex] = transformed;
@@ -45,19 +61,23 @@ const std::vector<Vertex>& Shape::GetShape()
 //
 // Model, View, Projection matrix.
 //
-const Matrix Shape::GetMVP() const
+const Matrix Shape::GetMVP(const char& type) const
 {
-	Matrix M = GetTransform();
+	bool hasM = (type & M) == M;
+	bool hasV = (type & V) == V;
+	bool hasP = (type & P) == P;
+
+	Matrix _M = hasM ? GetTransform() : Matrix::IdentityMatrix();
 
 	if (Camera::GetMainCamera())
 	{
-		Matrix V = Camera::GetMainCamera()->GetWorldToCameraMatrix();
-		Matrix P = Camera::GetMainCamera()->GetProjectionMatrix();
+		Matrix _V = hasV ? Camera::GetMainCamera()->GetWorldToCameraMatrix() : Matrix::IdentityMatrix();
+		Matrix _P = hasP ? Camera::GetMainCamera()->GetProjectionMatrix()	 : Matrix::IdentityMatrix();
 
-		return P * V * M;
+		return _P * _V * _M;
 	}
 
-	return M;
+	return _M;
 }
 
 //

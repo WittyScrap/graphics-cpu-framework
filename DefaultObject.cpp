@@ -5,7 +5,7 @@
 //
 // Initialiser constructor...
 //
-DefaultObject::DefaultObject(Rasteriser& world) : SceneObject(world)
+DefaultObject::DefaultObject(Rasteriser& world) : SceneObject(world), _pedistal{NULL}, _figurine{NULL}
 { }
 
 //
@@ -14,15 +14,19 @@ DefaultObject::DefaultObject(Rasteriser& world) : SceneObject(world)
 void DefaultObject::OnInit()
 {
 	// Create a cube mesh for the pedistal and a marvin mesh for reasons.
-	_pedistal = &CreateShape<Mesh>();
-	_figurine = &CreateShape<Mesh>();
+	_pedistal = CreateShape<Mesh>();
+	_figurine = CreateShape<Mesh>();
 
 	// Actually load the meshes because you haven't yet
 	_pedistal->LoadFromFile("Meshes/cube.md2");
 	_figurine->LoadFromFile("Meshes/marvin.md2");
 
+	// Set colour
+	_pedistal->SetColour(_shapeColour);
+	_figurine->SetColour(_shapeColour);
+
 	// Place the cube underneath
-	_pedistal->SetPosition({ 0, 0, 0 });
+	_pedistal->SetPosition({ 0, -43.f, 0 });
 
 	Camera::GetMainCamera()->SetPosition({ 0, 0, -50 });
 	
@@ -43,7 +47,6 @@ void DefaultObject::OnTick(const float& deltaTime)
 	Vector3 angle = { 0.f, .025f, 0.f };
 
 	// A nice spinning animation!
-	_pedistal->Rotate(angle);
 	_figurine->Rotate(angle);
 
 	// Move the camera, hurray!

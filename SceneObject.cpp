@@ -1,5 +1,6 @@
 #include "SceneObject.h"
 #include "Rasteriser.h"
+#include <algorithm>
 
 //
 // Default constructor.
@@ -53,14 +54,18 @@ void SceneObject::Render(const HDC& hdc)
 //
 void SceneObject::DestroyShape(const Shape& shape)
 {
-	std::vector<Shape>::const_iterator shapeFinder = std::find(_shapes.begin(), _shapes.end(), shape);
+	auto searchFunction = [&shape](const std::unique_ptr<Shape>& obj) -> bool {
+		return *obj == shape;
+	};
 
-	if (shapeFinder == _shapes.end())
+	auto obj_ptr = std::find_if(_shapes.begin(), _shapes.end(), searchFunction);
+
+	if (obj_ptr == _shapes.end())
 	{
-		return;
+		throw std::exception("The object that is being deleted does not exist.");
 	}
 
-	_shapes.erase(shapeFinder);
+	_shapes.erase(obj_ptr);
 }
 
 //

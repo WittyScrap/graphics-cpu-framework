@@ -39,7 +39,7 @@ public:
 	// Internal shape management
 	//
 	template <class TShapeType>
-	TShapeType& CreateShape();
+	TShapeType* const CreateShape();
 	void DestroyShape(const Shape& shape);
 
 protected:
@@ -59,7 +59,7 @@ private:
 // Creates a new shape object
 //
 template<class TShapeType>
-inline TShapeType& SceneObject::CreateShape()
+inline TShapeType* const SceneObject::CreateShape()
 {
 	if constexpr (!std::is_base_of<Shape, TShapeType>::value)
 	{
@@ -67,7 +67,7 @@ inline TShapeType& SceneObject::CreateShape()
 	}
 
 	_shapes.push_back(std::make_unique<TShapeType>());
-	TShapeType& createdShape = *_shapes.back();
+	TShapeType* const createdShape = dynamic_cast<TShapeType*>(_shapes.back().get());
 
 	return createdShape;
 }

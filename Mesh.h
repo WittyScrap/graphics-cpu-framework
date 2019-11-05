@@ -42,7 +42,7 @@ private:
 	//
 	// Drawing tools
 	//
-	void DrawPolygon(const Polygon3D& polygon, const HDC& hdc);
+	void DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vertices, const HDC& hdc);
 
 private:
 	std::vector<Polygon3D> _polygons;

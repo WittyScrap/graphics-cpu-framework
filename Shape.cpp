@@ -30,27 +30,22 @@ Shape::~Shape()
 //
 // Returns a vertex group containing every vertex in the internal shape, transformed by the matrix.
 //
-const std::vector<Vertex>& Shape::GetShape()
+const std::vector<Vertex>& Shape::CalculateTransformations()
 {
-	if (_shapeData.size() != _transformedShape.size())
-	{
-		Realign();
-	}
+	const Camera* const activeCamera = Camera::GetMainCamera();
+	const size_t  verticesCount = _shapeData.size();
 
 	Matrix mvp = GetMVP(MVP);
-	Matrix cameraToScreen = Camera::GetMainCamera() ? Camera::GetMainCamera()->GetCameraToScreenMatrix() : Matrix::IdentityMatrix();
+	Matrix cameraToScreen = Matrix::IdentityMatrix();
 
-	for (size_t vertex = 0; vertex < _shapeData.size(); ++vertex)
+	if (activeCamera)
 	{
-		Vertex currentVertex = _shapeData[vertex];
-		Vertex transformed = mvp * currentVertex;
+		cameraToScreen = activeCamera->GetCameraToScreenMatrix();
+	}
 
-		// Convert coordinates to screen-space.
-		transformed = cameraToScreen * transformed;
-
-
-		// Save vertex
-		_transformedShape[vertex] = transformed;
+	for (size_t i = 0; i < verticesCount; ++i)
+	{
+		_transformedShape[i] = cameraToScreen * mvp* _shapeData[i];
 	}
 
 	return _transformedShape;
@@ -79,26 +74,12 @@ const Matrix Shape::GetMVP(const char& type) const
 }
 
 //
-// Ensures the transformation vector and the model vector contain
-// the same number of elements.
-//
-void Shape::Realign()
-{
-	_transformedShape.clear();
-	_transformedShape.resize(_shapeData.size());
-
-	for (size_t i = 0; i < _shapeData.size(); ++i)
-	{
-		_transformedShape[i] = _shapeData[i];
-	}
-}
-
-//
 // Pushes a vertex
 //
 void Shape::CreateVertex(const Vertex& vertex)
 {
 	_shapeData.push_back(vertex);
+	_transformedShape.resize(_shapeData.size(), Vertex(vertex));
 }
 
 //

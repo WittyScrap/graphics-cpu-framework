@@ -62,11 +62,14 @@ void Mesh::AddPolygon(int i0, int i1, int i2)
 //
 void Mesh::Draw(HDC hdc)
 {
+	// Calculate transformed vertices
+	const auto& vertices = CalculateTransformations();
+
 	SetPen(hdc, GetColour());
 
-	for (Polygon3D polygon : _polygons)
+	for (const Polygon3D& polygon : _polygons)
 	{
-		DrawPolygon(polygon, hdc);
+		DrawPolygon(polygon, vertices, hdc);
 	}
 
 	SelectObject(hdc, _previousPen);
@@ -95,10 +98,8 @@ void Mesh::ResetPen(const HDC& hdc)
 //
 // Draws a single polygon.
 //
-void Mesh::DrawPolygon(const Polygon3D& polygon, const HDC& hdc)
+void Mesh::DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vertices, const HDC& hdc)
 {
-	std::vector<Vertex> vertices = GetShape();
-
 	Vertex a = vertices[polygon.GetIndex(0)];
 	Vertex b = vertices[polygon.GetIndex(1)];
 	Vertex c = vertices[polygon.GetIndex(2)];

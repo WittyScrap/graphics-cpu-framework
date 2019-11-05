@@ -14,10 +14,10 @@ DefaultObject::DefaultObject(Rasteriser& world) : SceneObject(world)
 void DefaultObject::OnInit()
 {
 	// Load mesh data...
-	Mesh::LoadFromFile("Meshes/teapot.md2");
+	Mesh::LoadFromFile("Meshes/marvin.md2");
 	SetColour(_shapeColour);
 
-	Camera::GetMainCamera()->Transform({ 0, 0, -50 }, { 0, 0, 0 });
+	Camera::GetMainCamera()->SetPosition({ 0, 0, -50 });
 	
 	// Register all inputs...
 	RegisterInputPair('A', 'D', "Horizontal");
@@ -49,10 +49,14 @@ void DefaultObject::OnTick(const float& deltaTime)
 
 	Camera* const mainCamera = Camera::GetMainCamera();
 
-	Vector3 cameraPosition = mainCamera->GetCameraToWorldMatrix().GetPosition();
-	cameraPosition = cameraPosition + cameraMovement;
+	Vector3 cameraPosition = mainCamera->GetPosition();
+	Vector3 cameraRotangle = mainCamera->GetRotation();
 
-	mainCamera->Transform(cameraPosition, cameraRotation);
+	cameraPosition = cameraPosition + cameraMovement;
+	cameraRotangle = cameraRotangle + cameraRotation;
+
+	mainCamera->SetPosition(cameraPosition);
+	mainCamera->SetRotation(cameraRotangle);
 }
 
 //

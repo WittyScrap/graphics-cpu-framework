@@ -10,10 +10,10 @@ Camera* Camera::_mainCamera;
 //
 // Default constructor
 //
-Camera::Camera() : _worldToCameraMatrix(Matrix::IdentityMatrix())
-{
-	SetupMatrices(Matrix::IdentityMatrix());
-}
+Camera::Camera() : _worldToCameraMatrix(Matrix::IdentityMatrix()),
+				   _position(Matrix::IdentityMatrix()),
+				   _rotation(Matrix::IdentityMatrix())
+{ }
 
 //
 // Destructor
@@ -128,8 +128,7 @@ const Matrix Camera::GetScreenToCameraMatrix() const
 //
 const float Camera::GetFieldOfView() const
 {
-	// To redo!
-	return 360.f; // I'm a spider.
+	return _fieldOfView;
 }
 
 //
@@ -137,7 +136,7 @@ const float Camera::GetFieldOfView() const
 //
 void Camera::SetFieldOfView(const float& fieldOfView)
 {
-	// To redo!
+	_fieldOfView = fieldOfView;
 }
 
 //
@@ -157,19 +156,64 @@ void Camera::SetPerspective(const bool& toggle)
 }
 
 //
-// Sets the world to camera matrix to a valid initial state.
+// Sets the internal position and world2cam matrices
 //
-void Camera::SetupMatrices(const Matrix& initialTransform)
+void Camera::SetPosition(const Vector3& position)
 {
-	_worldToCameraMatrix = initialTransform;
+	_position = {
+		1, 0, 0, -position.X,
+		0, 1, 0, -position.Y,
+		0, 0, 1, -position.Z,
+		0, 0, 0, 1
+	};
+
+	_worldToCameraMatrix = _position * _rotation;
 }
 
 //
-// Allows the camera to be placed in a certain position and rotation.
+// Sets the internal rotation and world2cam matrices
 //
-void Camera::Transform(const Vector3& position, const Vector3& rotation)
+void Camera::SetRotation(const Vector3& rotation)
 {
-	_worldToCameraMatrix = Matrix::TRS(-position, -rotation, { 1, 1, 1 });
+	Matrix rotationX = {
+		   1,		 	 0,					  0,		    0,
+		   0,  std::cos(rotation.X), std::sin(rotation.X), 0,
+		   0, -std::sin(rotation.X), std::cos(rotation.X), 0,
+		   0,			 0,					  0,			1
+	};
+
+	Matrix rotationY = {
+		std::cos(rotation.Y), 0, -std::sin(rotation.Y), 0,
+				 0,			  1,		  0,			0,
+		std::sin(rotation.Y), 0,  std::cos(rotation.Y), 0,
+				 0,			  0,		  0,			1
+	};
+
+	Matrix rotationZ = {
+		 std::cos(rotation.Z), std::sin(rotation.Z), 0, 0,
+		-std::sin(rotation.Z), std::cos(rotation.Z), 0, 0,
+				 0,						  0,		 1, 0,
+				 0,						  0,		 0, 1
+	};
+
+	_rotation = rotationX * rotationY * rotationZ;
+	_worldToCameraMatrix = _position * _rotation;
+}
+
+//
+// The position of this camera
+//
+const Vector3 Camera::GetPosition() const
+{
+	return -_position.GetPosition();
+}
+
+//
+// The rotation of this camera
+//
+const Vector3 Camera::GetRotation() const
+{
+	return -_rotation.GetRotation();
 }
 
 //

@@ -39,7 +39,11 @@ public:
 	//
 	// Allows the camera to be placed in a certain position and rotation
 	//
-	void Transform(const Vector3& position, const Vector3& rotation);
+	void SetPosition(const Vector3& position);
+	void SetRotation(const Vector3& rotation);
+
+	const Vector3 GetPosition() const;
+	const Vector3 GetRotation() const;
 
 	//
 	// Main camera
@@ -49,15 +53,15 @@ public:
 
 private:
 	//
-	// Sets up the view matrix to a valid initial state.
-	//
-	void SetupMatrices(const Matrix& initialTransform);
-
-private:
-	//
 	// View and screen matrix
 	//
 	Matrix _worldToCameraMatrix;
+
+	//
+	// Individual containers
+	//
+	Matrix _position;
+	Matrix _rotation;
 
 	//
 	// The main camera object

@@ -53,10 +53,6 @@ public:
 	void Rotate(const Vector3& amount);
 	void Scale(const Vector3& amount);
 
-private:
-	// Ensures the _shapeData and _transform vectors have the same size.
-	void Realign();
-
 protected:
 	void CreateVertex(const Vertex& vertex);
 	void CreateVertices(const std::vector<Vertex>& vertices);
@@ -65,7 +61,7 @@ protected:
 	//
 	// World-space vertices (read-only).
 	//
-	virtual const std::vector<Vertex>& GetShape();
+	virtual const std::vector<Vertex>& CalculateTransformations();
 	const Matrix GetMVP(const char& type) const;
 
 private:

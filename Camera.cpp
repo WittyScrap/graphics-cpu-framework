@@ -30,7 +30,8 @@ Camera::Camera(const Camera& other)
 }
 
 //
-// The projection matrix.
+// The projection matrix, transforms a point from camera space directly into screen
+// space (merges cam2proj and proj2screen matrices into one function call).
 //
 const Matrix Camera::GetProjectionMatrix() const
 {
@@ -88,11 +89,11 @@ const Matrix Camera::GetCameraToWorldMatrix() const
 }
 
 //
-// Matrix to transform coordinates from camera space to screen space.
+// Matrix to transform coordinates from projection space to screen space.
 //
 const Matrix Camera::GetProjectionToScreenMatrix() const
 {
-	Matrix cameraToScreenMatrix;
+	Matrix projectionToScreenMatrix;
 
 	/*
 	 *	 w/2  0   0  w/2
@@ -104,15 +105,15 @@ const Matrix Camera::GetProjectionToScreenMatrix() const
 	float width = static_cast<float>(Bitmap::GetActive()->GetWidth());
 	float height = static_cast<float>(Bitmap::GetActive()->GetHeight());
 
-	cameraToScreenMatrix.SetM(0, 0, width / 2);
-	cameraToScreenMatrix.SetM(0, 3, width / 2);
-	cameraToScreenMatrix.SetM(1, 1, -height / 2);
-	cameraToScreenMatrix.SetM(1, 3, height / 2);
-	cameraToScreenMatrix.SetM(2, 2, d / 2);
-	cameraToScreenMatrix.SetM(2, 3, d / 2);
-	cameraToScreenMatrix.SetM(3, 3, 1);
+	projectionToScreenMatrix.SetM(0, 0, width / 2);
+	projectionToScreenMatrix.SetM(0, 3, width / 2);
+	projectionToScreenMatrix.SetM(1, 1, -height / 2);
+	projectionToScreenMatrix.SetM(1, 3, height / 2);
+	projectionToScreenMatrix.SetM(2, 2, d / 2);
+	projectionToScreenMatrix.SetM(2, 3, d / 2);
+	projectionToScreenMatrix.SetM(3, 3, 1);
 
-	return cameraToScreenMatrix;
+	return projectionToScreenMatrix;
 }
 
 //

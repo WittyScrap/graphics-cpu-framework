@@ -159,6 +159,7 @@
     <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Square.cpp" />
+    <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
@@ -174,6 +175,7 @@
     <ClInclude Include="Point.h" />
     <ClInclude Include="Rasteriser.h" />
     <ClInclude Include="SceneObject.h" />
+    <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Polygon3D.h" />
     <ClInclude Include="Resource.h" />

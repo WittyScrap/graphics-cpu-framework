@@ -48,7 +48,7 @@ void Rasteriser::Render(const Bitmap& bitmap)
 
 	for (auto& sceneObject : _sceneObjects)
 	{
-		sceneObject->Draw(hdc);
+		sceneObject->Render(hdc);
 	}
 }
 
@@ -98,7 +98,7 @@ void Rasteriser::InitialiseComponents(const Bitmap& bitmap)
 
 	for (auto& sceneObject : _sceneObjects)
 	{
-		sceneObject->OnInit();
+		sceneObject->OnStart();
 	}
 }
 

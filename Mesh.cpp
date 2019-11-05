@@ -19,6 +19,9 @@ Mesh::~Mesh()
 //
 void Mesh::LoadFromFile(const char* const fileName)
 {
+	ClearVertices();
+	_polygons.clear();
+
 	if (!MD2Loader::LoadModel(fileName, *this, &Mesh::AddPolygon, &Mesh::AddVertex))
 	{
 		throw ModelLoadingException(fileName);

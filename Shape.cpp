@@ -13,10 +13,7 @@
 //
 // Default constructor
 //
-Shape::Shape() : _position(Matrix::IdentityMatrix()),
-				 _rotation(Matrix::IdentityMatrix()),
-				 _scale(Matrix::IdentityMatrix()),
-				 _shapeColour(RGB(0, 0, 0))
+Shape::Shape() : _shapeColour(RGB(0, 0, 0))
 { }
 
 //
@@ -54,10 +51,10 @@ const Matrix Shape::GetMVP(const char& type) const
 
 	Matrix _M = hasM ? GetTransform() : Matrix::IdentityMatrix();
 
-	if (Camera::GetMainCamera())
+	if (const Camera* const mainCamera = Camera::GetMainCamera())
 	{
-		Matrix _V = hasV ? Camera::GetMainCamera()->GetWorldToCameraMatrix() : Matrix::IdentityMatrix();
-		Matrix _P = hasP ? Camera::GetMainCamera()->GetProjectionMatrix()	 : Matrix::IdentityMatrix();
+		Matrix _V = hasV ? mainCamera->GetWorldToCameraMatrix() : Matrix::IdentityMatrix();
+		Matrix _P = hasP ? mainCamera->GetProjectionMatrix()	: Matrix::IdentityMatrix();
 
 		return _P * _V * _M;
 	}
@@ -123,60 +120,9 @@ void Shape::SetColour(const COLORREF& colour)
 }
 
 //
-// Returns the combined transformation matrix.
+// Full equality operator.
 //
-const Matrix Shape::GetTransform() const
+const bool operator==(const Shape& lhs, const Shape& rhs)
 {
-	return _position * _rotation * _scale;
-}
-
-//
-// Updates the position matrix.
-//
-void Shape::SetPosition(const Vector3& position)
-{
-	_position = Matrix::TranslationMatrix(position.X, position.Y, position.Z);
-}
-
-//
-// Updates the rotation matrix.
-//
-void Shape::SetRotation(const Vector3& rotation)
-{
-	_rotation = Matrix::RotationMatrix(rotation.X, rotation.Y, rotation.Z);
-}
-
-//
-// Updates the scale matrix.
-//
-void Shape::SetScale(const Vector3& scale)
-{
-	_scale = Matrix::ScaleMatrix(scale.X, scale.Y, scale.Z);
-}
-
-//
-// Translates the shape by a given amount.
-//
-void Shape::Translate(const Vector3& amount)
-{
-	Matrix translation = _position * Matrix::TranslationMatrix(amount.X, amount.Y, amount.Z);
-	_position = translation;
-}
-
-//
-// Rotates the shape by a given amount.
-//
-void Shape::Rotate(const Vector3& amount)
-{
-	Matrix rotation = _rotation * Matrix::RotationMatrix(amount.X, amount.Y, amount.Z);
-	_rotation = rotation;
-}
-
-//
-// Scales the shape by a given amount.
-//
-void Shape::Scale(const Vector3& amount)
-{
-	Matrix scale = _scale * Matrix::ScaleMatrix(amount.X, amount.Y, amount.Z);
-	_scale = scale;
+	return &lhs == &rhs;
 }

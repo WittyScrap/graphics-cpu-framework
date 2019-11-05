@@ -13,9 +13,16 @@ DefaultObject::DefaultObject(Rasteriser& world) : SceneObject(world)
 //
 void DefaultObject::OnInit()
 {
-	// Load mesh data...
-	Mesh::LoadFromFile("Meshes/marvin.md2");
-	SetColour(_shapeColour);
+	// Create a cube mesh for the pedistal and a marvin mesh for reasons.
+	_pedistal = &CreateShape<Mesh>();
+	_figurine = &CreateShape<Mesh>();
+
+	// Actually load the meshes because you haven't yet
+	_pedistal->LoadFromFile("Meshes/cube.md2");
+	_figurine->LoadFromFile("Meshes/marvin.md2");
+
+	// Place the cube underneath
+	_pedistal->SetPosition({ 0, 0, 0 });
 
 	Camera::GetMainCamera()->SetPosition({ 0, 0, -50 });
 	
@@ -33,8 +40,11 @@ void DefaultObject::OnInit()
 //
 void DefaultObject::OnTick(const float& deltaTime)
 {
+	Vector3 angle = { 0.f, .025f, 0.f };
+
 	// A nice spinning animation!
-	Rotate({ 0.f, .025f, 0.f });
+	_pedistal->Rotate(angle);
+	_figurine->Rotate(angle);
 
 	// Move the camera, hurray!
 	Vector3 cameraMovement{ 0, 0, 0 };
@@ -49,14 +59,14 @@ void DefaultObject::OnTick(const float& deltaTime)
 
 	Camera* const mainCamera = Camera::GetMainCamera();
 
-	Vector3 cameraPosition = mainCamera->GetPosition();
-	Vector3 cameraRotangle = mainCamera->GetRotation();
+	Vector3 cameraCurrentPosition = mainCamera->GetPosition();
+	Vector3 cameraCurrentRotation = mainCamera->GetRotation();
 
-	cameraPosition = cameraPosition + cameraMovement;
-	cameraRotangle = cameraRotangle + cameraRotation;
+	cameraCurrentPosition = cameraCurrentPosition + cameraMovement;
+	cameraCurrentRotation = cameraCurrentRotation + cameraRotation;
 
-	mainCamera->SetPosition(cameraPosition);
-	mainCamera->SetRotation(cameraRotangle);
+	mainCamera->SetPosition(cameraCurrentPosition);
+	mainCamera->SetRotation(cameraCurrentRotation);
 }
 
 //

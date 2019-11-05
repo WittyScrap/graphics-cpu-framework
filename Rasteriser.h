@@ -6,6 +6,7 @@
 #include <memory>
 #include "Camera.h"
 #include "SceneObject.h"
+#include "Shape.h"
 #include "ModelLoadingException.h"
 
 //
@@ -37,7 +38,7 @@ public:
 	// Scene object management
 	//
 	template<class TSceneObj>
-	const SceneObject& CreateSceneObject();
+	const TSceneObj& CreateSceneObject();
 	void DeleteSceneObject(const SceneObject& object);
 
 protected:
@@ -58,7 +59,7 @@ private:
 	COLORREF _background = RGB(0xFF, 0xFF, 0xFF);
 	float _timeElapsed = 0;
 
-	// Every shape in the scene
+	// Scene objects and render objects
 	std::vector<std::unique_ptr<SceneObject>> _sceneObjects;
 };
 
@@ -66,7 +67,7 @@ private:
 // Creates a new scene object, adds it to the objects list, returns it.
 //
 template<class TSceneObj>
-const SceneObject& Rasteriser::CreateSceneObject()
+const TSceneObj& Rasteriser::CreateSceneObject()
 {
 	if constexpr (!std::is_base_of<SceneObject, TSceneObj>::value)
 	{
@@ -75,6 +76,9 @@ const SceneObject& Rasteriser::CreateSceneObject()
 
 	_sceneObjects.push_back(std::make_unique<TSceneObj>(*this));
 	TSceneObj& created = *dynamic_cast<TSceneObj*>(_sceneObjects.back().get());
+
+	// OnInit...
+	created.OnInit();
 
 	return created;
 }

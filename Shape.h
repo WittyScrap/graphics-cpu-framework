@@ -3,13 +3,14 @@
 #include "Vector.h"
 #include "Vertex.h"
 #include "Matrix.h"
+#include "Transformable.h"
 #include <Windows.h>
 #include <stack>
 
 //
 // Base shape class (abstract).
 //
-class Shape
+class Shape : public Transformable
 {
 public:
 	Shape();
@@ -30,28 +31,9 @@ public:
 	void SetColour(const COLORREF& colour);
 
 	//
-	// Gets a TRS (Translation Rotation Scale) matrix from
-	// the shape's current location, rotation, and scale
-	// matrices.
+	// Full equality operator.
 	//
-	const Matrix GetTransform() const;
-
-	//
-	// Transformation overrides, these will overwrite
-	// the related current transformation matrices.
-	//
-	void SetPosition(const Vector3& position);
-	void SetRotation(const Vector3& rotation);
-	void SetScale(const Vector3& scale);
-
-	//
-	// Transformation alterations, these will multiply
-	// the related current transformation matrices by
-	// the supplied matrices.
-	//
-	void Translate(const Vector3& amount);
-	void Rotate(const Vector3& amount);
-	void Scale(const Vector3& amount);
+	friend const bool operator==(const Shape& lhs, const Shape& rhs);
 
 protected:
 	void CreateVertex(const Vertex& vertex);
@@ -69,12 +51,5 @@ private:
 
 	std::vector<Vertex> _shapeData;			// Where the model-space vertices will be stored.
 	std::vector<Vertex> _transformedShape;	// Where the world-space vertices will be stored and updated.
-
-	//
-	// Transformation matrices
-	//
-	Matrix _position;
-	Matrix _rotation;
-	Matrix _scale;
 };
 

@@ -2,6 +2,7 @@
 #include "Matrix.h"
 #include "Vector.h"
 #include "Bitmap.h"
+#include "Transformable.h"
 
 //
 // Scene camera.

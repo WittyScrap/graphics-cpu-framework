@@ -16,13 +16,15 @@ public:
 	Camera(const Camera& other);
 
 	//
-	// Transformation matrices
+	// Matrix to convert from camera space to screen space.
 	//
-	const Matrix  GetProjectionMatrix() const;
+	const Matrix GetProjectionMatrix() const;
+
+	//
+	// Matrices to convert from world to camera space and vice versa.
+	//
 	const Matrix& GetWorldToCameraMatrix() const;
 	const Matrix  GetCameraToWorldMatrix() const;
-	const Matrix  GetCameraToScreenMatrix() const;
-	const Matrix  GetScreenToCameraMatrix() const;
 
 	//
 	// Field of view accessors.
@@ -50,6 +52,12 @@ public:
 	//
 	static Camera* const GetMainCamera();
 	void SetMain();
+
+private:
+	//
+	// Matrix to convert points from projection space to screen space.
+	//
+	const Matrix GetProjectionToScreenMatrix() const;
 
 private:
 	//

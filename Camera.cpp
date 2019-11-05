@@ -68,7 +68,7 @@ const Matrix Camera::GetProjectionMatrix() const
 		projectionMatrix.SetM(3, 2, 1);
 	}
 
-	return projectionMatrix;
+	return GetProjectionToScreenMatrix() * projectionMatrix;
 }
 
 //
@@ -90,7 +90,7 @@ const Matrix Camera::GetCameraToWorldMatrix() const
 //
 // Matrix to transform coordinates from camera space to screen space.
 //
-const Matrix Camera::GetCameraToScreenMatrix() const
+const Matrix Camera::GetProjectionToScreenMatrix() const
 {
 	Matrix cameraToScreenMatrix;
 
@@ -113,14 +113,6 @@ const Matrix Camera::GetCameraToScreenMatrix() const
 	cameraToScreenMatrix.SetM(3, 3, 1);
 
 	return cameraToScreenMatrix;
-}
-
-//
-// Matrix to transform coordinates from screen space to camera space.
-//
-const Matrix Camera::GetScreenToCameraMatrix() const
-{
-	return GetCameraToScreenMatrix().Inverse();
 }
 
 //

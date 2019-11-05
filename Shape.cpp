@@ -32,20 +32,12 @@ Shape::~Shape()
 //
 const std::vector<Vertex>& Shape::CalculateTransformations()
 {
-	const Camera* const activeCamera = Camera::GetMainCamera();
 	const size_t  verticesCount = _shapeData.size();
-
 	Matrix mvp = GetMVP(MVP);
-	Matrix cameraToScreen = Matrix::IdentityMatrix();
-
-	if (activeCamera)
-	{
-		cameraToScreen = activeCamera->GetCameraToScreenMatrix();
-	}
 
 	for (size_t i = 0; i < verticesCount; ++i)
 	{
-		_transformedShape[i] = cameraToScreen * mvp* _shapeData[i];
+		_transformedShape[i] = mvp * _shapeData[i];
 	}
 
 	return _transformedShape;

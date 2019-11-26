@@ -26,6 +26,8 @@ void Mesh::LoadFromFile(const char* const fileName)
 	{
 		throw ModelLoadingException(fileName);
 	}
+
+	RecalculateNormals();
 }
 
 //
@@ -58,6 +60,22 @@ void Mesh::AddVertex(float x, float y, float z)
 void Mesh::AddPolygon(int i0, int i1, int i2)
 {
 	_polygons.push_back(Polygon3D(i0, i1, i2));
+}
+
+//
+// Recalculates the normals for all polygons.
+//
+void Mesh::RecalculateNormals()
+{
+	const std::vector<Vertex>& vertices = GetVertices();
+	for (Polygon3D& polygon : _polygons)
+	{
+		const Vertex& a = vertices[polygon.GetIndex(0)];
+		const Vertex& b = vertices[polygon.GetIndex(1)];
+		const Vertex& c = vertices[polygon.GetIndex(2)];
+
+		polygon.CalculateNormal(a, b, c);
+	}
 }
 
 //
@@ -96,6 +114,19 @@ void Mesh::ResetPen(const HDC& hdc)
 {
 	HPEN newPen = static_cast<HPEN>(SelectObject(hdc, _previousPen));
 	DeleteObject(newPen);
+}
+
+//
+// Calculates which polygons should be backface culled and sorts all others in
+// a list.
+//
+void Mesh::CalculateBackfaceCulling()
+{
+	_culledPolygons.clear();
+	for (const Polygon3D& polygon : _polygons)
+	{
+		const Vector3& normal = polygon.GetNormal();
+	}
 }
 
 //

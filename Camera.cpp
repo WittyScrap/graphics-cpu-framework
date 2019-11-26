@@ -69,7 +69,7 @@ const Matrix Camera::GetProjectionMatrix() const
 		projectionMatrix.SetM(3, 2, 1);
 	}
 
-	return GetProjectionToScreenMatrix() * projectionMatrix;
+	return projectionMatrix;
 }
 
 //
@@ -91,7 +91,7 @@ const Matrix Camera::GetCameraToWorldMatrix() const
 //
 // Matrix to transform coordinates from projection space to screen space.
 //
-const Matrix Camera::GetProjectionToScreenMatrix() const
+const Matrix Camera::GetProjectionToClipMatrix() const
 {
 	Matrix projectionToScreenMatrix;
 
@@ -154,9 +154,9 @@ void Camera::SetPerspective(const bool& toggle)
 void Camera::SetPosition(const Vector3& position)
 {
 	_position = {
-		1, 0, 0, -position.X,
-		0, 1, 0, -position.Y,
-		0, 0, 1, -position.Z,
+		1, 0, 0, -position.GetX(),
+		0, 1, 0, -position.GetY(),
+		0, 0, 1, -position.GetZ(),
 		0, 0, 0, 1
 	};
 
@@ -169,24 +169,24 @@ void Camera::SetPosition(const Vector3& position)
 void Camera::SetRotation(const Vector3& rotation)
 {
 	Matrix rotationX = {
-		   1,		 	 0,					  0,		    0,
-		   0,  std::cos(rotation.X), std::sin(rotation.X), 0,
-		   0, -std::sin(rotation.X), std::cos(rotation.X), 0,
-		   0,			 0,					  0,			1
+		   1,		 	   0,					    0,		         0,
+		   0,  std::cos(rotation.GetX()), std::sin(rotation.GetX()), 0,
+		   0, -std::sin(rotation.GetX()), std::cos(rotation.GetX()), 0,
+		   0,			   0,					    0,			     1
 	};
 
 	Matrix rotationY = {
-		std::cos(rotation.Y), 0, -std::sin(rotation.Y), 0,
-				 0,			  1,		  0,			0,
-		std::sin(rotation.Y), 0,  std::cos(rotation.Y), 0,
-				 0,			  0,		  0,			1
+		std::cos(rotation.GetY()), 0, -std::sin(rotation.GetY()), 0,
+				   0,			   1,		      0,			  0,
+		std::sin(rotation.GetY()), 0,  std::cos(rotation.GetY()), 0,
+				   0,			   0,		      0,			  1
 	};
 
 	Matrix rotationZ = {
-		 std::cos(rotation.Z), std::sin(rotation.Z), 0, 0,
-		-std::sin(rotation.Z), std::cos(rotation.Z), 0, 0,
-				 0,						  0,		 1, 0,
-				 0,						  0,		 0, 1
+		 std::cos(rotation.GetZ()), std::sin(rotation.GetZ()), 0, 0,
+		-std::sin(rotation.GetZ()), std::cos(rotation.GetZ()), 0, 0,
+					0,							0,			   1, 0,
+					0,							0,			   0, 1
 	};
 
 	_rotation = rotationX * rotationY * rotationZ;

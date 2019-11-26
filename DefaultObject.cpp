@@ -1,12 +1,7 @@
 #include "DefaultObject.h"
-#include "Rasteriser.h"
+#include "Camera.h"
+#include "Input.h"
 #include <cmath>
-
-//
-// Initialiser constructor...
-//
-DefaultObject::DefaultObject(Rasteriser& world) : SceneObject(world), _pedistal{NULL}, _figurine{NULL}
-{ }
 
 //
 // Initialises the class.
@@ -29,14 +24,17 @@ void DefaultObject::OnInit()
 	_pedistal->SetPosition({ 0, -43.f, 0 });
 
 	Camera::GetMainCamera()->SetPosition({ 0, 0, -50 });
+
+	// Cache input manager's pointer.
+	Input* const inputManager = Input::Get();
 	
 	// Register all inputs...
-	RegisterInputPair('A', 'D', "Horizontal");
-	RegisterInputPair('S', 'W', "Forward");
-	RegisterInputPair('C', VK_SPACE, "Vertical");
+	inputManager->SaveAxis('A', 'D', "Horizontal");
+	inputManager->SaveAxis('S', 'W', "Forward");
+	inputManager->SaveAxis('C', VK_SPACE, "Vertical");
 
-	RegisterInputPair(VK_LEFT, VK_RIGHT, "X");
-	RegisterInputPair(VK_UP, VK_DOWN, "Y");
+	inputManager->SaveAxis(VK_LEFT, VK_RIGHT, "X");
+	inputManager->SaveAxis(VK_UP, VK_DOWN, "Y");
 }
 
 //
@@ -53,12 +51,15 @@ void DefaultObject::OnTick(const float& deltaTime)
 	Vector3 cameraMovement{ 0, 0, 0 };
 	Vector3 cameraRotation{ 0, 0, 0 };
 
-	cameraMovement.X = GetInput("Horizontal");
-	cameraMovement.Y = GetInput("Vertical");
-	cameraMovement.Z = GetInput("Forward");
+	// Cache input manager's pointer.
+	Input* const inputManager = Input::Get();
 
-	cameraRotation.X = GetInput("Y") * .01f;
-	cameraRotation.Y = GetInput("X") * .01f;
+	cameraMovement.SetX(inputManager->GetAxis("Horizontal"));
+	cameraMovement.SetY(inputManager->GetAxis("Vertical"));
+	cameraMovement.SetZ(inputManager->GetAxis("Forward"));
+
+	cameraRotation.SetX(inputManager->GetAxis("Y") * .01f);
+	cameraRotation.SetY(inputManager->GetAxis("X") * .01f);
 
 	Camera* const mainCamera = Camera::GetMainCamera();
 
@@ -73,46 +74,30 @@ void DefaultObject::OnTick(const float& deltaTime)
 }
 
 //
-// Registers a new input pair to the internal map.
-//
-void DefaultObject::RegisterInputPair(const int& a, const int& b, const std::string& name)
-{
-	_inputManager.insert(std::pair<std::string, Input>(name, Input(GetWorld(), a, b)));
-}
-
-//
-// Polls input data from an existing manager.
-//
-float DefaultObject::GetInput(const std::string& name) const
-{
-	return _inputManager.at(name).Evaluate();
-}
-
-//
 // Initialises an input system module.
 //
-Input::Input(Rasteriser& world, int a, int b) : _world(world), _a(a), _b(b)
+InputAxis::InputAxis(int a, int b) : _a(a), _b(b)
 { }
 
 //
 // Destructor
 //
-Input::~Input()
+InputAxis::~InputAxis()
 { }
 
 //
 // Evaluates this input module.
 //
-float Input::Evaluate() const
+float InputAxis::Evaluate() const
 {
 	float value = 0.f;
 
-	if (_world.IsKeyHeld(_a))
+	if (Input::Get()->IsKeyHeld(_a))
 	{
 		value -= 1.f;
 	}
 
-	if (_world.IsKeyHeld(_b))
+	if (Input::Get()->IsKeyHeld(_b))
 	{
 		value += 1.f;
 	}

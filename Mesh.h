@@ -28,6 +28,11 @@ public:
 	void AddPolygon(int i0, int i1, int i2);
 
 	//
+	// Normals
+	//
+	void RecalculateNormals();
+
+	//
 	// Draw operation
 	//
 	void Draw(HDC hdc);
@@ -42,10 +47,13 @@ private:
 	//
 	// Drawing tools
 	//
+	void CalculateBackfaceCulling();
 	void DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vertices, const HDC& hdc);
 
 private:
 	std::vector<Polygon3D> _polygons;
+	std::vector<Polygon3D*> _culledPolygons;
+
 	HPEN _previousPen;
 };
 

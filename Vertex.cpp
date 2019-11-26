@@ -1,4 +1,5 @@
 #include "Vertex.h"
+#include "Vector.h"
 
 Vertex::Vertex() : Vertex(0, 0, 0, 1)
 { }
@@ -73,9 +74,14 @@ const Vertex Vertex::operator+(const Vertex& rhs) const
 	return sum;
 }
 
-const Vector3 Vertex::AsPoint()
+const Vertex Vertex::operator-(const Vertex& rhs) const
 {
-	return { _x, _y };
+	return Vertex(_x - rhs._x, _y - rhs._y, _z - rhs._z);
+}
+
+const Vector3 Vertex::AsPoint() const
+{
+	return Vector3(_x, _y, _z);
 }
 
 void Vertex::Dehomogenise()

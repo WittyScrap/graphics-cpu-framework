@@ -28,6 +28,11 @@ public:
 	const Matrix  GetCameraToWorldMatrix() const;
 
 	//
+	// Matrix to convert points from projection space to screen space.
+	//
+	const Matrix GetProjectionToClipMatrix() const;
+
+	//
 	// Field of view accessors.
 	//
 	const float GetFieldOfView() const;
@@ -53,12 +58,6 @@ public:
 	//
 	static Camera* const GetMainCamera();
 	void SetMain();
-
-private:
-	//
-	// Matrix to convert points from projection space to screen space.
-	//
-	const Matrix GetProjectionToScreenMatrix() const;
 
 private:
 	//

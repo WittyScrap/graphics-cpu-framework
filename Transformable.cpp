@@ -21,7 +21,7 @@ const Matrix Transformable::GetTransform() const
 //
 void Transformable::SetPosition(const Vector3& position)
 {
-	_position = Matrix::TranslationMatrix(position.X, position.Y, position.Z);
+	_position = Matrix::TranslationMatrix(position.GetX(), position.GetY(), position.GetZ());
 }
 
 //
@@ -29,7 +29,7 @@ void Transformable::SetPosition(const Vector3& position)
 //
 void Transformable::SetRotation(const Vector3& rotation)
 {
-	_rotation = Matrix::RotationMatrix(rotation.X, rotation.Y, rotation.Z);
+	_rotation = Matrix::RotationMatrix(rotation.GetX(), rotation.GetY(), rotation.GetZ());
 }
 
 //
@@ -37,7 +37,7 @@ void Transformable::SetRotation(const Vector3& rotation)
 //
 void Transformable::SetScale(const Vector3& scale)
 {
-	_scale = Matrix::ScaleMatrix(scale.X, scale.Y, scale.Z);
+	_scale = Matrix::ScaleMatrix(scale.GetX(), scale.GetY(), scale.GetZ());
 }
 
 //
@@ -45,7 +45,7 @@ void Transformable::SetScale(const Vector3& scale)
 //
 void Transformable::Translate(const Vector3& amount)
 {
-	Matrix translation = _position * Matrix::TranslationMatrix(amount.X, amount.Y, amount.Z);
+	Matrix translation = _position * Matrix::TranslationMatrix(amount.GetX(), amount.GetY(), amount.GetZ());
 	_position = translation;
 }
 
@@ -54,7 +54,7 @@ void Transformable::Translate(const Vector3& amount)
 //
 void Transformable::Rotate(const Vector3& amount)
 {
-	Matrix rotation = _rotation * Matrix::RotationMatrix(amount.X, amount.Y, amount.Z);
+	Matrix rotation = _rotation * Matrix::RotationMatrix(amount.GetX(), amount.GetY(), amount.GetZ());
 	_rotation = rotation;
 }
 
@@ -63,6 +63,6 @@ void Transformable::Rotate(const Vector3& amount)
 //
 void Transformable::Scale(const Vector3& amount)
 {
-	Matrix scale = _scale * Matrix::ScaleMatrix(amount.X, amount.Y, amount.Z);
+	Matrix scale = _scale * Matrix::ScaleMatrix(amount.GetX(), amount.GetY(), amount.GetZ());
 	_scale = scale;
 }

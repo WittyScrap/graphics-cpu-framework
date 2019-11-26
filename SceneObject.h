@@ -1,6 +1,7 @@
 #pragma once
 #include "Transformable.h"
 #include "Shape.h"
+#include <string>
 #include <memory>
 
 // Forward declare rasteriser
@@ -15,7 +16,7 @@ class SceneObject
 public:
 	// Constructors
 	SceneObject();
-	SceneObject(Rasteriser& world);
+	SceneObject(const std::string& objectName);
 
 	//
 	// Events
@@ -46,13 +47,9 @@ protected:
 	// Equality operator internal function
 	virtual const bool Equals(const SceneObject& rhs) const;
 
-	// The rasteriser this object exists in.
-	Rasteriser& GetWorld() const;
-
 private:
-	// Reference to the world (rasteriser).
-	Rasteriser* _world;
 	std::vector<std::unique_ptr<Shape>> _shapes;
+	std::string _name;
 };
 
 //

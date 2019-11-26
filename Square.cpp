@@ -13,7 +13,7 @@ void Square::CreateModel(const Vector3& position)
 	CreateVertex(Vertex(-_squareWidth,  _squareHeight, 0));
 
 	// Transform them by the position
-	SetPosition({ position.X, position.Y, 0 });
+	SetPosition({ position.GetX(), position.GetY(), 0 });
 }
 
 //

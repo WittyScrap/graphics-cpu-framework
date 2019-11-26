@@ -46,6 +46,26 @@ int Polygon3D::GetIndex(const int& i) const
 }
 
 //
+// This polygon's pre-calculated normal.
+//
+const Vector3& Polygon3D::GetNormal() const
+{
+	return _normal;
+}
+
+//
+// Calculates the normal for this polygon.
+//
+const Vector3& Polygon3D::CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c)
+{
+	Vector3 aTob((b - a).AsPoint());
+	Vector3 aToc((c - a).AsPoint());
+
+	_normal = Vector3::Cross(aTob, aToc);
+	return _normal;
+}
+
+//
 // Assigns the values of the passed polygon to this one, then returns this object.
 //
 Polygon3D& Polygon3D::operator=(const Polygon3D& rhs)

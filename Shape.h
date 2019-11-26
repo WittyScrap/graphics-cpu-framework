@@ -45,6 +45,12 @@ protected:
 	//
 	virtual const std::vector<Vertex>& CalculateTransformations();
 	const Matrix GetMVP(const char& type) const;
+	const Matrix GetP2C() const;
+
+	//
+	// Final application of all necessary transformations.
+	//
+	const Vertex ObjectToClipSpace(const Matrix& mvp, const Matrix& p2c, const Vertex& vertex);
 
 private:
 	COLORREF _shapeColour; // The colour of the shape.

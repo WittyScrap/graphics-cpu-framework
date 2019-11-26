@@ -1,6 +1,13 @@
 #pragma once
-#include "Vector.h"
 
+//
+// Vector class forward declaration
+//
+struct Vector3;
+
+//
+// Represents a vertex, with X, Y, Z, and W components.
+//
 class Vertex
 {
 public:
@@ -21,8 +28,9 @@ public:
 
 	const Vertex& operator=(const Vertex& rhs);
 	const Vertex operator+(const Vertex& rhs) const;
+	const Vertex operator-(const Vertex& rhs) const;
 
-	const Vector3 AsPoint();
+	const Vector3 AsPoint() const;
 	void Dehomogenise();
 private:
 	float _x;
@@ -30,4 +38,3 @@ private:
 	float _z;
 	float _w;
 };
-

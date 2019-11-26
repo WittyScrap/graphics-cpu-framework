@@ -149,7 +149,9 @@
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DefaultObject.cpp" />
+    <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Framework.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MD2Loader.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -167,7 +169,9 @@
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DefaultObject.h" />
+    <ClInclude Include="Environment.h" />
     <ClInclude Include="Framework.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MD2Loader.h" />
     <ClInclude Include="Mesh.h" />

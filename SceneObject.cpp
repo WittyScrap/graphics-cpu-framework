@@ -5,13 +5,13 @@
 //
 // Default constructor.
 //
-SceneObject::SceneObject() : _world(NULL)
+SceneObject::SceneObject() : _name("")
 { }
 
 //
-// Constructor that takes in the world it's been created in into consideration.
+// Constructor to define an object name.
 //
-SceneObject::SceneObject(Rasteriser& world) : _world(&world)
+SceneObject::SceneObject(const std::string& objectName) : _name(objectName)
 { }
 
 //
@@ -74,14 +74,6 @@ void SceneObject::DestroyShape(const Shape& shape)
 const bool SceneObject::Equals(const SceneObject& rhs) const
 {
 	return this == &rhs;
-}
-
-//
-// The rasteriser this object exists in.
-//
-Rasteriser& SceneObject::GetWorld() const
-{
-	return *_world;
 }
 
 //

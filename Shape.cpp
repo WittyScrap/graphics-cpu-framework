@@ -25,16 +25,18 @@ Shape::~Shape()
 }
 
 //
-// Returns a vertex group containing every vertex in the internal shape, transformed by the matrix.
+// Returns a vertex group containing every vertex in the internal shape, transformed by the MVP matrix.
 //
 const std::vector<Vertex>& Shape::CalculateTransformations()
 {
 	const size_t  verticesCount = _shapeData.size();
+
 	Matrix mvp = GetMVP(MVP);
+	Matrix p2c = GetP2C();
 
 	for (size_t i = 0; i < verticesCount; ++i)
 	{
-		_transformedShape[i] = mvp * _shapeData[i];
+		_transformedShape[i] = ObjectToClipSpace(mvp, p2c, _shapeData[i]);
 	}
 
 	return _transformedShape;
@@ -60,6 +62,34 @@ const Matrix Shape::GetMVP(const char& type) const
 	}
 
 	return _M;
+}
+
+//
+// Projection-To-Clip matrix.
+//
+const Matrix Shape::GetP2C() const
+{
+	if (const Camera * const mainCamera = Camera::GetMainCamera())
+	{
+		return mainCamera->GetProjectionToClipMatrix();
+	}
+
+	return Matrix::IdentityMatrix();
+}
+
+//
+// Applies the MVP transformation, dehomogenisation, and screen transformation.
+//
+const Vertex Shape::ObjectToClipSpace(const Matrix& mvp, const Matrix& p2c, const Vertex& vertex)
+{
+	Vertex transformed = mvp * vertex;
+	transformed.Dehomogenise();
+
+	// Apply projection-to-clip matrix...
+	transformed = p2c * transformed;
+
+
+	return transformed;
 }
 
 //

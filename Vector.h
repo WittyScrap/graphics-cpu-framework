@@ -1,18 +1,23 @@
 #pragma once
 #include "Point.h"
+#include "Vertex.h"
 
 struct Vector3
 {
 public:
-	//
-	// Main member variables are exposed for easier initialisation
-	// and because they are simple holders that do not need any kind
-	// of explicit getter/setter and can be set to any valid float
-	// value without any repercussions.
-	//
-	float X;
-	float Y;
-	float Z;
+	Vector3();
+	Vector3(const Vector3& copy);
+	Vector3(const float& x, const float& y, const float& z);
+
+	// --- Setters --- //
+	inline void SetX(const float& value);
+	inline void SetY(const float& value);
+	inline void SetZ(const float& value);
+
+	// --- Getters --- //
+	inline const float& GetX() const;
+	inline const float& GetY() const;
+	inline const float& GetZ() const;
 
 	//
 	// Mathematics operators
@@ -27,10 +32,94 @@ public:
 	Vector3  operator*=(const Vector3& rhs) const;
 	Vector3  operator/=(const Vector3& rhs) const;
 	Vector3  operator- () const;
+
+	//
+	// Operators on vertices
+	//
+	Vector3& operator= (const Vertex& rhs);
+	Vector3  operator+ (const Vertex& rhs) const;
+	Vector3  operator- (const Vertex& rhs) const;
+	Vector3  operator* (const Vertex& rhs) const;
+	Vector3  operator/ (const Vertex& rhs) const;
+	Vector3  operator+=(const Vertex& rhs) const;
+	Vector3  operator-=(const Vertex& rhs) const;
+	Vector3  operator*=(const Vertex& rhs) const;
+	Vector3  operator/=(const Vertex& rhs) const;
+
+	//
+	// Static Vector aritmetics
+	//
+	static const float Dot(const Vector3& lhs, const Vector3& rhs);
+	static const Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
+	static const Vector3 Normalise(const Vector3& vector);
+
+	//
+	// Vector aritmetics
+	//
+	void Normalise();
+	const float GetMagnitude() const;
+	const float GetSqrMagnitude() const;
 	
 	//
 	// Comparison operators
 	//
 	bool operator==(const Vector3& rhs) const;
 	bool operator!=(const Vector3& rhs) const;
+
+private:
+	//
+	// Main member variables.
+	//
+	float _x;
+	float _y;
+	float _z;
+
 };
+
+//
+// Sets the X component of the vector.
+//
+inline void Vector3::SetX(const float& value)
+{
+	_x = value;
+}
+
+//
+// Sets the Y component of the vector.
+//
+inline void Vector3::SetY(const float& value)
+{
+	_y = value;
+}
+
+//
+// Sets the Z component of the vector.
+//
+inline void Vector3::SetZ(const float& value)
+{
+	_z = value;
+}
+
+//
+// The X component of the vector.
+//
+inline const float& Vector3::GetX() const
+{
+	return _x;
+}
+
+//
+// The Y component of the vector.
+//
+inline const float& Vector3::GetY() const
+{
+	return _y;
+}
+
+//
+// The Z component of the vector.
+//
+inline const float& Vector3::GetZ() const
+{
+	return _z;
+}

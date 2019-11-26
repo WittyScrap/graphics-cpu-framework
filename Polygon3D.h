@@ -1,4 +1,6 @@
 #pragma once
+#include "Vector.h"
+#include "Vertex.h"
 
 //
 // Indices supported by polygon.
@@ -25,9 +27,13 @@ public:
 	Polygon3D(const Polygon3D& other);
 	int GetIndex(const int& i) const;
 
+	const Vector3& GetNormal() const;
+	const Vector3& CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c);
+
 	Polygon3D& operator=(const Polygon3D& rhs);
 
 private:
 	int _indices[INDICES_COUNT];
+	Vector3 _normal;
 };
 

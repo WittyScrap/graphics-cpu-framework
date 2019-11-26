@@ -45,11 +45,7 @@ void Rasteriser::Render(const Bitmap& bitmap)
 	HDC hdc = bitmap.GetDC();
 
 	Clear(clearColour, bitmap);
-
-	for (auto& sceneObject : _sceneObjects)
-	{
-		sceneObject->Render(hdc);
-	}
+	_environment.OnRender(hdc);
 }
 
 //
@@ -58,11 +54,7 @@ void Rasteriser::Render(const Bitmap& bitmap)
 void Rasteriser::Tick(const Bitmap& bitmap, const float& deltaTime)
 {
 	_timeElapsed += deltaTime;
-
-	for (auto& sceneObject : _sceneObjects)
-	{
-		sceneObject->OnTick(deltaTime);
-	}
+	_environment.OnTick(deltaTime);
 }
 
 //
@@ -94,12 +86,8 @@ void Rasteriser::InitialiseComponents(const Bitmap& bitmap)
 	_camera.SetMain();
 
 	// Add default scene object
-	CreateSceneObject<DefaultObject>();
-
-	for (auto& sceneObject : _sceneObjects)
-	{
-		sceneObject->OnStart();
-	}
+	_environment.CreateObject<DefaultObject>("Starter");
+	_environment.OnStart();
 }
 
 //
@@ -125,60 +113,9 @@ void Rasteriser::Clear(const COLORREF& colour, const Bitmap& bitmap)
 }
 
 //
-// Returns true if the given key code is currently held down.
-//
-bool Rasteriser::IsKeyHeld(int keyCode)
-{
-	SHORT keyState = GetKeyState(keyCode);
-	return keyState & 0x8000;
-}
-
-//
-// Returns true if the given key has just been pressed.
-//
-bool Rasteriser::IsKeyDown(int keyCode)
-{
-	SHORT keyState = GetKeyState(keyCode);
-	return keyState & (0x8000 | 1);
-}
-
-bool Rasteriser::IsKeyUp(int keyCode)
-{
-	SHORT keyState = GetKeyState(keyCode);
-	if (!(keyState & 0x8000))
-	{
-		return keyState & 1;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-//
 // The time elapsed since the initialisation of this rasteriser.
 //
 const float& Rasteriser::GetTimeElapsed() const
 {
 	return _timeElapsed;
-}
-
-//
-// Deletes an object from the scene.
-//
-void Rasteriser::DeleteSceneObject(const SceneObject& object)
-{
-	auto searchFunction = [&object](const std::unique_ptr<SceneObject>& obj) -> bool {
-		return *obj == object;
-	};
-
-	auto obj_ptr = std::find_if(_sceneObjects.begin(), _sceneObjects.end(), searchFunction);
-
-	if (obj_ptr == _sceneObjects.end())
-	{
-		throw std::exception("The object that is being deleted does not exist.");
-	}
-
-	(*obj_ptr)->OnDelete();
-	_sceneObjects.erase(obj_ptr);
 }

@@ -31,6 +31,7 @@ public:
 	// Normals
 	//
 	void RecalculateNormals();
+	static const Vertex GetPolygonCenter(const Polygon3D& polygon, const std::vector<Vertex>& vertices);
 
 	//
 	// Draw operation
@@ -47,12 +48,14 @@ private:
 	//
 	// Drawing tools
 	//
-	void CalculateBackfaceCulling();
+	void CalculateBackfaceCulling(const std::vector<Vertex>& vertices);
 	void DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vertices, const HDC& hdc);
 
 private:
 	std::vector<Polygon3D> _polygons;
-	std::vector<Polygon3D*> _culledPolygons;
+
+	std::vector<const Polygon3D*> _visibleGeometry;
+	std::vector<const Polygon3D*> _culledGeometry;
 
 	HPEN _previousPen;
 };

@@ -28,7 +28,7 @@ public:
 	int GetIndex(const int& i) const;
 
 	const Vector3& GetNormal() const;
-	const Vector3& CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c);
+	void CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c);
 
 	Polygon3D& operator=(const Polygon3D& rhs);
 

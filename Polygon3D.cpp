@@ -56,13 +56,13 @@ const Vector3& Polygon3D::GetNormal() const
 //
 // Calculates the normal for this polygon.
 //
-const Vector3& Polygon3D::CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c)
+void Polygon3D::CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c)
 {
-	Vector3 aTob((b - a).AsPoint());
-	Vector3 aToc((c - a).AsPoint());
+	Vector3 aTob(b - a);
+	Vector3 aToc(c - a);
 
 	_normal = Vector3::Cross(aTob, aToc);
-	return _normal;
+	_normal.Normalise();
 }
 
 //

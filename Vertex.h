@@ -26,9 +26,22 @@ public:
 	void SetZ(const float& x);
 	void SetW(const float& x);
 
-	const Vertex& operator=(const Vertex& rhs);
 	const Vertex operator+(const Vertex& rhs) const;
 	const Vertex operator-(const Vertex& rhs) const;
+	const Vertex operator*(const Vertex& rhs) const;
+	const Vertex operator/(const Vertex& rhs) const;
+
+	const Vertex& operator =(const Vertex& rhs);
+	const Vertex& operator*=(const Vertex& rhs);
+	const Vertex& operator/=(const Vertex& rhs);
+
+	const Vertex& operator*=(const float& rhs);
+	const Vertex& operator/=(const float& rhs);
+
+	const Vertex operator+(const Vector3& rhs) const;
+	const Vertex operator-(const Vector3& rhs) const;
+	const Vertex operator*(const Vector3& rhs) const;
+	const Vertex operator/(const Vector3& rhs) const;
 
 	const Vector3 AsPoint() const;
 	void Dehomogenise();

@@ -7,6 +7,7 @@ struct Vector3
 public:
 	Vector3();
 	Vector3(const Vector3& copy);
+	Vector3(const Vertex& copy);
 	Vector3(const float& x, const float& y, const float& z);
 
 	// --- Setters --- //
@@ -50,8 +51,8 @@ public:
 	// Static Vector aritmetics
 	//
 	static const float Dot(const Vector3& lhs, const Vector3& rhs);
-	static const Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
-	static const Vector3 Normalise(const Vector3& vector);
+	static Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
+	static Vector3 NormaliseVector(const Vector3& vector);
 
 	//
 	// Vector aritmetics

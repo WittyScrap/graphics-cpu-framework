@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "ModelLoadingException.h"
 #include "MD2Loader.h"
+#include "Camera.h"
 
 //
 // Default constructor.
@@ -79,6 +80,21 @@ void Mesh::RecalculateNormals()
 }
 
 //
+// The center point for a polygon.
+//
+const Vertex Mesh::GetPolygonCenter(const Polygon3D& polygon, const std::vector<Vertex>& vertices)
+{
+	const Vertex& a = vertices[polygon.GetIndex(0)];
+	const Vertex& b = vertices[polygon.GetIndex(1)];
+	const Vertex& c = vertices[polygon.GetIndex(2)];
+
+	Vertex combined = a + b + c;
+	combined /= 3;
+
+	return combined;
+}
+
+//
 // TODO: Draw mesh...
 //
 void Mesh::Draw(HDC hdc)
@@ -86,11 +102,14 @@ void Mesh::Draw(HDC hdc)
 	// Calculate transformed vertices
 	const auto& vertices = CalculateTransformations();
 
+	RecalculateNormals();
+	CalculateBackfaceCulling(vertices);
+
 	SetPen(hdc, GetColour());
 
-	for (const Polygon3D& polygon : _polygons)
+	for (const Polygon3D* polygon : _visibleGeometry)
 	{
-		DrawPolygon(polygon, vertices, hdc);
+		DrawPolygon(*polygon, vertices, hdc);
 	}
 
 	SelectObject(hdc, _previousPen);
@@ -120,12 +139,30 @@ void Mesh::ResetPen(const HDC& hdc)
 // Calculates which polygons should be backface culled and sorts all others in
 // a list.
 //
-void Mesh::CalculateBackfaceCulling()
+void Mesh::CalculateBackfaceCulling(const std::vector<Vertex>& vertices)
 {
-	_culledPolygons.clear();
-	for (const Polygon3D& polygon : _polygons)
+	if (const Camera* const mainCamera = Camera::GetMainCamera())
 	{
-		const Vector3& normal = polygon.GetNormal();
+		_visibleGeometry.clear();
+		_culledGeometry.clear();
+
+		for (const Polygon3D& polygon : _polygons)
+		{
+			const Vector3& normal = polygon.GetNormal();
+			const Vector3 eye = Vector3(GetPolygonCenter(polygon, vertices) - mainCamera->GetPosition());
+
+			float normalDotEye = Vector3::Dot(normal, eye);
+
+			// We can render this polygon.
+			if (normalDotEye > 0)
+			{
+				_visibleGeometry.push_back(&polygon);
+			}
+			else // We can't render this polygon because it's shy and facing away.
+			{
+				_culledGeometry.push_back(&polygon);
+			}
+		}
 	}
 }
 

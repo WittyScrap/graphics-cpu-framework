@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector.h"
 #include "Vertex.h"
+#include <vector>
 
 //
 // Indices supported by polygon.
@@ -28,12 +29,17 @@ public:
 	int GetIndex(const int& i) const;
 
 	const Vector3& GetNormal() const;
-	const Vector3& CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c);
+	const float& GetDepth() const;
+	const Vertex CalculateCenter(const std::vector<Vertex>& vertices) const;
+
+	void CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c);
+	void CalculateDepth(const std::vector<Vertex>& vertices);
 
 	Polygon3D& operator=(const Polygon3D& rhs);
+	bool operator<(const Polygon3D& rhs);
 
 private:
 	int _indices[INDICES_COUNT];
+	float _depth;
 	Vector3 _normal;
 };
-

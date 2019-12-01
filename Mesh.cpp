@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "ModelLoadingException.h"
 #include "MD2Loader.h"
+#include <algorithm>
 
 //
 // Default constructor.
@@ -26,8 +27,6 @@ void Mesh::LoadFromFile(const char* const fileName)
 	{
 		throw ModelLoadingException(fileName);
 	}
-
-	RecalculateNormals();
 }
 
 //
@@ -65,9 +64,8 @@ void Mesh::AddPolygon(int i0, int i1, int i2)
 //
 // Recalculates the normals for all polygons.
 //
-void Mesh::RecalculateNormals()
+void Mesh::RecalculateNormals(const std::vector<Vertex>& vertices)
 {
-	const std::vector<Vertex>& vertices = GetVertices();
 	for (Polygon3D& polygon : _polygons)
 	{
 		const Vertex& a = vertices[polygon.GetIndex(0)];
@@ -86,11 +84,15 @@ void Mesh::Draw(HDC hdc)
 	// Calculate transformed vertices
 	const auto& vertices = CalculateTransformations();
 
+	RecalculateNormals(vertices);
+	CalculateBackfaceCulling(vertices);
+	CalculateDepthSorting(vertices);
+
 	SetPen(hdc, GetColour());
 
-	for (const Polygon3D& polygon : _polygons)
+	for (const Polygon3D* polygon : _culledPolygons)
 	{
-		DrawPolygon(polygon, vertices, hdc);
+		DrawPolygon(*polygon, vertices, hdc);
 	}
 
 	SelectObject(hdc, _previousPen);
@@ -120,13 +122,38 @@ void Mesh::ResetPen(const HDC& hdc)
 // Calculates which polygons should be backface culled and sorts all others in
 // a list.
 //
-void Mesh::CalculateBackfaceCulling()
+void Mesh::CalculateBackfaceCulling(const std::vector<Vertex>& vertices)
 {
+	Matrix transform = GetMVP(MVP);
+
 	_culledPolygons.clear();
-	for (const Polygon3D& polygon : _polygons)
+	for (Polygon3D& polygon : _polygons)
 	{
-		const Vector3& normal = polygon.GetNormal();
+		Vector3 normal = polygon.GetNormal();
+		Vector3 view = polygon.CalculateCenter(vertices).AsVector();
+
+		normal.Normalise();
+		view.Normalise();
+
+		float normalDotView = Vector3::Dot(normal, view);
+		if (normalDotView > 0)
+		{
+			_culledPolygons.push_back(&polygon);
+		}
 	}
+}
+
+//
+// Sorts polygons from furthest away to closest.
+//
+void Mesh::CalculateDepthSorting(const std::vector<Vertex>& vertices)
+{
+	for (Polygon3D* polygon : _culledPolygons)
+	{
+		polygon->CalculateDepth(vertices);
+	}
+
+	std::sort(_culledPolygons.begin(), _culledPolygons.end());
 }
 
 //

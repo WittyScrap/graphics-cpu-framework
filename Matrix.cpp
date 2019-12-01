@@ -111,6 +111,27 @@ const Vertex Matrix::operator*(const Vertex &p) const
 }
 
 //
+// Multiplies this matrix by the given vector.
+//
+const Vector3 Matrix::operator*(const Vector3& v) const
+{
+	float x = (_m[0][0] * v.GetX() + _m[0][1] * v.GetY() + _m[0][2] * v.GetZ() + _m[0][3]);
+	float y = (_m[1][0] * v.GetX() + _m[1][1] * v.GetY() + _m[1][2] * v.GetZ() + _m[1][3]);
+	float z = (_m[2][0] * v.GetX() + _m[2][1] * v.GetY() + _m[2][2] * v.GetZ() + _m[2][3]);
+	float w = (_m[3][0] * v.GetX() + _m[3][1] * v.GetY() + _m[3][2] * v.GetZ() + _m[3][3]);
+
+	if (w != 1)
+	{
+		x = x / w;
+		y = y / w;
+		z = z / w;
+		w = w / w; // 1
+	}
+
+	return Vector3(x, y, z);
+}
+
+//
 // Returns the inverse of this matrix.
 //
 const Matrix Matrix::Inverse() const

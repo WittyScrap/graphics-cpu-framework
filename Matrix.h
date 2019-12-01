@@ -28,8 +28,9 @@ class Matrix
 		Matrix& operator= (const Matrix &rhs) noexcept;
 		bool	operator==(const Matrix&other) const;
 
-		const Matrix operator*(const Matrix &other) const;
-		const Vertex operator*(const Vertex &other) const;
+		const Matrix  operator*(const Matrix&  other) const;
+		const Vertex  operator*(const Vertex&  other) const;
+		const Vector3 operator*(const Vector3& other) const;
 
 		const Matrix Inverse() const;
 

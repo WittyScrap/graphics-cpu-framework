@@ -1,14 +1,6 @@
 #include "Shape.h"
 #include "Camera.h"
 
-#define M	0b00000001
-#define V	0b00000010
-#define P	0b00000100
-
-#define MV	M | V
-#define MP	M | P
-#define VP	V | P
-#define MVP M | V | P
 
 //
 // Default constructor

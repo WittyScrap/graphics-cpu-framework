@@ -30,7 +30,7 @@ public:
 	//
 	// Normals
 	//
-	void RecalculateNormals();
+	void RecalculateNormals(const std::vector<Vertex>& vertices);
 
 	//
 	// Draw operation
@@ -47,7 +47,8 @@ private:
 	//
 	// Drawing tools
 	//
-	void CalculateBackfaceCulling();
+	void CalculateBackfaceCulling(const std::vector<Vertex>& vertices);
+	void CalculateDepthSorting(const std::vector<Vertex>& polygons);
 	void DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vertices, const HDC& hdc);
 
 private:

@@ -54,15 +54,46 @@ const Vector3& Polygon3D::GetNormal() const
 }
 
 //
+// The depth of this polygon.
+//
+const float& Polygon3D::GetDepth() const
+{
+	return _depth;
+}
+
+//
 // Calculates the normal for this polygon.
 //
-const Vector3& Polygon3D::CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c)
+void Polygon3D::CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c)
 {
-	Vector3 aTob((b - a).AsPoint());
-	Vector3 aToc((c - a).AsPoint());
+	Vector3 aTob((b - a).AsVector());
+	Vector3 aToc((c - a).AsVector());
 
 	_normal = Vector3::Cross(aTob, aToc);
-	return _normal;
+}
+
+//
+// Calculates the center of the polygon.
+//
+const Vertex Polygon3D::CalculateCenter(const std::vector<Vertex>& vertices) const
+{
+	const Vertex& a = vertices[_indices[0]];
+	const Vertex& b = vertices[_indices[1]];
+	const Vertex& c = vertices[_indices[2]];
+
+	return Vertex::GetAverage(a, b, c);
+}
+
+//
+// Calculates the average depth of all vertices in the polygon.
+//
+void Polygon3D::CalculateDepth(const std::vector<Vertex>& vertices)
+{
+	const Vertex& a = vertices[_indices[0]];
+	const Vertex& b = vertices[_indices[1]];
+	const Vertex& c = vertices[_indices[2]];
+
+	_depth = (a.GetZ() + b.GetZ() + c.GetZ()) / 3;
 }
 
 //
@@ -75,4 +106,12 @@ Polygon3D& Polygon3D::operator=(const Polygon3D& rhs)
 	_indices[2] = rhs._indices[2];
 
 	return *this;
+}
+
+//
+// Compares two polygons depth-wise.
+//
+bool Polygon3D::operator<(const Polygon3D& rhs)
+{
+	return _depth < rhs._depth;
 }

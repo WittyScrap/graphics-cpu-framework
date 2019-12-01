@@ -1,5 +1,6 @@
 #include "Vertex.h"
 #include "Vector.h"
+#include <numeric>
 
 Vertex::Vertex() : Vertex(0, 0, 0, 1)
 { }
@@ -79,7 +80,7 @@ const Vertex Vertex::operator-(const Vertex& rhs) const
 	return Vertex(_x - rhs._x, _y - rhs._y, _z - rhs._z);
 }
 
-const Vector3 Vertex::AsPoint() const
+const Vector3 Vertex::AsVector() const
 {
 	return Vector3(_x, _y, _z);
 }
@@ -90,4 +91,20 @@ void Vertex::Dehomogenise()
 	_y /= _w;
 	_z /= _w;
 	_w = 1; /* w/w = 1 */
+}
+
+//
+// Calculates the average of the given vertices.
+//
+Vertex Vertex::GetAverage(const std::initializer_list<Vertex>& vertices)
+{
+	Vertex sum = std::accumulate(vertices.begin(), vertices.end(), Vertex());
+	size_t size = vertices.size();
+
+	sum._x /= size;
+	sum._y /= size;
+	sum._z /= size;
+	sum._w /= size;
+
+	return sum;
 }

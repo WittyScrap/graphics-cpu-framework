@@ -1,4 +1,5 @@
 #pragma once
+#include <initializer_list>
 
 //
 // Vector class forward declaration
@@ -30,11 +31,29 @@ public:
 	const Vertex operator+(const Vertex& rhs) const;
 	const Vertex operator-(const Vertex& rhs) const;
 
-	const Vector3 AsPoint() const;
+	template <typename ...TVertices>
+	static Vertex GetAverage(const TVertices& ...vertices);
+	
+
+	const Vector3 AsVector() const;
 	void Dehomogenise();
+
+private:
+	static Vertex GetAverage(const std::initializer_list<Vertex>& vertices);
+
 private:
 	float _x;
 	float _y;
 	float _z;
 	float _w;
 };
+
+//
+// Returns the average of all passed vertices.
+//
+template<typename ...TVertices>
+inline Vertex Vertex::GetAverage(const TVertices& ...vertices)
+{
+	return GetAverage({ vertices... });
+}
+

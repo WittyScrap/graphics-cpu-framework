@@ -64,82 +64,6 @@ const Vertex& Vertex::operator=(const Vertex& rhs)
 	return *this;
 }
 
-const Vertex& Vertex::operator*=(const Vertex& rhs)
-{
-	_x *= rhs._x;
-	_y *= rhs._y;
-	_z *= rhs._z;
-	_w *= rhs._w;
-
-	return *this;
-}
-
-const Vertex& Vertex::operator/=(const Vertex& rhs)
-{
-	_x /= rhs._x;
-	_y /= rhs._y;
-	_z /= rhs._z;
-	_w /= rhs._w;
-
-	return *this;
-}
-
-const Vertex& Vertex::operator*=(const float& rhs)
-{
-	_x *= rhs;
-	_y *= rhs;
-	_z *= rhs;
-	_w *= rhs;
-
-	return *this;
-}
-
-const Vertex& Vertex::operator/=(const float& rhs)
-{
-	_x /= rhs;
-	_y /= rhs;
-	_z /= rhs;
-	_w /= rhs;
-
-	return *this;
-}
-
-const Vertex Vertex::operator+(const Vector3& rhs) const
-{
-	return Vertex(
-		_x + rhs.GetX(),
-		_y + rhs.GetY(),
-		_z + rhs.GetZ(),
-	1);
-}
-
-const Vertex Vertex::operator-(const Vector3& rhs) const
-{
-	return Vertex(
-		_x - rhs.GetX(),
-		_y - rhs.GetY(),
-		_z - rhs.GetZ(), 
-	1);
-}
-
-const Vertex Vertex::operator*(const Vector3& rhs) const
-{
-	return Vertex(
-		_x * rhs.GetX(),
-		_y * rhs.GetY(),
-		_z * rhs.GetZ(),
-	1);
-}
-
-const Vertex Vertex::operator/(const Vector3& rhs) const
-{
-	return Vertex(
-		_x / rhs.GetX(),
-		_y / rhs.GetY(),
-		_z / rhs.GetZ(),
-	1);
-}
-
 const Vertex Vertex::operator+(const Vertex& rhs) const
 {
 	Vertex sum;
@@ -154,16 +78,6 @@ const Vertex Vertex::operator+(const Vertex& rhs) const
 const Vertex Vertex::operator-(const Vertex& rhs) const
 {
 	return Vertex(_x - rhs._x, _y - rhs._y, _z - rhs._z);
-}
-
-const Vertex Vertex::operator*(const Vertex& rhs) const
-{
-	return Vertex(_x * rhs._x, _y * rhs._y, _z * rhs._z);
-}
-
-const Vertex Vertex::operator/(const Vertex& rhs) const
-{
-	return Vertex(_x / rhs._x, _y / rhs._y, _z / rhs._z);
 }
 
 const Vector3 Vertex::AsVector() const

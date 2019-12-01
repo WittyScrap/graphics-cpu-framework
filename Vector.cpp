@@ -14,6 +14,12 @@ Vector3::Vector3(const Vector3& copy) : _x{copy._x}, _y{copy._y}, _z{copy._z}
 { }
 
 //
+// "Copy" constructor.
+//
+Vector3::Vector3(const Vertex& copy) : _x{copy.GetX()}, _y{copy.GetY()}, _z{copy.GetZ()}
+{ }
+
+//
 // Full constructor.
 //
 Vector3::Vector3(const float& x, const float& y, const float& z) : _x{x}, _y{y}, _z{z}
@@ -213,7 +219,7 @@ const float Vector3::Dot(const Vector3& lhs, const Vector3& rhs)
 //
 // Performs the cross product from the lhs and rhs vectors.
 //
-const Vector3 Vector3::Cross(const Vector3& lhs, const Vector3& rhs)
+Vector3 Vector3::Cross(const Vector3& lhs, const Vector3& rhs)
 {
 	return Vector3(
 		lhs._y * rhs._z - lhs._z * rhs._y,
@@ -225,7 +231,7 @@ const Vector3 Vector3::Cross(const Vector3& lhs, const Vector3& rhs)
 //
 // Normalises the vector.
 //
-const Vector3 Vector3::Normalise(const Vector3& vector)
+Vector3 Vector3::NormaliseVector(const Vector3& vector)
 {
 	Vector3 copy(vector);
 	copy.Normalise();

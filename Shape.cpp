@@ -23,15 +23,17 @@ const std::vector<Vertex>& Shape::CalculateTransformations()
 {
 	const size_t  verticesCount = _shapeData.size();
 
-	Matrix mvp = GetMVP(MVP);
+	Matrix mv = GetMVP(MV);
+	Matrix p = GetMVP(P);
 	Matrix p2c = GetP2C();
 
 	for (size_t i = 0; i < verticesCount; ++i)
 	{
-		_transformedShape[i] = ObjectToClipSpace(mvp, p2c, _shapeData[i]);
+		_worldSpaceData[i] = mv * _shapeData[i];
+		_clipSpaceData[i] = ObjectToClipSpace(p, p2c, _worldSpaceData[i]);
 	}
 
-	return _transformedShape;
+	return _clipSpaceData;
 }
 
 //
@@ -72,9 +74,9 @@ const Matrix Shape::GetP2C() const
 //
 // Applies the MVP transformation, dehomogenisation, and screen transformation.
 //
-const Vertex Shape::ObjectToClipSpace(const Matrix& mvp, const Matrix& p2c, const Vertex& vertex)
+const Vertex Shape::ObjectToClipSpace(const Matrix& p, const Matrix& p2c, const Vertex& vertex)
 {
-	Vertex transformed = mvp * vertex;
+	Vertex transformed = p * vertex;
 	transformed.Dehomogenise();
 
 	// Apply projection-to-clip matrix...
@@ -85,12 +87,22 @@ const Vertex Shape::ObjectToClipSpace(const Matrix& mvp, const Matrix& p2c, cons
 }
 
 //
+// The world-space vertices without any projection/clip space transformation applied to them.
+//
+const std::vector<Vertex>& Shape::GetWorldSpaceVertices() const
+{
+	return _worldSpaceData;
+}
+
+//
 // Pushes a vertex
 //
 void Shape::CreateVertex(const Vertex& vertex)
 {
 	_shapeData.push_back(vertex);
-	_transformedShape.resize(_shapeData.size(), Vertex(vertex));
+
+	_clipSpaceData.resize(_shapeData.size(), Vertex(vertex));
+	_worldSpaceData.resize(_shapeData.size(), Vertex(vertex));
 }
 
 //

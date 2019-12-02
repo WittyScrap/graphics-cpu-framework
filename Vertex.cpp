@@ -2,16 +2,16 @@
 #include "Vector.h"
 #include <numeric>
 
-Vertex::Vertex() : Vertex(0, 0, 0, 1)
+Vertex::Vertex() : _x{ 0 }, _y{ 0 }, _z{ 0 }, _w{ 0 }, _depth{ 0 }
 { }
 
-Vertex::Vertex(float x, float y, float z) : Vertex(x, y, z, 1)
+Vertex::Vertex(float x, float y, float z) : _x{ x }, _y{ y }, _z{ z }, _w{ 1 }, _depth{ 0 }
 { }
 
-Vertex::Vertex(float x, float y, float z, float w) : _x(x), _y(y), _z(z), _w(w)
+Vertex::Vertex(float x, float y, float z, float w) : _x{ x }, _y{ y }, _z{ z }, _w{ w }, _depth{ 0 }
 { }
 
-Vertex::Vertex(const Vertex& other) : Vertex(other._x, other._y, other._z, other._w)
+Vertex::Vertex(const Vertex& other) : _x{ other._x }, _y{ other._y }, _z{ other._z }, _w{ other._w }, _depth{ other._depth }
 { }
 
 const float& Vertex::GetX() const
@@ -32,6 +32,11 @@ const float& Vertex::GetZ() const
 const float& Vertex::GetW() const
 {
 	return _w;
+}
+
+const float& Vertex::GetDepth() const
+{
+	return _depth;
 }
 
 void Vertex::SetX(const float& x)
@@ -61,6 +66,8 @@ const Vertex& Vertex::operator=(const Vertex& rhs)
 	_z = rhs._z;
 	_w = rhs._w;
 
+	_depth = rhs._depth;
+
 	return *this;
 }
 
@@ -87,6 +94,8 @@ const Vector3 Vertex::AsVector() const
 
 void Vertex::Dehomogenise()
 {
+	_depth = _w;
+
 	_x /= _w;
 	_y /= _w;
 	_z /= _w;

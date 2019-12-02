@@ -213,7 +213,7 @@ Vector3 Vector3::operator/=(const Vertex& rhs) const
 //
 const float Vector3::Dot(const Vector3& lhs, const Vector3& rhs)
 {
-	return lhs._x * rhs._x + lhs._y + rhs._y, lhs._z + rhs._z;
+	return lhs._x * rhs._x + lhs._y * rhs._y + lhs._z * rhs._z;
 }
 
 //

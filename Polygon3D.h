@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector.h"
 #include "Vertex.h"
+#include "Colour.h"
 #include <vector>
 
 //
@@ -30,16 +31,31 @@ public:
 
 	const Vector3& GetNormal() const;
 	const float& GetDepth() const;
+	const Colour& GetColour() const;
+
 	const Vertex CalculateCenter(const std::vector<Vertex>& vertices) const;
+	const Vector3 TemporaryNormal(const std::vector<Vertex>& vertices) const;
 
 	void CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c);
 	void CalculateDepth(const std::vector<Vertex>& vertices);
 
 	Polygon3D& operator=(const Polygon3D& rhs);
+
 	bool operator<(const Polygon3D& rhs);
+	bool operator>(const Polygon3D& rhs);
 
 private:
 	int _indices[INDICES_COUNT];
 	float _depth;
 	Vector3 _normal;
+	Colour _finalColour;
+};
+
+
+//
+// Compares the depth of two polygons
+//
+struct DepthTest
+{
+	const bool operator()(Polygon3D* lhs, Polygon3D* rhs) const;
 };

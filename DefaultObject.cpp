@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Input.h"
 #include <cmath>
+#include "Environment.h"
 
 //
 // Initialises the class.
@@ -22,6 +23,10 @@ void DefaultObject::OnInit()
 
 	// Place the cube underneath
 	_pedistal->SetPosition({ 0, -43.f, 0 });
+
+	// Create light
+	_directional = Environment::GetActive().CreateLight<DirectionalLight>().get();
+	_directional->SetDirection(Vector3(0.f, -1.f, 0.f));
 
 	Camera::GetMainCamera()->SetPosition({ 0, 0, -50 });
 

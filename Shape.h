@@ -62,10 +62,16 @@ protected:
 	//
 	const Vertex ObjectToClipSpace(const Matrix& mvp, const Matrix& p2c, const Vertex& vertex);
 
+	//
+	// The world-space vertices without any projection/clip space transformation applied to them.
+	//
+	const std::vector<Vertex>& GetWorldSpaceVertices() const;
+
 private:
 	COLORREF _shapeColour; // The colour of the shape.
 
 	std::vector<Vertex> _shapeData;			// Where the model-space vertices will be stored.
-	std::vector<Vertex> _transformedShape;	// Where the world-space vertices will be stored and updated.
+	std::vector<Vertex> _clipSpaceData;		// Where the clip-space vertices will be stored and updated.
+	std::vector<Vertex> _worldSpaceData;	// WHere the world-space vertices will be stored and updated.
 };
 

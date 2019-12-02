@@ -37,7 +37,7 @@ const Environment& Environment::operator=(Environment& rhs)
 {
 	_sceneObjects.clear();
 
-	for (std::unique_ptr<SceneObject>& so : rhs._sceneObjects)
+	for (std::shared_ptr<SceneObject>& so : rhs._sceneObjects)
 	{
 		_sceneObjects.push_back(std::move(so));
 	}
@@ -48,10 +48,10 @@ const Environment& Environment::operator=(Environment& rhs)
 //
 // Deletes an object from the environment.
 //
-const bool Environment::DeleteObject(SceneObject& sceneObject)
+const bool Environment::DeleteObject(std::shared_ptr<SceneObject> sceneObject)
 {
-	auto searchFunction = [&sceneObject](const std::unique_ptr<SceneObject>& obj) -> bool {
-		return *obj == sceneObject;
+	auto searchFunction = [&sceneObject](const std::shared_ptr<SceneObject>& obj) -> bool {
+		return obj == sceneObject;
 	};
 
 	auto obj_ptr = std::find_if(_sceneObjects.begin(), _sceneObjects.end(), searchFunction);
@@ -65,6 +65,35 @@ const bool Environment::DeleteObject(SceneObject& sceneObject)
 	_sceneObjects.erase(obj_ptr);
 
 	return true;
+}
+
+//
+// Deletes an existing light from the environment.
+//
+const bool Environment::DeleteLight(std::shared_ptr<Light> sceneLight)
+{
+	auto searchFunction = [&sceneLight](const std::shared_ptr<Light>& obj) -> bool {
+		return obj == sceneLight;
+	};
+
+	auto obj_ptr = std::find_if(_sceneLights.begin(), _sceneLights.end(), searchFunction);
+
+	if (obj_ptr == _sceneLights.end())
+	{
+		return false;
+	}
+
+	_sceneLights.erase(obj_ptr);
+
+	return true;
+}
+
+//
+// Returns the list of all lights in the scene.
+//
+const std::vector<std::shared_ptr<Light>>& Environment::GetSceneLights() const
+{
+	return _sceneLights;
 }
 
 //

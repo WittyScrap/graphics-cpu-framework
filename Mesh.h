@@ -2,6 +2,7 @@
 #include "Shape.h"
 #include "Vertex.h"
 #include "Polygon3D.h"
+#include "Colour.h"
 
 //
 // A 3D mesh composed of multiple plygons and vertices.
@@ -28,11 +29,6 @@ public:
 	void AddPolygon(int i0, int i1, int i2);
 
 	//
-	// Normals
-	//
-	void RecalculateNormals(const std::vector<Vertex>& vertices);
-
-	//
 	// Draw operation
 	//
 	void Draw(HDC hdc);
@@ -41,8 +37,13 @@ private:
 	//
 	// Pen handler
 	//
-	void SetPen(const HDC& hdc, const COLORREF& penColor, int thickness = 1);
-	void ResetPen(const HDC& hdc);
+	void SetActiveColour(const HDC& hdc, const COLORREF& penColor, int thickness = 1);
+	void ResetActiveColour(const HDC& hdc);
+
+	//
+	// Normals
+	//
+	void RecalculateNormals(const std::vector<Vertex>& vertices);
 
 	//
 	// Drawing tools
@@ -51,10 +52,22 @@ private:
 	void CalculateDepthSorting(const std::vector<Vertex>& polygons);
 	void DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vertices, const HDC& hdc);
 
+	//
+	// Lighting tools
+	//
+	Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices);
+
 private:
 	std::vector<Polygon3D> _polygons;
 	std::vector<Polygon3D*> _culledPolygons;
 
 	HPEN _previousPen;
+	HBRUSH _previousBrush;
+
+	/*
+	Colour _kd;
+	Colour _ka;
+	Colour _ks;
+	*/
 };
 

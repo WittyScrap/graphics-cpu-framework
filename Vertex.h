@@ -22,6 +22,8 @@ public:
 	const float& GetZ() const;
 	const float& GetW() const;
 
+	const float& GetDepth() const;
+
 	void SetX(const float& x);
 	void SetY(const float& x);
 	void SetZ(const float& x);
@@ -46,6 +48,8 @@ private:
 	float _y;
 	float _z;
 	float _w;
+
+	float _depth;
 };
 
 //

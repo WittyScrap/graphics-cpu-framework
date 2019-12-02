@@ -61,6 +61,11 @@ const float& Polygon3D::GetDepth() const
 	return _depth;
 }
 
+const Colour& Polygon3D::GetColour() const
+{
+	return _finalColour;
+}
+
 //
 // Calculates the normal for this polygon.
 //
@@ -69,7 +74,7 @@ void Polygon3D::CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& 
 	Vector3 aTob((b - a).AsVector());
 	Vector3 aToc((c - a).AsVector());
 
-	_normal = Vector3::Cross(aTob, aToc);
+	_normal = Vector3::NormaliseVector(Vector3::Cross(aTob, aToc));
 }
 
 //
@@ -85,6 +90,21 @@ const Vertex Polygon3D::CalculateCenter(const std::vector<Vertex>& vertices) con
 }
 
 //
+// Calculates a temporary normal and returns a copy without storing its reference.
+//
+const Vector3 Polygon3D::TemporaryNormal(const std::vector<Vertex>& vertices) const
+{
+	const Vertex& a = vertices[_indices[0]];
+	const Vertex& b = vertices[_indices[1]];
+	const Vertex& c = vertices[_indices[2]];
+
+	Vector3 aTob((b - a).AsVector());
+	Vector3 aToc((c - a).AsVector());
+
+	return Vector3::NormaliseVector(Vector3::Cross(aTob, aToc));
+}
+
+//
 // Calculates the average depth of all vertices in the polygon.
 //
 void Polygon3D::CalculateDepth(const std::vector<Vertex>& vertices)
@@ -93,7 +113,7 @@ void Polygon3D::CalculateDepth(const std::vector<Vertex>& vertices)
 	const Vertex& b = vertices[_indices[1]];
 	const Vertex& c = vertices[_indices[2]];
 
-	_depth = (a.GetZ() + b.GetZ() + c.GetZ()) / 3;
+	_depth = (a.GetDepth() + b.GetDepth() + c.GetDepth()) / 3;
 }
 
 //
@@ -105,6 +125,10 @@ Polygon3D& Polygon3D::operator=(const Polygon3D& rhs)
 	_indices[1] = rhs._indices[1];
 	_indices[2] = rhs._indices[2];
 
+	_depth = rhs._depth;
+	_normal = rhs._normal;
+	_finalColour = rhs._finalColour;
+
 	return *this;
 }
 
@@ -114,4 +138,20 @@ Polygon3D& Polygon3D::operator=(const Polygon3D& rhs)
 bool Polygon3D::operator<(const Polygon3D& rhs)
 {
 	return _depth < rhs._depth;
+}
+
+//
+// Compares two polygons depth wise.
+//
+bool Polygon3D::operator>(const Polygon3D& rhs)
+{
+	return _depth > rhs._depth;
+}
+
+//
+// Compares the depth of two polygons.
+//
+const bool DepthTest::operator()(Polygon3D* lhs, Polygon3D* rhs) const
+{
+	return *lhs > *rhs;
 }

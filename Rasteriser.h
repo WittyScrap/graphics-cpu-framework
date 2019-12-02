@@ -41,7 +41,7 @@ private:
 	Camera _camera;
 
 	// Colours
-	COLORREF _background = RGB(0xFF, 0xFF, 0xFF);
+	COLORREF _background = RGB(0x75, 0x75, 0x75);
 	float _timeElapsed = 0;
 
 	// Scene objects and render objects

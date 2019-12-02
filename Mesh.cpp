@@ -2,11 +2,14 @@
 #include "ModelLoadingException.h"
 #include "MD2Loader.h"
 #include <algorithm>
+#include <windowsx.h>
+#include <memory>
+#include "Environment.h"
 
 //
 // Default constructor.
 //
-Mesh::Mesh() : _previousPen { 0 }
+Mesh::Mesh() : _previousPen { 0 }, _previousBrush { 0 }, _kd(1, 1, 1), _ka(1, 1, 1), _ks(1, 1, 1)
 { }
 
 //
@@ -88,34 +91,37 @@ void Mesh::Draw(HDC hdc)
 	CalculateBackfaceCulling(vertices);
 	CalculateDepthSorting(vertices);
 
-	SetPen(hdc, GetColour());
-
 	for (const Polygon3D* polygon : _culledPolygons)
 	{
 		DrawPolygon(*polygon, vertices, hdc);
 	}
-
-	SelectObject(hdc, _previousPen);
 }
 
 //
 // Pen handling.
 //
-void Mesh::SetPen(const HDC& hdc, const COLORREF& penColor, int thickness)
+void Mesh::SetActiveColour(const HDC& hdc, const COLORREF& color, int thickness)
 {
-	HPEN newPen = CreatePen(PS_SOLID, thickness, penColor);
-	HPEN oldPen = static_cast<HPEN>(SelectObject(hdc, newPen));
+	HPEN newPen = CreatePen(PS_SOLID, thickness, color);
+	HPEN oldPen = SelectPen(hdc, newPen);
+
+	HBRUSH newBrush = CreateSolidBrush(color);
+	HBRUSH oldBrush = SelectBrush(hdc, newBrush);
 
 	_previousPen = oldPen;
+	_previousBrush = oldBrush;
 }
 
 //
 // Resets the pen to its previous value, releases the new pen.
 //
-void Mesh::ResetPen(const HDC& hdc)
+void Mesh::ResetActiveColour(const HDC& hdc)
 {
-	HPEN newPen = static_cast<HPEN>(SelectObject(hdc, _previousPen));
+	HPEN newPen = SelectPen(hdc, _previousPen);
+	HBRUSH newBrush = SelectBrush(hdc, _previousBrush);
+
 	DeleteObject(newPen);
+	DeleteObject(newBrush);
 }
 
 //
@@ -153,7 +159,7 @@ void Mesh::CalculateDepthSorting(const std::vector<Vertex>& vertices)
 		polygon->CalculateDepth(vertices);
 	}
 
-	std::sort(_culledPolygons.begin(), _culledPolygons.end());
+	std::sort(_culledPolygons.begin(), _culledPolygons.end(), DepthTest());
 }
 
 //
@@ -165,11 +171,33 @@ void Mesh::DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vert
 	Vertex b = vertices[polygon.GetIndex(1)];
 	Vertex c = vertices[polygon.GetIndex(2)];
 
-	// Move to first vertex in triangle
-	MoveToEx(hdc, static_cast<int>(a.GetX()), static_cast<int>(a.GetY()), NULL);
+	// Convert to points
+	POINT pointA{ static_cast<int>(a.GetX()), static_cast<int>(a.GetY()) };
+	POINT pointB{ static_cast<int>(b.GetX()), static_cast<int>(b.GetY()) };
+	POINT pointC{ static_cast<int>(c.GetX()), static_cast<int>(c.GetY()) };
+	POINT points[3]{ pointA, pointB, pointC };
 
-	// Draw lines to b and c, then back to a
-	LineTo(hdc, static_cast<int>(b.GetX()), static_cast<int>(b.GetY()));
-	LineTo(hdc, static_cast<int>(c.GetX()), static_cast<int>(c.GetY()));
-	LineTo(hdc, static_cast<int>(a.GetX()), static_cast<int>(a.GetY()));
+	// Compute final colour
+	Colour lighting = ComputeLighting(polygon, GetWorldSpaceVertices());
+	Colour finalColour = Colour::FromColor(GetColour()) * lighting;
+
+	SetActiveColour(hdc, finalColour.AsColor());
+	Polygon(hdc, points, 3);
+	ResetActiveColour(hdc);
+}
+
+//
+// Computes all lighting to be applied to the polygon.
+//
+Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices)
+{
+	const std::vector<std::shared_ptr<Light>> sceneLights = Environment::GetActive().GetSceneLights();
+	Colour totalLightContributions;
+
+	for (std::shared_ptr<Light> light : sceneLights)
+	{
+		totalLightContributions += light->CalculateContribution(polygon, vertices);
+	}
+
+	return totalLightContributions;
 }

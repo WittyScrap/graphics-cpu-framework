@@ -1,8 +1,8 @@
 #pragma once
 #include "SceneObject.h"
+#include "DirectionalLight.h"
 #include "Mesh.h"
 #include <string>
-#include <unordered_map>
 
 //
 // Default entry point object.
@@ -21,7 +21,10 @@ private:
 	COLORREF _shapeColour = RGB(0x00, 0x00, 0xFF);
 
 	// Pedistal and figurine (don't shame me).
-	Mesh* _pedistal;
-	Mesh* _figurine;
+	Mesh* _pedistal = nullptr;
+	Mesh* _figurine = nullptr;
+
+	// Light
+	DirectionalLight* _directional = nullptr;
 };
 

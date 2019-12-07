@@ -57,6 +57,7 @@ public:
 	//
 	// Vector aritmetics
 	//
+	void Clear();
 	void Normalise();
 	const float GetMagnitude() const;
 	const float GetSqrMagnitude() const;

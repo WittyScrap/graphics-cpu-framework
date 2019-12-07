@@ -29,7 +29,7 @@ void Square::Draw(HDC hdc)
 		return;
 	}
 
-	HPEN pen = CreatePen(PS_SOLID, 1, GetColour());
+	HPEN pen = CreatePen(PS_SOLID, 1, GetColour().AsColor());
 	HPEN old = static_cast<HPEN>(SelectObject(hdc, pen));
 
 	// Iterator to vertices

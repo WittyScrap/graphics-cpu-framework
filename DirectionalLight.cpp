@@ -35,7 +35,7 @@ void DirectionalLight::SetDirection(const Vector3& vector)
 //
 Colour DirectionalLight::CalculateContribution(const Polygon3D& polygon, const std::vector<Vertex>& vertices)
 {
-	const Vector3 normal = polygon.TemporaryNormal(vertices);
+	const Vector3 normal = polygon.GetWorldNormal();
 	const Vector3 inverseDirection = -_direction;
 	float normalDotDirection = Vector3::Dot(normal, inverseDirection);
 

@@ -29,15 +29,19 @@ public:
 	Polygon3D(const Polygon3D& other);
 	int GetIndex(const int& i) const;
 
-	const Vector3& GetNormal() const;
+	const Vector3& GetObjectNormal() const;
+	const Vector3& GetWorldNormal() const;
+	const Vector3& GetClipNormal() const;
+
 	const float& GetDepth() const;
 	const Colour& GetColour() const;
 
 	const Vertex CalculateCenter(const std::vector<Vertex>& vertices) const;
-	const Vector3 TemporaryNormal(const std::vector<Vertex>& vertices) const;
-
-	void CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c);
 	void CalculateDepth(const std::vector<Vertex>& vertices);
+
+	void CalculateObjectNormal(const std::vector<Vertex>& objectSpace);
+	void CalculateWorldNormal(const std::vector<Vertex>& worldSpace);
+	void CalculateClipNormal(const std::vector<Vertex>& clipSpace);
 
 	Polygon3D& operator=(const Polygon3D& rhs);
 
@@ -47,8 +51,11 @@ public:
 private:
 	int _indices[INDICES_COUNT];
 	float _depth;
-	Vector3 _normal;
 	Colour _finalColour;
+
+	Vector3 _objectNormal;
+	Vector3 _worldNormal;
+	Vector3 _clipNormal;
 };
 
 

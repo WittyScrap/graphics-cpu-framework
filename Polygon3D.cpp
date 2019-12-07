@@ -46,11 +46,27 @@ int Polygon3D::GetIndex(const int& i) const
 }
 
 //
-// This polygon's pre-calculated normal.
+// This polygon's precalculated OBJECT SPACE normal.
 //
-const Vector3& Polygon3D::GetNormal() const
+const Vector3& Polygon3D::GetObjectNormal() const
 {
-	return _normal;
+	return _objectNormal;
+}
+
+//
+// This polygon's precalculated OBJECT SPACE normal.
+//
+const Vector3& Polygon3D::GetWorldNormal() const
+{
+	return _worldNormal;
+}
+
+//
+// This polygon's precalculated OBJECT SPACE normal.
+//
+const Vector3& Polygon3D::GetClipNormal() const
+{
+	return _clipNormal;
 }
 
 //
@@ -61,20 +77,12 @@ const float& Polygon3D::GetDepth() const
 	return _depth;
 }
 
+//
+// The calculated colour of this polygon.
+//
 const Colour& Polygon3D::GetColour() const
 {
 	return _finalColour;
-}
-
-//
-// Calculates the normal for this polygon.
-//
-void Polygon3D::CalculateNormal(const Vertex& a, const Vertex& b, const Vertex& c)
-{
-	Vector3 aTob((b - a).AsVector());
-	Vector3 aToc((c - a).AsVector());
-
-	_normal = Vector3::NormaliseVector(Vector3::Cross(aTob, aToc));
 }
 
 //
@@ -90,21 +98,6 @@ const Vertex Polygon3D::CalculateCenter(const std::vector<Vertex>& vertices) con
 }
 
 //
-// Calculates a temporary normal and returns a copy without storing its reference.
-//
-const Vector3 Polygon3D::TemporaryNormal(const std::vector<Vertex>& vertices) const
-{
-	const Vertex& a = vertices[_indices[0]];
-	const Vertex& b = vertices[_indices[1]];
-	const Vertex& c = vertices[_indices[2]];
-
-	Vector3 aTob((b - a).AsVector());
-	Vector3 aToc((c - a).AsVector());
-
-	return Vector3::NormaliseVector(Vector3::Cross(aTob, aToc));
-}
-
-//
 // Calculates the average depth of all vertices in the polygon.
 //
 void Polygon3D::CalculateDepth(const std::vector<Vertex>& vertices)
@@ -117,6 +110,51 @@ void Polygon3D::CalculateDepth(const std::vector<Vertex>& vertices)
 }
 
 //
+// Calculates the OBJECT SPACE normal for this polygon.
+//
+void Polygon3D::CalculateObjectNormal(const std::vector<Vertex>& objectSpace)
+{
+	const Vertex& a = objectSpace[_indices[0]];
+	const Vertex& b = objectSpace[_indices[1]];
+	const Vertex& c = objectSpace[_indices[2]];
+
+	Vector3 aTob((b - a).AsVector());
+	Vector3 aToc((c - a).AsVector());
+
+	_objectNormal = Vector3::NormaliseVector(Vector3::Cross(aTob, aToc));
+}
+
+//
+// Calculates the WORLD SPACE normal for this polygon.
+//
+void Polygon3D::CalculateWorldNormal(const std::vector<Vertex>& worldSpace)
+{
+	const Vertex& a = worldSpace[_indices[0]];
+	const Vertex& b = worldSpace[_indices[1]];
+	const Vertex& c = worldSpace[_indices[2]];
+
+	Vector3 aTob((b - a).AsVector());
+	Vector3 aToc((c - a).AsVector());
+
+	_worldNormal = Vector3::NormaliseVector(Vector3::Cross(aTob, aToc));
+}
+
+//
+// Calculates the CLIP SPACE normal for this polygon.
+//
+void Polygon3D::CalculateClipNormal(const std::vector<Vertex>& clipSpace)
+{
+	const Vertex& a = clipSpace[_indices[0]];
+	const Vertex& b = clipSpace[_indices[1]];
+	const Vertex& c = clipSpace[_indices[2]];
+
+	Vector3 aTob((b - a).AsVector());
+	Vector3 aToc((c - a).AsVector());
+
+	_clipNormal = Vector3::NormaliseVector(Vector3::Cross(aTob, aToc));
+}
+
+//
 // Assigns the values of the passed polygon to this one, then returns this object.
 //
 Polygon3D& Polygon3D::operator=(const Polygon3D& rhs)
@@ -126,7 +164,9 @@ Polygon3D& Polygon3D::operator=(const Polygon3D& rhs)
 	_indices[2] = rhs._indices[2];
 
 	_depth = rhs._depth;
-	_normal = rhs._normal;
+	_objectNormal = rhs._objectNormal;
+	_worldNormal = rhs._worldNormal;
+	_clipNormal = rhs._clipNormal;
 	_finalColour = rhs._finalColour;
 
 	return *this;

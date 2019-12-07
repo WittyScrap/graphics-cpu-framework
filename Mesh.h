@@ -5,6 +5,16 @@
 #include "Colour.h"
 
 //
+// How to draw a mesh.
+//
+enum DrawMode
+{
+	DRAW_WIREFRAME,
+	DRAW_SOLID,
+	DRAW_FRAGMENT
+};
+
+//
 // A 3D mesh composed of multiple plygons and vertices.
 //
 class Mesh : public Shape
@@ -32,6 +42,7 @@ public:
 	// Draw operation
 	//
 	void Draw(HDC hdc);
+	void DrawMode(const ::DrawMode& mode);
 
 private:
 	//
@@ -43,14 +54,23 @@ private:
 	//
 	// Normals
 	//
-	void RecalculateNormals(const std::vector<Vertex>& vertices);
+	void GenerateObjectNormals();
+	void GenerateWorldNormals();
+	void GenerateClipNormals();
+	void GenerateVertexNormals();
 
 	//
-	// Drawing tools
+	// Optimisation tools
 	//
 	void CalculateBackfaceCulling(const std::vector<Vertex>& vertices);
 	void CalculateDepthSorting(const std::vector<Vertex>& polygons);
-	void DrawPolygon(const Polygon3D& polygon, const std::vector<Vertex>& vertices, const HDC& hdc);
+	
+	//
+	// Drawing tools
+	//
+	void DrawSolidPolygon(const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace, const HDC& hdc);
+	void DrawWirePolygon(const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace, const HDC& hdc);
+	void DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace, const HDC& hdc);
 
 	//
 	// Lighting tools
@@ -64,10 +84,6 @@ private:
 	HPEN _previousPen;
 	HBRUSH _previousBrush;
 
-	/*
-	Colour _kd;
-	Colour _ka;
-	Colour _ks;
-	*/
+	::DrawMode _drawMode;
 };
 

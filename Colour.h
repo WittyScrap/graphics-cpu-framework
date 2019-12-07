@@ -10,6 +10,7 @@ public:
 	Colour();
 	Colour(const float& red, const float& green, const float& blue);
 	Colour(const Colour& copy);
+	Colour(const COLORREF& copy);
 
 	const float& GetRed() const;
 	const float& GetGreen() const;

@@ -8,6 +8,7 @@
 #include "Environment.h"
 #include "ModelLoadingException.h"
 #include "Input.h"
+#include "DefaultObject.h"
 
 //
 // Rasteriser class for handling drawing and mathematics operations.
@@ -45,6 +46,7 @@ private:
 	float _timeElapsed = 0;
 
 	// Scene objects and render objects
+	std::shared_ptr<DefaultObject> _start;
 	Environment _environment;
 	Input _inputManager;
 };

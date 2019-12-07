@@ -86,7 +86,7 @@ void Rasteriser::InitialiseComponents(const Bitmap& bitmap)
 	_camera.SetMain();
 
 	// Add default scene object
-	_environment.CreateObject<DefaultObject>("Starter");
+	_start = _environment.CreateObject<DefaultObject>("Starter");
 	_environment.OnStart();
 }
 

@@ -19,7 +19,7 @@ Shape::~Shape()
 //
 // Returns a vertex group containing every vertex in the internal shape, transformed by the MVP matrix.
 //
-const std::vector<Vertex>& Shape::CalculateTransformations()
+void Shape::CalculateTransformations()
 {
 	const size_t  verticesCount = _shapeData.size();
 
@@ -32,8 +32,6 @@ const std::vector<Vertex>& Shape::CalculateTransformations()
 		_worldSpaceData[i] = mv * _shapeData[i];
 		_clipSpaceData[i] = ObjectToClipSpace(p, p2c, _worldSpaceData[i]);
 	}
-
-	return _clipSpaceData;
 }
 
 //
@@ -84,6 +82,14 @@ const Vertex Shape::ObjectToClipSpace(const Matrix& p, const Matrix& p2c, const 
 
 
 	return transformed;
+}
+
+//
+// The fully tranformed vertices, after all projection and clip space transformations have been applied.
+//
+const std::vector<Vertex>& Shape::GetClipSpaceVertices() const
+{
+	return _clipSpaceData;
 }
 
 //
@@ -140,17 +146,17 @@ const size_t Shape::GetVerticesCount() const
 //
 // The shape's colour
 //
-const COLORREF& Shape::GetColour() const
+const Colour Shape::GetColour() const
 {
-	return _shapeColour;
+	return Colour(_shapeColour);
 }
 
 //
 // The shape's colour.
 //
-void Shape::SetColour(const COLORREF& colour)
+void Shape::SetColour(const Colour& colour)
 {
-	_shapeColour = colour;
+	_shapeColour = colour.AsColor();
 }
 
 //

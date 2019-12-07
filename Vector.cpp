@@ -239,6 +239,17 @@ Vector3 Vector3::NormaliseVector(const Vector3& vector)
 }
 
 //
+// Clears the components of this vector without
+// allocating a new vector.
+//
+void Vector3::Clear()
+{
+	_x = 0;
+	_y = 0;
+	_z = 0;
+}
+
+//
 // Normalises this vector.
 //
 void Vector3::Normalise()

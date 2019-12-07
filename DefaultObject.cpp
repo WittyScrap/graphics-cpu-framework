@@ -18,17 +18,32 @@ void DefaultObject::OnInit()
 	_figurine->LoadFromFile("Meshes/marvin.md2");
 
 	// Set colour
-	_pedistal->SetColour(_shapeColour);
-	_figurine->SetColour(_shapeColour);
+	_pedistal->SetColour(Colour(.5f, .5f, 1.f));
+	_figurine->SetColour(Colour(1.f, .5f, .5f));
+
+	// Set draw modes
+	_pedistal->DrawMode(DRAW_FRAGMENT);
+	_figurine->DrawMode(DRAW_FRAGMENT);
 
 	// Place the cube underneath
 	_pedistal->SetPosition({ 0, -43.f, 0 });
 
 	// Create light
 	_directional = Environment::GetActive().CreateLight<DirectionalLight>().get();
-	_directional->SetDirection(Vector3(0.f, -1.f, 0.f));
+	_directional->SetDirection(Vector3(-1.f, -1.f, 1.f));
+	_directional->SetIntensity(Colour(1.f, 0.f, 0.f));
+
+	// Create ambient light
+	_ambient = Environment::GetActive().CreateLight<AmbientLight>().get();
+	_ambient->SetIntensity(Colour(.1f, .1f, .1f));
+
+	// Create point light
+	_point = Environment::GetActive().CreateLight<PointLight>().get();
+	_point->SetPosition(Vector3(0, 50, -50.f));
+	_point->SetIntensity(Colour(.5f, .5f, 1.f));
 
 	Camera::GetMainCamera()->SetPosition({ 0, 0, -50 });
+	Camera::GetMainCamera()->SetRotation({ 0, 0, 0 });
 
 	// Cache input manager's pointer.
 	Input* const inputManager = Input::Get();
@@ -76,6 +91,11 @@ void DefaultObject::OnTick(const float& deltaTime)
 
 	mainCamera->SetPosition(cameraCurrentPosition);
 	mainCamera->SetRotation(cameraCurrentRotation);
+
+	Vector3 lightDir = _directional->GetDirection();
+	lightDir = Matrix::RotationMatrix(0.f, .1f, 0.f) * lightDir;
+
+	_directional->SetDirection(lightDir);
 }
 
 //

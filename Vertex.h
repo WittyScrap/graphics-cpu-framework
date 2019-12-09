@@ -1,10 +1,7 @@
 #pragma once
 #include <initializer_list>
-
-//
-// Vector class forward declaration
-//
-struct Vector3;
+#include "Colour.h"
+#include "VertexData.h"
 
 //
 // Represents a vertex, with X, Y, Z, and W components.
@@ -35,10 +32,14 @@ public:
 
 	template <typename ...TVertices>
 	static Vertex GetAverage(const TVertices& ...vertices);
-	
 
 	const Vector3 AsVector() const;
 	void Dehomogenise();
+
+	VertexData& GetVertexData();
+	const VertexData& GetVertexData() const;
+
+	static Vertex Lerp(const Vertex& lhs, const Vertex& rhs, const float& alpha);
 
 private:
 	static Vertex GetAverage(const std::initializer_list<Vertex>& vertices);
@@ -50,6 +51,8 @@ private:
 	float _w;
 
 	float _depth;
+
+	VertexData _vertexData;
 };
 
 //

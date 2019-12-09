@@ -62,18 +62,16 @@ void PointLight::SetAttenuation(const float& value)
 //
 // Calculates the overall contribution of the point light.
 //
-Colour PointLight::CalculateContribution(const Polygon3D& polygon, const std::vector<Vertex>& vertices)
+Colour PointLight::CalculateContribution(const Vertex& position, const Vector3& normal)
 {
 	constexpr float a = 0.f;
 	constexpr float c = 0.f;
 
-	const Vector3 polygonCenter = polygon.CalculateCenter(vertices);
-	const Vector3 lightRay = _position - polygonCenter;
-	const Vector3 normal = polygon.GetWorldNormal();
+	const Vector3 lightRay = _position - position;
 
 	const float distance = lightRay.GetMagnitude();
 	const float attenuation = 1 / (a + _attenuation * distance + c * (distance * distance));
-	const float normalDotRay = Vector3::Dot(normal, Vector3::NormaliseVector(lightRay));
+	const float normalDotRay = std::clamp(Vector3::Dot(normal, Vector3::NormaliseVector(lightRay)), 0.f, 1.f);
 	const float finalIntensity = normalDotRay * attenuation;
 
 	return GetIntensity() * finalIntensity;

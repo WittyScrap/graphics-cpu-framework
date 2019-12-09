@@ -5,12 +5,11 @@
 #include <windowsx.h>
 #include <memory>
 #include "Environment.h"
-#include "TriangleRasteriser.h"
 
 //
 // Default constructor.
 //
-Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DRAW_SOLID }
+Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DrawMode::DRAW_SOLID }, _shadeMode { ShadeMode::SHADE_FLAT }
 { }
 
 //
@@ -111,7 +110,38 @@ void Mesh::GenerateClipNormals()
 //
 void Mesh::GenerateVertexNormals()
 {
+	std::vector<Vertex>& worldVertices = GetWorldSpaceVertices();
+	std::vector<Vertex>& clipVertices = GetClipSpaceVertices();
 
+	for (Vertex& vertex : worldVertices)
+	{
+		vertex.GetVertexData().SetNormal({ 0, 0, 0 });
+		vertex.GetVertexData().SetContribution(0);
+	}
+
+	for (const Polygon3D& polygon : _polygons)
+	{
+		Vertex& a = worldVertices[polygon.GetIndex(0)];
+		Vertex& b = worldVertices[polygon.GetIndex(1)];
+		Vertex& c = worldVertices[polygon.GetIndex(2)];
+
+		const Vector3& normal = polygon.GetWorldNormal();
+
+		a.GetVertexData().AddNormal(normal);
+		a.GetVertexData().AddContribution(1);
+
+		b.GetVertexData().AddNormal(normal);
+		b.GetVertexData().AddContribution(1);
+
+		c.GetVertexData().AddNormal(normal);
+		c.GetVertexData().AddContribution(1);
+	}
+
+	for (size_t i = 0; i < worldVertices.size(); ++i)
+	{
+		worldVertices[i].GetVertexData().DivideNormalByContribution();
+		clipVertices[i].GetVertexData().SetNormal(worldVertices[i].GetVertexData().GetNormal());
+	}
 }
 
 //
@@ -127,20 +157,26 @@ void Mesh::Draw(HDC hdc)
 
 	GenerateWorldNormals();
 	GenerateClipNormals();
+
 	CalculateBackfaceCulling(clipSpace);
 	CalculateDepthSorting(clipSpace);
 
-	for (const Polygon3D* polygon : _culledPolygons)
+	if (_drawMode == DrawMode::DRAW_FRAGMENT)
+	{
+		GenerateVertexNormals();
+	}
+
+	for (const Polygon3D* polygon : _visiblePolygons)
 	{
 		switch (_drawMode)
 		{
-		case DRAW_WIREFRAME:
+		case DrawMode::DRAW_WIREFRAME:
 			DrawWirePolygon(*polygon, clipSpace, worldSpace, hdc);
 			break;
-		case DRAW_SOLID:
+		case DrawMode::DRAW_SOLID:
 			DrawSolidPolygon(*polygon, clipSpace, worldSpace, hdc);
 			break;
-		case DRAW_FRAGMENT:
+		case DrawMode::DRAW_FRAGMENT:
 			DrawFragPolygon(*polygon, clipSpace, worldSpace, hdc);
 			break;
 		}
@@ -150,9 +186,17 @@ void Mesh::Draw(HDC hdc)
 //
 // The way this mesh should be rendered.
 //
-void Mesh::DrawMode(const ::DrawMode& mode)
+void Mesh::Mode(const DrawMode& mode)
 {
 	_drawMode = mode;
+}
+
+//
+// The way this mesh should shade its triangles.
+//
+void Mesh::Shade(const ShadeMode& mode)
+{
+	_shadeMode = mode;
 }
 
 //
@@ -190,7 +234,7 @@ void Mesh::CalculateBackfaceCulling(const std::vector<Vertex>& vertices)
 {
 	Matrix transform = GetMVP(MVP);
 
-	_culledPolygons.clear();
+	_visiblePolygons.clear();
 	for (Polygon3D& polygon : _polygons)
 	{
 		Vector3 normal = polygon.GetClipNormal();
@@ -202,7 +246,7 @@ void Mesh::CalculateBackfaceCulling(const std::vector<Vertex>& vertices)
 		float normalDotView = Vector3::Dot(normal, view);
 		if (normalDotView > 0)
 		{
-			_culledPolygons.push_back(&polygon);
+			_visiblePolygons.push_back(&polygon);
 		}
 	}
 }
@@ -212,12 +256,12 @@ void Mesh::CalculateBackfaceCulling(const std::vector<Vertex>& vertices)
 //
 void Mesh::CalculateDepthSorting(const std::vector<Vertex>& vertices)
 {
-	for (Polygon3D* polygon : _culledPolygons)
+	for (Polygon3D* polygon : _visiblePolygons)
 	{
 		polygon->CalculateDepth(vertices);
 	}
 
-	std::sort(_culledPolygons.begin(), _culledPolygons.end(), DepthTest());
+	std::sort(_visiblePolygons.begin(), _visiblePolygons.end(), DepthTest());
 }
 
 //
@@ -274,30 +318,81 @@ void Mesh::DrawWirePolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 //
 void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace, const HDC& hdc)
 {
-	// Compute final colour
-	Colour lighting = ComputeLighting(polygon, worldSpace);
-	Colour finalColour = GetColour() * lighting;
+	const int& index0 = polygon.GetIndex(0);
+	const int& index1 = polygon.GetIndex(1);
+	const int& index2 = polygon.GetIndex(2);
 
-	SetActiveColour(hdc, finalColour.AsColor());
+	const Vertex& clipA = clipSpace[index0];
+	const Vertex& clipB = clipSpace[index1];
+	const Vertex& clipC = clipSpace[index2];
+
+	FragmentFunction frag = std::bind(&Mesh::Frag, this, std::placeholders::_1);
 
 	// Draw using custom rasterizing system.
-	TriangleRasteriser::Draw(hdc, polygon, clipSpace, worldSpace);
+	switch (_shadeMode)
+	{
+	case ShadeMode::SHADE_FLAT:
+	{
+		Colour lighting = ComputeLighting(polygon, worldSpace);
+		Colour finalColour = GetColour() * lighting;
 
-	ResetActiveColour(hdc);
+		SetActiveColour(hdc, finalColour.AsColor());
+		TriangleRasteriser::DrawFlat(hdc, { clipA, clipB, clipC });
+		ResetActiveColour(hdc);
+
+		break;
+	}
+	case ShadeMode::SHADE_SMOOTH:
+		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
+		TriangleRasteriser::DrawSmooth(hdc, { clipA, clipB, clipC }, frag);
+		break;
+	}
 }
 
 //
 // Computes all lighting to be applied to the polygon.
 //
-Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices)
+Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices) const
 {
-	const std::vector<std::shared_ptr<Light>> sceneLights = Environment::GetActive().GetSceneLights();
+	const Vertex position = polygon.CalculateCenter(vertices);
+	const Vector3& normal = polygon.GetWorldNormal();
+
+	const std::vector<LightPtr> sceneLights = Environment::GetActive().GetSceneLights();
 	Colour totalLightContributions;
 
-	for (std::shared_ptr<Light> light : sceneLights)
+	for (const LightPtr& light : sceneLights)
 	{
-		totalLightContributions += light->CalculateContribution(polygon, vertices);
+		totalLightContributions += light->CalculateContribution(position, normal);
 	}
 
 	return totalLightContributions;
+}
+
+//
+// Computers all lighting to be applied to this vertex.
+//
+Colour Mesh::ComputeLighting(const Vertex& vertex) const
+{
+	const Vector3& normal = vertex.GetVertexData().GetNormal();
+
+	const std::vector<LightPtr> sceneLights = Environment::GetActive().GetSceneLights();
+	Colour totalLightContributions;
+
+	for (const LightPtr& light : sceneLights)
+	{
+		totalLightContributions += light->CalculateContribution(vertex, normal);
+	}
+
+	return totalLightContributions;
+}
+
+//
+// Fragment function.
+//
+Colour Mesh::Frag(const Vertex& i) const
+{
+	const Colour light = ComputeLighting(i);
+	const Colour& base = GetColour();
+
+	return base;
 }

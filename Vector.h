@@ -1,6 +1,10 @@
 #pragma once
 #include "Point.h"
-#include "Vertex.h"
+
+//
+// Vertex forward declaration.
+//
+class Vertex;
 
 struct Vector3
 {
@@ -28,10 +32,10 @@ public:
 	Vector3  operator- (const Vector3& rhs) const;
 	Vector3  operator* (const Vector3& rhs) const;
 	Vector3  operator/ (const Vector3& rhs) const;
-	Vector3  operator+=(const Vector3& rhs) const;
-	Vector3  operator-=(const Vector3& rhs) const;
-	Vector3  operator*=(const Vector3& rhs) const;
-	Vector3  operator/=(const Vector3& rhs) const;
+	Vector3& operator+=(const Vector3& rhs);
+	Vector3& operator-=(const Vector3& rhs);
+	Vector3& operator*=(const Vector3& rhs);
+	Vector3& operator/=(const Vector3& rhs);
 	Vector3  operator- () const;
 
 	//
@@ -42,10 +46,19 @@ public:
 	Vector3  operator- (const Vertex& rhs) const;
 	Vector3  operator* (const Vertex& rhs) const;
 	Vector3  operator/ (const Vertex& rhs) const;
-	Vector3  operator+=(const Vertex& rhs) const;
-	Vector3  operator-=(const Vertex& rhs) const;
-	Vector3  operator*=(const Vertex& rhs) const;
-	Vector3  operator/=(const Vertex& rhs) const;
+	Vector3& operator+=(const Vertex& rhs);
+	Vector3& operator-=(const Vertex& rhs);
+	Vector3& operator*=(const Vertex& rhs);
+	Vector3& operator/=(const Vertex& rhs);
+
+	//
+	// Operators on scalars
+	//
+	Vector3  operator* (const float& rhs) const;
+	Vector3  operator/ (const float& rhs) const;
+
+	Vector3& operator*=(const float& rhs);
+	Vector3& operator/=(const float& rhs);
 
 	//
 	// Static Vector aritmetics
@@ -53,6 +66,7 @@ public:
 	static const float Dot(const Vector3& lhs, const Vector3& rhs);
 	static Vector3 Cross(const Vector3& lhs, const Vector3& rhs);
 	static Vector3 NormaliseVector(const Vector3& vector);
+	static Vector3 Lerp(const Vector3& lhs, const Vector3& rhs, const float& alpha);
 
 	//
 	// Vector aritmetics

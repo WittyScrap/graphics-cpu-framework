@@ -9,7 +9,7 @@ AmbientLight::AmbientLight() : Light()
 //
 // Returns a constant value related to its intensity.
 //
-Colour AmbientLight::CalculateContribution(const Polygon3D& polygon, const std::vector<Vertex>& vertices)
+Colour AmbientLight::CalculateContribution(const Vertex& position, const Vector3& normal)
 {
 	return GetIntensity();
 }

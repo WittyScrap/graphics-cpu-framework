@@ -170,6 +170,9 @@
     <ClInclude Include="TriangleRasteriser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VertexData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Rasteriser.ico">

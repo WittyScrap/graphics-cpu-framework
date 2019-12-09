@@ -73,6 +73,12 @@ protected:
 	const std::vector<Vertex>& GetClipSpaceVertices() const;
 	const std::vector<Vertex>& GetWorldSpaceVertices() const;
 
+	//
+	// Non-const versions of vertices accessors.
+	//
+	std::vector<Vertex>& GetClipSpaceVertices();
+	std::vector<Vertex>& GetWorldSpaceVertices();
+
 private:
 	COLORREF _shapeColour; // The colour of the shape.
 

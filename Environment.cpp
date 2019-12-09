@@ -48,7 +48,7 @@ const Environment& Environment::operator=(Environment& rhs)
 //
 // Deletes an object from the environment.
 //
-const bool Environment::DeleteObject(std::shared_ptr<SceneObject> sceneObject)
+const bool Environment::DeleteObject(SceneObjectPtr& sceneObject)
 {
 	auto searchFunction = [&sceneObject](const std::shared_ptr<SceneObject>& obj) -> bool {
 		return obj == sceneObject;
@@ -70,7 +70,7 @@ const bool Environment::DeleteObject(std::shared_ptr<SceneObject> sceneObject)
 //
 // Deletes an existing light from the environment.
 //
-const bool Environment::DeleteLight(std::shared_ptr<Light> sceneLight)
+const bool Environment::DeleteLight(LightPtr& sceneLight)
 {
 	auto searchFunction = [&sceneLight](const std::shared_ptr<Light>& obj) -> bool {
 		return obj == sceneLight;

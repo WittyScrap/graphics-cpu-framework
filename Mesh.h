@@ -3,16 +3,8 @@
 #include "Vertex.h"
 #include "Polygon3D.h"
 #include "Colour.h"
+#include "TriangleRasteriser.h"
 
-//
-// How to draw a mesh.
-//
-enum DrawMode
-{
-	DRAW_WIREFRAME,
-	DRAW_SOLID,
-	DRAW_FRAGMENT
-};
 
 //
 // A 3D mesh composed of multiple plygons and vertices.
@@ -20,6 +12,26 @@ enum DrawMode
 class Mesh : public Shape
 {
 public:
+	//
+	// How to draw a mesh.
+	//
+	enum class DrawMode
+	{
+		DRAW_WIREFRAME,
+		DRAW_SOLID,
+		DRAW_FRAGMENT
+	};
+
+	//
+	// How to shade a triangle.
+	//
+	enum class ShadeMode
+	{
+		SHADE_FLAT,
+		SHADE_SMOOTH
+	};
+
+
 	Mesh();
 	~Mesh();
 
@@ -42,7 +54,8 @@ public:
 	// Draw operation
 	//
 	void Draw(HDC hdc);
-	void DrawMode(const ::DrawMode& mode);
+	void Mode(const DrawMode& mode);
+	void Shade(const ShadeMode& mode);
 
 private:
 	//
@@ -75,15 +88,22 @@ private:
 	//
 	// Lighting tools
 	//
-	Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices);
+	Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices) const;
+	Colour ComputeLighting(const Vertex& vertices) const;
+
+	//
+	// Fragment callback
+	//
+	Colour Frag(const Vertex& i) const;
 
 private:
 	std::vector<Polygon3D> _polygons;
-	std::vector<Polygon3D*> _culledPolygons;
+	std::vector<Polygon3D*> _visiblePolygons;
 
 	HPEN _previousPen;
 	HBRUSH _previousBrush;
 
-	::DrawMode _drawMode;
+	DrawMode _drawMode;
+	ShadeMode _shadeMode;
 };
 

@@ -1,5 +1,5 @@
-#include "Vertex.h"
 #include "Vector.h"
+#include "Vertex.h"
 #include <numeric>
 
 Vertex::Vertex() : _x{ 0 }, _y{ 0 }, _z{ 0 }, _w{ 0 }, _depth{ 0 }
@@ -11,7 +11,7 @@ Vertex::Vertex(float x, float y, float z) : _x{ x }, _y{ y }, _z{ z }, _w{ 1 }, 
 Vertex::Vertex(float x, float y, float z, float w) : _x{ x }, _y{ y }, _z{ z }, _w{ w }, _depth{ 0 }
 { }
 
-Vertex::Vertex(const Vertex& other) : _x{ other._x }, _y{ other._y }, _z{ other._z }, _w{ other._w }, _depth{ other._depth }
+Vertex::Vertex(const Vertex& other) : _x{ other._x }, _y{ other._y }, _z{ other._z }, _w{ other._w }, _depth{ other._depth }, _vertexData{ other._vertexData }
 { }
 
 const float& Vertex::GetX() const
@@ -67,6 +67,7 @@ const Vertex& Vertex::operator=(const Vertex& rhs)
 	_w = rhs._w;
 
 	_depth = rhs._depth;
+	_vertexData = rhs._vertexData;
 
 	return *this;
 }
@@ -100,6 +101,34 @@ void Vertex::Dehomogenise()
 	_y /= _w;
 	_z /= _w;
 	_w = 1; /* w/w = 1 */
+}
+
+VertexData& Vertex::GetVertexData()
+{
+	return _vertexData;
+}
+
+const VertexData& Vertex::GetVertexData() const
+{
+	return _vertexData;
+}
+
+//
+// Interpolates lineraly between the to vertices.
+//
+Vertex Vertex::Lerp(const Vertex& lhs, const Vertex& rhs, const float& alpha)
+{
+	Vertex lerp;
+
+	lerp.SetX(rhs.GetX() * alpha + lhs.GetX() * (1 - alpha));
+	lerp.SetY(rhs.GetY() * alpha + lhs.GetY() * (1 - alpha));
+	lerp.SetZ(rhs.GetZ() * alpha + lhs.GetZ() * (1 - alpha));
+	lerp.SetW(rhs.GetW() * alpha + lhs.GetW() * (1 - alpha));
+
+	lerp.GetVertexData().SetNormal(Vector3::Lerp(lhs.GetVertexData().GetNormal(), rhs.GetVertexData().GetNormal(), alpha));
+	lerp.GetVertexData().SetColour(Colour::Lerp(lhs.GetVertexData().GetColour(), rhs.GetVertexData().GetColour(), alpha));
+
+	return lerp;
 }
 
 //

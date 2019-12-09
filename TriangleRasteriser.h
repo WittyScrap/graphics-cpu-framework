@@ -1,7 +1,13 @@
 #pragma once
 #include <Windows.h>
 #include <vector>
+#include <functional>
 #include "Polygon3D.h"
+
+//
+// Fragment function alias.
+//
+typedef std::function<Colour(const Vertex&)> FragmentFunction;
 
 //
 // Rasterises a triangle using the standard solid rasterisation
@@ -9,28 +15,30 @@
 //
 class TriangleRasteriser
 {
+	//
+	// Raw polygon data structure.
+	//
+	struct PolygonData
+	{
+		const Vertex& a;
+		const Vertex& b;
+		const Vertex& c;
+	};
+
 public:
 	//
 	// Rasterises a triangle using the standard solid rasterisation
 	// technique.
 	//
-	static void Draw(const HDC& hdc, const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace);
+	static void DrawFlat(const HDC& hdc, const PolygonData& clipSpace);
+
+	//
+	// Rasterises a triangle using the standard solid rasterisation
+	// technique, shading on a fragment-by-fragment basis.
+	//
+	static void DrawSmooth(const HDC& hdc, const PolygonData& clipSpace, const FragmentFunction& frag);
 
 private:
-	//
-	// Fills a triangle whose bottom side is perfectly horizontal.
-	// Precondition is that v2 and v3 perform the flat side and 
-	// that v1.y < v2.y, v3.y.
-	//
-	static void BottomFlat(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC);
-	
-	//
-	// Fills a triangle whose top side is perfectly horizontal.
-	// Precondition is that v1 and v2 perform the flat side and 
-	// that v3.y > v1.y, v2.y.
-	//
-	static void TopFlat(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC);
-
 	//
 	// Sorts vertices by their Y value, so that A has the smallest
 	// Y value, B has one that is always less than C and more than A,
@@ -39,15 +47,32 @@ private:
 	static void SortVertices(Vertex& a, Vertex& b, Vertex& c);
 
 	//
-	// Ceils a floating point value and casts it into an
-	// integer.
+	// Fills a triangle whose bottom side is perfectly horizontal.
+	// Precondition is that v2 and v3 perform the flat side and 
+	// that v1.y < v2.y, v3.y.
 	//
-	static int Ceil(const float& value);
+	static void BottomFlat(const HDC& hdc, const Vertex& a, const Vertex& b, const Vertex& c);
+	
+	//
+	// Fills a triangle whose top side is perfectly horizontal.
+	// Precondition is that v1 and v2 perform the flat side and 
+	// that v3.y > v1.y, v2.y.
+	//
+	static void TopFlat(const HDC& hdc, const Vertex& a, const Vertex& b, const Vertex& c);
 
 	//
-	// Floors a floating point value and casts it into an
-	// integer.
+	// Fills a triangle whose bottom side is perfectly horizontal.
+	// Precondition is that v2 and v3 perform the flat side and 
+	// that v1.y < v2.y, v3.y.
 	//
-	static int Floor(const float& value);
+	static void BottomSmooth(const HDC& hdc, const FragmentFunction& frag, const PolygonData& clipSpace);
+
+	//
+	// Fills a triangle whose top side is perfectly horizontal.
+	// Precondition is that v1 and v2 perform the flat side and 
+	// that v3.y > v1.y, v2.y.
+	//
+	static void TopSmooth(const HDC& hdc, const FragmentFunction& frag, const PolygonData& clipSpace);
+
 };
 

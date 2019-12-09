@@ -6,6 +6,9 @@
 #include <string>
 #include <type_traits>
 
+using SceneObjectPtr = std::shared_ptr<SceneObject>;
+using LightPtr = std::shared_ptr<Light>;
+
 //
 // Environment:
 //	Defines the collection of all scene objects and logic
@@ -22,12 +25,13 @@ public:
 	
 	template<typename TObjType>
 	std::shared_ptr<TObjType> CreateObject(const std::string& objectName);
-	const bool DeleteObject(std::shared_ptr<SceneObject> sceneObject);
+	const bool DeleteObject(SceneObjectPtr& sceneObject);
 
 	template<class TLightType>
 	std::shared_ptr<TLightType> CreateLight();
-	const bool DeleteLight(std::shared_ptr<Light> sceneLight);
-	const std::vector<std::shared_ptr<Light>>& GetSceneLights() const;
+	const bool DeleteLight(LightPtr& sceneLight);
+
+	const std::vector<LightPtr>& GetSceneLights() const;
 
 	void OnStart();
 	void OnTick(const float& deltaTime);
@@ -38,8 +42,8 @@ public:
 private:
 	static Environment* _activeEnvironment;
 
-	std::vector<std::shared_ptr<SceneObject>> _sceneObjects;
-	std::vector<std::shared_ptr<Light>> _sceneLights;
+	std::vector<SceneObjectPtr> _sceneObjects;
+	std::vector<LightPtr> _sceneLights;
 };
 
 //

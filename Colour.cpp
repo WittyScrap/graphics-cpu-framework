@@ -239,3 +239,11 @@ const COLORREF Colour::AsColor() const
 {
 	return RGB(static_cast<int>(_red * 255), static_cast<int>(_green * 255), static_cast<int>(_blue * 255));
 }
+
+//
+// Linearly interpolates the value of two colours.
+//
+Colour Colour::Lerp(const Colour& lhs, const Colour& rhs, const float& alpha)
+{
+	return rhs * alpha + lhs * (1 - alpha);
+}

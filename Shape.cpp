@@ -101,6 +101,22 @@ const std::vector<Vertex>& Shape::GetWorldSpaceVertices() const
 }
 
 //
+// The fully tranformed vertices, after all projection and clip space transformations have been applied.
+//
+std::vector<Vertex>& Shape::GetClipSpaceVertices()
+{
+	return _clipSpaceData;
+}
+
+//
+// The world-space vertices without any projection/clip space transformation applied to them.
+//
+std::vector<Vertex>& Shape::GetWorldSpaceVertices()
+{
+	return _worldSpaceData;
+}
+
+//
 // Pushes a vertex
 //
 void Shape::CreateVertex(const Vertex& vertex)

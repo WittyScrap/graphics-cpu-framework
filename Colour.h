@@ -37,6 +37,8 @@ public:
 	static Colour FromColor(const COLORREF& rhs);
 	const COLORREF AsColor() const;
 
+	static Colour Lerp(const Colour& lhs, const Colour& rhs, const float& alpha);
+
 private:
 	float _red;
 	float _green;

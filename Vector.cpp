@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include "Vertex.h"
 #include <cmath>
 
 //
@@ -91,33 +92,49 @@ Vector3 Vector3::operator/(const Vector3& rhs) const
 //
 // Concat addition operator.
 //
-Vector3 Vector3::operator+=(const Vector3& rhs) const
+Vector3& Vector3::operator+=(const Vector3& rhs)
 {
-	return *this + rhs;
+	_x += rhs._x;
+	_y += rhs._y;
+	_z += rhs._z;
+
+	return *this;
 }
 
 //
 // Concat subtraction operator.
 //
-Vector3 Vector3::operator-=(const Vector3& rhs) const
+Vector3& Vector3::operator-=(const Vector3& rhs)
 {
-	return *this - rhs;
+	_x -= rhs._x;
+	_y -= rhs._y;
+	_z -= rhs._z;
+
+	return *this;
 }
 
 //
 // Concat multiplication operator.
 //
-Vector3 Vector3::operator*=(const Vector3& rhs) const
+Vector3& Vector3::operator*=(const Vector3& rhs)
 {
-	return *this * rhs;
+	_x *= rhs._x;
+	_y *= rhs._y;
+	_z *= rhs._z;
+
+	return *this;
 }
 
 //
 // Concat division operator.
 //
-Vector3 Vector3::operator/=(const Vector3& rhs) const
+Vector3& Vector3::operator/=(const Vector3& rhs)
 {
-	return *this / rhs;
+	_x /= rhs._x;
+	_y /= rhs._y;
+	_z /= rhs._z;
+
+	return *this;
 }
 
 //
@@ -179,33 +196,101 @@ Vector3 Vector3::operator/(const Vertex& rhs) const
 //
 // Concat adds the vertex's components to this vector's.
 //
-Vector3 Vector3::operator+=(const Vertex& rhs) const
+Vector3& Vector3::operator+=(const Vertex& rhs)
 {
-	return *this + rhs;
+	_x += rhs.GetX();
+	_y += rhs.GetY();
+	_z += rhs.GetZ();
+
+	return *this;
 }
 
 //
 // Concat subtracts the vertex's components from this vector's.
 //
-Vector3 Vector3::operator-=(const Vertex& rhs) const
+Vector3& Vector3::operator-=(const Vertex& rhs)
 {
-	return *this - rhs;
+	_x -= rhs.GetX();
+	_y -= rhs.GetY();
+	_z -= rhs.GetZ();
+
+	return *this;
 }
 
 //
 // Concat multiplies the vertex's components to this vector's.
 //
-Vector3 Vector3::operator*=(const Vertex& rhs) const
+Vector3& Vector3::operator*=(const Vertex& rhs)
 {
-	return *this * rhs;
+	_x *= rhs.GetX();
+	_y *= rhs.GetY();
+	_z *= rhs.GetZ();
+
+	return *this;
 }
 
 //
 // Concat divides the vertex's components from this vector's.
 //
-Vector3 Vector3::operator/=(const Vertex& rhs) const
+Vector3& Vector3::operator/=(const Vertex& rhs)
 {
-	return *this / rhs;
+	_x /= rhs.GetX();
+	_y /= rhs.GetY();
+	_z /= rhs.GetZ();
+
+	return *this;
+}
+
+//
+// Multiplies each component of a copy of this vector by a scalar.
+//
+Vector3 Vector3::operator* (const float& rhs) const
+{
+	Vector3 mul(*this);
+
+	mul._x *= rhs;
+	mul._y *= rhs;
+	mul._z *= rhs;
+
+	return mul;
+}
+
+//
+// Divides each component of a copy of this vector by a scalar.
+//
+Vector3 Vector3::operator/ (const float& rhs) const
+{
+	Vector3 div(*this);
+
+	div._x /= rhs;
+	div._y /= rhs;
+	div._z /= rhs;
+
+	return div;
+}
+
+//
+// Multiplies each component of this vector by a scalar.
+//
+Vector3& Vector3::operator*=(const float& rhs)
+{
+	_x *= rhs;
+	_y *= rhs;
+	_z *= rhs;
+
+	return *this;
+}
+
+//
+// Divides each component of this vector by a scalar.
+//
+Vector3& Vector3::operator/=(const float& rhs)
+{
+	_x /= rhs;
+	_y /= rhs;
+	_z /= rhs;
+
+	return *this;
 }
 
 //
@@ -236,6 +321,14 @@ Vector3 Vector3::NormaliseVector(const Vector3& vector)
 	Vector3 copy(vector);
 	copy.Normalise();
 	return copy;
+}
+
+//
+// Interpolates lineraly between the two vectors.
+//
+Vector3 Vector3::Lerp(const Vector3& lhs, const Vector3& rhs, const float& alpha)
+{
+	return rhs * alpha + lhs * (1 - alpha);
 }
 
 //

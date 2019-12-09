@@ -22,8 +22,12 @@ void DefaultObject::OnInit()
 	_figurine->SetColour(Colour(1.f, .5f, .5f));
 
 	// Set draw modes
-	_pedistal->DrawMode(DRAW_FRAGMENT);
-	_figurine->DrawMode(DRAW_FRAGMENT);
+	_pedistal->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
+	_figurine->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
+
+	// Set shade modes
+	_pedistal->Shade(Mesh::ShadeMode::SHADE_SMOOTH);
+	_figurine->Shade(Mesh::ShadeMode::SHADE_SMOOTH);
 
 	// Place the cube underneath
 	_pedistal->SetPosition({ 0, -43.f, 0 });

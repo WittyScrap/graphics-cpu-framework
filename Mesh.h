@@ -89,12 +89,9 @@ private:
 	// Lighting tools
 	//
 	Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices) const;
-	Colour ComputeLighting(const Vertex& vertices) const;
+	Colour ComputeLighting(const Vertex& vertex) const;
 
-	//
-	// Fragment callback
-	//
-	Colour Frag(const Vertex& i) const;
+	void ComputeVertexLighting(); // Computes the lighting for all vertices.
 
 private:
 	std::vector<Polygon3D> _polygons;

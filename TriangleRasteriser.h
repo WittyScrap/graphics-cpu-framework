@@ -36,7 +36,7 @@ public:
 	// Rasterises a triangle using the standard solid rasterisation
 	// technique, shading on a fragment-by-fragment basis.
 	//
-	static void DrawSmooth(const HDC& hdc, const PolygonData& clipSpace, const FragmentFunction& frag);
+	static void DrawSmooth(const HDC& hdc, const PolygonData& clipSpace);
 
 private:
 	//
@@ -65,14 +65,14 @@ private:
 	// Precondition is that v2 and v3 perform the flat side and 
 	// that v1.y < v2.y, v3.y.
 	//
-	static void BottomSmooth(const HDC& hdc, const FragmentFunction& frag, const PolygonData& clipSpace);
+	static void BottomSmooth(const HDC& hdc, const PolygonData& clipSpace);
 
 	//
 	// Fills a triangle whose top side is perfectly horizontal.
 	// Precondition is that v1 and v2 perform the flat side and 
 	// that v3.y > v1.y, v2.y.
 	//
-	static void TopSmooth(const HDC& hdc, const FragmentFunction& frag, const PolygonData& clipSpace);
+	static void TopSmooth(const HDC& hdc, const PolygonData& clipSpace);
 
 };
 

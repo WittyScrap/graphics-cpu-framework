@@ -111,7 +111,6 @@ void Mesh::GenerateClipNormals()
 void Mesh::GenerateVertexNormals()
 {
 	std::vector<Vertex>& worldVertices = GetWorldSpaceVertices();
-	std::vector<Vertex>& clipVertices = GetClipSpaceVertices();
 
 	for (Vertex& vertex : worldVertices)
 	{
@@ -137,10 +136,9 @@ void Mesh::GenerateVertexNormals()
 		c.GetVertexData().AddContribution(1);
 	}
 
-	for (size_t i = 0; i < worldVertices.size(); ++i)
+	for (Vertex& vertex : worldVertices)
 	{
-		worldVertices[i].GetVertexData().DivideNormalByContribution();
-		clipVertices[i].GetVertexData().SetNormal(worldVertices[i].GetVertexData().GetNormal());
+		vertex.GetVertexData().DivideNormalByContribution();
 	}
 }
 
@@ -164,6 +162,11 @@ void Mesh::Draw(HDC hdc)
 	if (_drawMode == DrawMode::DRAW_FRAGMENT)
 	{
 		GenerateVertexNormals();
+	}
+
+	if (_drawMode == DrawMode::DRAW_FRAGMENT && _shadeMode == ShadeMode::SHADE_SMOOTH)
+	{
+		ComputeVertexLighting();
 	}
 
 	for (const Polygon3D* polygon : _visiblePolygons)
@@ -326,8 +329,6 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 	const Vertex& clipB = clipSpace[index1];
 	const Vertex& clipC = clipSpace[index2];
 
-	FragmentFunction frag = std::bind(&Mesh::Frag, this, std::placeholders::_1);
-
 	// Draw using custom rasterizing system.
 	switch (_shadeMode)
 	{
@@ -344,7 +345,7 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 	}
 	case ShadeMode::SHADE_SMOOTH:
 		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
-		TriangleRasteriser::DrawSmooth(hdc, { clipA, clipB, clipC }, frag);
+		TriangleRasteriser::DrawSmooth(hdc, { clipA, clipB, clipC });
 		break;
 	}
 }
@@ -369,7 +370,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 }
 
 //
-// Computers all lighting to be applied to this vertex.
+// Computes the lighting for a single vertex.
 //
 Colour Mesh::ComputeLighting(const Vertex& vertex) const
 {
@@ -387,12 +388,23 @@ Colour Mesh::ComputeLighting(const Vertex& vertex) const
 }
 
 //
-// Fragment function.
+// Computes lighting on a per-vertex basis on every vertex of this object.
 //
-Colour Mesh::Frag(const Vertex& i) const
+void Mesh::ComputeVertexLighting()
 {
-	const Colour light = ComputeLighting(i);
-	const Colour& base = GetColour();
+	const std::vector<Vertex>& worldVertices = GetWorldSpaceVertices();
+	std::vector<Colour> vertexColours;
 
-	return base;
+	for (const Vertex& vertex : worldVertices)
+	{
+		vertexColours.push_back(GetColour() * ComputeLighting(vertex));
+	}
+
+	// Apply vertex colours to clip-space vertices.
+	std::vector<Vertex>& clipVertices = GetClipSpaceVertices();
+
+	for (size_t i = 0; i < clipVertices.size(); ++i)
+	{
+		clipVertices[i].GetVertexData().SetColour(vertexColours[i]);
+	}
 }

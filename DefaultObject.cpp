@@ -22,7 +22,7 @@ void DefaultObject::OnInit()
 	_figurine->SetColour(Colour(1.f, .5f, .5f));
 
 	// Set draw modes
-	_pedistal->Mode(Mesh::DrawMode::DRAW_SOLID);
+	_pedistal->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
 	_figurine->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
 
 	// Set shade modes

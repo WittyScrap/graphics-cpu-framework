@@ -29,10 +29,7 @@ void TriangleRasteriser::DrawFlat(const HDC& hdc, const PolygonData& clipSpace)
 	else
 	{
 		// general case - split the triangle in a topflat and bottom-flat one
-		float middleX = a.GetX() + (static_cast<float>(b.GetY() - a.GetY()) / static_cast<float>(c.GetY() - a.GetY())) * (c.GetX() - a.GetX());
-		float middleY = b.GetY();
-
-		Vertex tempVertex(middleX, middleY, 0.f);
+		Vertex tempVertex = Vertex::Lerp(a, c, 0.5f);
 
 		BottomFlat(hdc, a, b, tempVertex);
 		TopFlat(hdc, b, tempVertex, c);
@@ -97,10 +94,10 @@ void TriangleRasteriser::BottomFlat(const HDC& hdc, const Vertex& vertexA, const
 	float x1 = vertexA.GetX();
 	float x2 = x1 + 0.5f;
 
-	for (int scanlineY = static_cast<int>(vertexA.GetY()); scanlineY <= vertexB.GetY(); scanlineY++)
+	for (float scanlineY = vertexA.GetY(); scanlineY <= vertexB.GetY(); scanlineY++)
 	{
-		MoveToEx(hdc, static_cast<int>(x1), scanlineY, NULL);
-		LineTo(hdc, static_cast<int>(x2), scanlineY);
+		MoveToEx(hdc, static_cast<int>(std::floorf(x1)), static_cast<int>(std::ceilf(scanlineY)), NULL);
+		LineTo(hdc, static_cast<int>(std::ceilf(x2)), static_cast<int>(std::ceilf(scanlineY)));
 
 		x1 += slope1;
 		x2 += slope2;
@@ -120,10 +117,10 @@ void TriangleRasteriser::TopFlat(const HDC& hdc, const Vertex& vertexA, const Ve
 	float x1 = vertexC.GetX();
 	float x2 = x1 + 0.5f;
 
-	for (int scanlineY = static_cast<int>(vertexC.GetY()); scanlineY > vertexA.GetY(); scanlineY--)
+	for (float scanlineY = vertexC.GetY(); scanlineY >= vertexA.GetY(); scanlineY--)
 	{
-		MoveToEx(hdc, static_cast<int>(x1), scanlineY, NULL);
-		LineTo(hdc, static_cast<int>(x2), scanlineY);
+		MoveToEx(hdc, static_cast<int>(std::floorf(x1)), static_cast<int>(std::floorf(scanlineY)), NULL);
+		LineTo(hdc, static_cast<int>(std::ceilf(x2)), static_cast<int>(std::floorf(scanlineY)));
 
 		x1 -= slope1;
 		x2 -= slope2;
@@ -185,16 +182,15 @@ void TriangleRasteriser::BottomSmooth(const HDC& hdc, const PolygonData& clipSpa
 	if (slope2 < slope1)
 	{
 		std::swap(slope1, slope2);
-
 		std::swap(colourSlopeRed1, colourSlopeRed2);
 		std::swap(colourSlopeGreen1, colourSlopeGreen2);
 		std::swap(colourSlopeBlue1, colourSlopeBlue2);
 	}
 
-	for (int scanlineY = static_cast<int>(v1.GetY()); scanlineY <= v2.GetY(); scanlineY++)
+	for (float scanlineY = v1.GetY(); scanlineY <= v2.GetY(); scanlineY++)
 	{
 		// Loop over each pixel in the horizontal line.
-		for (int xPos = static_cast<int>(std::ceilf(x1)); xPos < static_cast<int>(x2); xPos++)
+		for (float xPos = std::floorf(x1); xPos <= std::ceilf(x2); xPos++)
 		{
 			float t = (xPos - x1) / (x2 - x1);
 
@@ -202,7 +198,7 @@ void TriangleRasteriser::BottomSmooth(const HDC& hdc, const PolygonData& clipSpa
 			float green = (1 - t) * colourGreen1 + t * colourGreen2;
 			float blue = (1 - t) * colourBlue1 + t * colourBlue2;
 
-			SetPixelV(hdc, static_cast<int>(xPos), scanlineY, RGB(red * 255, green * 255, blue * 255));
+			SetPixelV(hdc, static_cast<int>(std::floorf(xPos)), static_cast<int>(std::ceilf(scanlineY)), RGB(red * 255, green * 255, blue * 255));
 		}
 
 		// Get new x-coordinate of endpoints of horizontal line.
@@ -276,16 +272,15 @@ void TriangleRasteriser::TopSmooth(const HDC& hdc, const PolygonData& clipSpace)
 	if (slope1 < slope2)
 	{
 		std::swap(slope1, slope2);
-
 		std::swap(colourSlopeRed1, colourSlopeRed2);
 		std::swap(colourSlopeGreen1, colourSlopeGreen2);
 		std::swap(colourSlopeBlue1, colourSlopeBlue2);
 	}
 
-	for (int scanlineY = static_cast<int>(v3.GetY()); scanlineY > v1.GetY(); scanlineY--)
+	for (float scanlineY = v3.GetY(); scanlineY >= v1.GetY(); scanlineY--)
 	{
 		// Loop over each pixel in the horizontal line.
-		for (int xPos = static_cast<int>(std::ceilf(x1)); xPos < static_cast<int>(x2); xPos++)
+		for (float xPos = std::floorf(x1); xPos <= std::ceilf(x2); xPos++)
 		{
 			float t = (xPos - x1) / (x2 - x1);
 
@@ -293,7 +288,7 @@ void TriangleRasteriser::TopSmooth(const HDC& hdc, const PolygonData& clipSpace)
 			float green = (1 - t) * colourGreen1 + t * colourGreen2;
 			float blue = (1 - t) * colourBlue1 + t * colourBlue2;
 
-			SetPixelV(hdc, static_cast<int>(xPos), scanlineY, RGB(red * 255, green * 255, blue * 255));
+			SetPixelV(hdc, static_cast<int>(std::ceilf(xPos)), static_cast<int>(std::floorf(scanlineY)), RGB(red * 255, green * 255, blue * 255));
 		}
 
 		// Get new x-coordinate of endpoints of horizontal line.

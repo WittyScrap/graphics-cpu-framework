@@ -51,28 +51,28 @@ private:
 	// Precondition is that v2 and v3 perform the flat side and 
 	// that v1.y < v2.y, v3.y.
 	//
-	static void BottomFlat(const HDC& hdc, const Vertex& a, const Vertex& b, const Vertex& c);
+	static void TopFlatShaded(const HDC& hdc, const Vertex& a, const Vertex& b, const Vertex& c);
 	
 	//
 	// Fills a triangle whose top side is perfectly horizontal.
 	// Precondition is that v1 and v2 perform the flat side and 
 	// that v3.y > v1.y, v2.y.
 	//
-	static void TopFlat(const HDC& hdc, const Vertex& a, const Vertex& b, const Vertex& c);
+	static void BottomFlatShaded(const HDC& hdc, const Vertex& a, const Vertex& b, const Vertex& c);
 
 	//
 	// Fills a triangle whose bottom side is perfectly horizontal.
 	// Precondition is that v2 and v3 perform the flat side and 
 	// that v1.y < v2.y, v3.y.
 	//
-	static void BottomSmooth(const HDC& hdc, const PolygonData& clipSpace);
+	static void TopSmoothShaded(const HDC& hdc, const PolygonData& clipSpace);
 
 	//
 	// Fills a triangle whose top side is perfectly horizontal.
 	// Precondition is that v1 and v2 perform the flat side and 
 	// that v3.y > v1.y, v2.y.
 	//
-	static void TopSmooth(const HDC& hdc, const PolygonData& clipSpace);
+	static void BottomSmoothShaded(const HDC& hdc, const PolygonData& clipSpace);
 
 };
 

@@ -20,19 +20,19 @@ void TriangleRasteriser::DrawFlat(const HDC& hdc, const PolygonData& clipSpace)
 	 * or that of a top-flat triangle. */
 	if (b.GetY() == c.GetY())
 	{
-		BottomFlat(hdc, a, b, c);
+		TopFlatShaded(hdc, a, b, c);
 	}
 	else if (a.GetY() == b.GetY())
 	{
-		TopFlat(hdc, a, b, c);
+		BottomFlatShaded(hdc, a, b, c);
 	}
 	else
 	{
 		// general case - split the triangle in a topflat and bottom-flat one
 		Vertex tempVertex = Vertex::Lerp(a, c, 0.5f);
 
-		BottomFlat(hdc, a, b, tempVertex);
-		TopFlat(hdc, b, tempVertex, c);
+		TopFlatShaded(hdc, a, b, tempVertex);
+		BottomFlatShaded(hdc, b, tempVertex, c);
 	}
 }
 
@@ -62,11 +62,11 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 	 * or that of a top-flat triangle. */
 	if (b.GetY() == c.GetY())
 	{
-		BottomSmooth(hdc, data);
+		TopSmoothShaded(hdc, data);
 	}
 	else if (a.GetY() == b.GetY())
 	{
-		TopSmooth(hdc, data);
+		BottomSmoothShaded(hdc, data);
 	}
 	else
 	{
@@ -76,8 +76,8 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 		PolygonData topTriangle{ a, b, tempVertex };
 		PolygonData bottomTriangle{ b, tempVertex, c };
 
-		BottomSmooth(hdc, topTriangle);
-		TopSmooth(hdc, bottomTriangle);
+		TopSmoothShaded(hdc, topTriangle);
+		BottomSmoothShaded(hdc, bottomTriangle);
 	}
 }
 
@@ -86,7 +86,7 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 // Precondition is that v2 and v3 perform the flat side and 
 // that v1.y < v2.y, v3.y.
 //
-void TriangleRasteriser::BottomFlat(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC)
+void TriangleRasteriser::TopFlatShaded(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC)
 {
 	float slope1 = (vertexB.GetX() - vertexA.GetX()) / (vertexB.GetY() - vertexA.GetY());
 	float slope2 = (vertexC.GetX() - vertexA.GetX()) / (vertexC.GetY() - vertexA.GetY());
@@ -109,7 +109,7 @@ void TriangleRasteriser::BottomFlat(const HDC& hdc, const Vertex& vertexA, const
 // Precondition is that v1 and v2 perform the flat side and 
 // that v3.y > v1.y, v2.y.
 //
-void TriangleRasteriser::TopFlat(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC)
+void TriangleRasteriser::BottomFlatShaded(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC)
 {
 	float slope1 = (vertexC.GetX() - vertexA.GetX()) / (vertexC.GetY() - vertexA.GetY());
 	float slope2 = (vertexC.GetX() - vertexB.GetX()) / (vertexC.GetY() - vertexB.GetY());
@@ -132,7 +132,7 @@ void TriangleRasteriser::TopFlat(const HDC& hdc, const Vertex& vertexA, const Ve
 // Precondition is that v2 and v3 perform the flat side and 
 // that v1.y < v2.y, v3.y.
 //
-void TriangleRasteriser::BottomSmooth(const HDC& hdc, const PolygonData& clipSpace)
+void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clipSpace)
 {
 	const Vertex& v1 = clipSpace.a;
 	const Vertex& v2 = clipSpace.b;
@@ -222,7 +222,7 @@ void TriangleRasteriser::BottomSmooth(const HDC& hdc, const PolygonData& clipSpa
 // Precondition is that v1 and v2 perform the flat side and 
 // that v3.y > v1.y, v2.y.
 //
-void TriangleRasteriser::TopSmooth(const HDC& hdc, const PolygonData& clipSpace)
+void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& clipSpace)
 {
 	const Vertex& v1 = clipSpace.a;
 	const Vertex& v2 = clipSpace.b;

@@ -161,9 +161,9 @@ const Colour Colour::operator-(const Colour& rhs) const
 {
 	Colour subtract;
 
-	subtract._red = std::clamp(rhs._red  - _red, 0.f, 1.f);
-	subtract._green = std::clamp(rhs._green - _green, 0.f, 1.f);
-	subtract._blue = std::clamp(rhs._blue - _blue, 0.f, 1.f);
+	subtract._red = std::clamp(_red - rhs._red, 0.f, 1.f);
+	subtract._green = std::clamp(_green - rhs._green, 0.f, 1.f);
+	subtract._blue = std::clamp(_blue - rhs._blue, 0.f, 1.f);
 
 	return subtract;
 }
@@ -189,9 +189,9 @@ const Colour Colour::operator/(const Colour& rhs) const
 {
 	Colour divide;
 
-	divide._red = std::clamp(rhs._red / _red, 0.f, 1.f);
-	divide._green = std::clamp(rhs._green / _green, 0.f, 1.f);
-	divide._blue = std::clamp(rhs._blue / _blue, 0.f, 1.f);
+	divide._red = std::clamp(_red / rhs._red, 0.f, 1.f);
+	divide._green = std::clamp(_green / rhs._green, 0.f, 1.f);
+	divide._blue = std::clamp(_blue / rhs._blue, 0.f, 1.f);
 
 	return divide;
 }

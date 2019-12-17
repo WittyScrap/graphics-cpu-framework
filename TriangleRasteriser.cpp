@@ -16,24 +16,35 @@ void TriangleRasteriser::DrawFlat(const HDC& hdc, const PolygonData& clipSpace)
 
 	SortVertices(a, b, c);
 
+	// Construct copied structure
+	PolygonData data
+	{
+		a,
+		b,
+		c
+	};
+
 	/* here we know that v1.y <= v2.y <= v3.y
 	 * check for trivial case of bottom-flat triangle
 	 * or that of a top-flat triangle. */
 	if (b.GetY() == c.GetY())
 	{
-		TopFlatShaded(hdc, a, b, c);
+		TopFlatShaded(hdc, data);
 	}
 	else if (a.GetY() == b.GetY())
 	{
-		BottomFlatShaded(hdc, a, b, c);
+		BottomFlatShaded(hdc, data);
 	}
 	else
 	{
 		// general case - split the triangle in a topflat and bottom-flat one
 		Vertex tempVertex = Vertex::Lerp(a, c, 0.5f);
 
-		TopFlatShaded(hdc, a, b, tempVertex);
-		BottomFlatShaded(hdc, b, tempVertex, c);
+		PolygonData topTriangle{ a, b, tempVertex };
+		PolygonData bottomTriangle{ b, tempVertex, c };
+
+		TopFlatShaded(hdc, topTriangle);
+		BottomFlatShaded(hdc, bottomTriangle);
 	}
 }
 
@@ -87,15 +98,19 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 // Precondition is that v2 and v3 perform the flat side and 
 // that v1.y < v2.y, v3.y.
 //
-void TriangleRasteriser::TopFlatShaded(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC)
+void TriangleRasteriser::TopFlatShaded(const HDC& hdc, const PolygonData& clipSpace)
 {
-	float slope1 = (vertexB.GetX() - vertexA.GetX()) / (vertexB.GetY() - vertexA.GetY());
-	float slope2 = (vertexC.GetX() - vertexA.GetX()) / (vertexC.GetY() - vertexA.GetY());
+	const Vertex& v1 = clipSpace.a;
+	const Vertex& v2 = clipSpace.b;
+	const Vertex& v3 = clipSpace.c;
 
-	float x1 = vertexA.GetX();
+	float slope1 = (v2.GetX() - v1.GetX()) / (v2.GetY() - v1.GetY());
+	float slope2 = (v3.GetX() - v1.GetX()) / (v3.GetY() - v1.GetY());
+
+	float x1 = v1.GetX();
 	float x2 = x1 + 0.5f;
 
-	for (float scanlineY = vertexA.GetY(); scanlineY <= vertexB.GetY(); scanlineY++)
+	for (float scanlineY = v1.GetY(); scanlineY <= v2.GetY(); scanlineY++)
 	{
 		MoveToEx(hdc, static_cast<int>(std::floorf(x1)), static_cast<int>(std::ceilf(scanlineY)), NULL);
 		LineTo(hdc, static_cast<int>(std::ceilf(x2)), static_cast<int>(std::ceilf(scanlineY)));
@@ -110,15 +125,19 @@ void TriangleRasteriser::TopFlatShaded(const HDC& hdc, const Vertex& vertexA, co
 // Precondition is that v1 and v2 perform the flat side and 
 // that v3.y > v1.y, v2.y.
 //
-void TriangleRasteriser::BottomFlatShaded(const HDC& hdc, const Vertex& vertexA, const Vertex& vertexB, const Vertex& vertexC)
+void TriangleRasteriser::BottomFlatShaded(const HDC& hdc, const PolygonData& clipSpace)
 {
-	float slope1 = (vertexC.GetX() - vertexA.GetX()) / (vertexC.GetY() - vertexA.GetY());
-	float slope2 = (vertexC.GetX() - vertexB.GetX()) / (vertexC.GetY() - vertexB.GetY());
+	const Vertex& v1 = clipSpace.a;
+	const Vertex& v2 = clipSpace.b;
+	const Vertex& v3 = clipSpace.c;
 
-	float x1 = vertexC.GetX();
+	float slope1 = (v3.GetX() - v1.GetX()) / (v3.GetY() - v1.GetY());
+	float slope2 = (v3.GetX() - v2.GetX()) / (v3.GetY() - v2.GetY());
+
+	float x1 = v3.GetX();
 	float x2 = x1 + 0.5f;
 
-	for (float scanlineY = vertexC.GetY(); scanlineY >= vertexA.GetY(); scanlineY--)
+	for (float scanlineY = v3.GetY(); scanlineY >= v1.GetY(); scanlineY--)
 	{
 		MoveToEx(hdc, static_cast<int>(std::floorf(x1)), static_cast<int>(std::floorf(scanlineY)), NULL);
 		LineTo(hdc, static_cast<int>(std::ceilf(x2)), static_cast<int>(std::floorf(scanlineY)));
@@ -149,30 +168,18 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 	float x1 = v1.GetX();
 	float x2 = x1 + 0.5f;
 
-	// Get the change of colour components along edge v2->v1
-	float baDifference = (v2.GetY() - v1.GetY());
+	float ba = (v2.GetY() - v1.GetY()); // Get the change of colour components along edge v2->v1
+	float ca = (v3.GetY() - v1.GetY()); // Get the change of colour components along edge v3->v1
 
-	// Colour
-	float colourSlopeRed1 = (c2.GetRed() - c1.GetRed()) / baDifference;
-	float colourSlopeGreen1 = (c2.GetGreen() - c1.GetGreen()) / baDifference;
-	float colourSlopeBlue1 = (c2.GetBlue() - c1.GetBlue()) / baDifference;
-
-	// Get the change of colour components along edge v3->v1
-	float caDifference = (v3.GetY() - v1.GetY());
-
-	// Colour
-	float colourSlopeRed2 = (c3.GetRed() - c1.GetRed()) / caDifference;
-	float colourSlopeGreen2 = (c3.GetGreen() - c1.GetGreen()) / caDifference;
-	float colourSlopeBlue2 = (c3.GetBlue() - c1.GetBlue()) / caDifference;
+	UnclampedColour sourceSlope((c2.GetRed() - c1.GetRed()) / ba, (c2.GetGreen() - c1.GetGreen()) / ba, (c2.GetBlue() - c1.GetBlue()) / ba);
+	UnclampedColour targetSlope((c3.GetRed() - c1.GetRed()) / ca, (c3.GetGreen() - c1.GetGreen()) / ca, (c3.GetBlue() - c1.GetBlue()) / ca);
 
 	// Get starting values
-	float colourRed1 = c1.GetRed();
-	float colourGreen1 = c1.GetGreen();
-	float colourBlue1 = c1.GetBlue();
+	UnclampedColour source(c1);
+	UnclampedColour target(source);
 
-	float colourRed2 = colourRed1;
-	float colourGreen2 = colourGreen1;
-	float colourBlue2 = colourBlue1;
+	// Interpolator
+	UnclampedColour interpolator;
 
 	/* As we will do not fill in a complete line using MoveToEx/LineTo but instead
 	 * we will loop over all pixels of a horizontal line, we need a predefined
@@ -183,9 +190,7 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 	if (slope2 < slope1)
 	{
 		std::swap(slope1, slope2);
-		std::swap(colourSlopeRed1, colourSlopeRed2);
-		std::swap(colourSlopeGreen1, colourSlopeGreen2);
-		std::swap(colourSlopeBlue1, colourSlopeBlue2);
+		std::swap(sourceSlope, targetSlope);
 	}
 
 	for (float scanlineY = v1.GetY(); scanlineY <= v2.GetY(); scanlineY++)
@@ -194,27 +199,19 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 		for (float xPos = std::floorf(x1); xPos <= std::ceilf(x2); xPos++)
 		{
 			float t = (xPos - x1) / (x2 - x1);
+			interpolator = source * (1 - t) + target * t;
 
-			float red = (1 - t) * colourRed1 + t * colourRed2;
-			float green = (1 - t) * colourGreen1 + t * colourGreen2;
-			float blue = (1 - t) * colourBlue1 + t * colourBlue2;
+			COLORREF pixelColour = RGB(interpolator.GetRed() * 255, interpolator.GetGreen() * 255, interpolator.GetBlue() * 255);
 
-			SetPixelV(hdc, static_cast<int>(std::floorf(xPos)), static_cast<int>(std::ceilf(scanlineY)), RGB(red * 255, green * 255, blue * 255));
+			SetPixelV(hdc, static_cast<int>(std::floorf(xPos)), static_cast<int>(std::ceilf(scanlineY)), pixelColour);
 		}
 
 		// Get new x-coordinate of endpoints of horizontal line.
 		x1 += slope1;
 		x2 += slope2;
 
-		// Get new colour of left endpoint of horizontal line.
-		colourRed1 += colourSlopeRed1;
-		colourGreen1 += colourSlopeGreen1;
-		colourBlue1 += colourSlopeBlue1;
-
-		// Get new colour of right endpoint of horizontal line.
-		colourRed2 += colourSlopeRed2;
-		colourGreen2 += colourSlopeGreen2;
-		colourBlue2 += colourSlopeBlue2;
+		source += sourceSlope;
+		target += targetSlope;
 	}
 }
 
@@ -239,30 +236,18 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 	float x1 = v3.GetX();
 	float x2 = x1 + 0.5f;
 
-	// Get the change of colour components along edge v3->v1
-	float caDifference = (v3.GetY() - v1.GetY());
+	float ca = (v3.GetY() - v1.GetY()); // Get the change of colour components along edge v2->v1
+	float cb = (v3.GetY() - v2.GetY()); // Get the change of colour components along edge v3->v1
 
-	// Colour
-	float colourSlopeRed1 = (c3.GetRed() - c1.GetRed()) / caDifference;
-	float colourSlopeGreen1 = (c3.GetGreen() - c1.GetGreen()) / caDifference;
-	float colourSlopeBlue1 = (c3.GetBlue() - c1.GetBlue()) / caDifference;
-
-	// Get the change of colour components along edge v3->v2
-	float cbDifference = (v3.GetY() - v2.GetY());
-
-	// Colour
-	float colourSlopeRed2 = (c3.GetRed() - c2.GetRed()) / cbDifference;
-	float colourSlopeGreen2 = (c3.GetGreen() - c2.GetGreen()) / cbDifference;
-	float colourSlopeBlue2 = (c3.GetBlue() - c2.GetBlue()) / cbDifference;
+	UnclampedColour sourceSlope((c3.GetRed() - c1.GetRed()) / ca, (c3.GetGreen() - c1.GetGreen()) / ca, (c3.GetBlue() - c1.GetBlue()) / ca);
+	UnclampedColour targetSlope((c3.GetRed() - c2.GetRed()) / cb, (c3.GetGreen() - c2.GetGreen()) / cb, (c3.GetBlue() - c2.GetBlue()) / cb);
 
 	// Get starting values
-	float colourRed1 = c3.GetRed();
-	float colourGreen1 = c3.GetGreen();
-	float colourBlue1 = c3.GetBlue();
+	UnclampedColour source(c3);
+	UnclampedColour target(source);
 
-	float colourRed2 = colourRed1;
-	float colourGreen2 = colourGreen1;
-	float colourBlue2 = colourBlue1;
+	// Interpolator
+	UnclampedColour interpolator;
 
 	/* As we will do not fill in a complete line using MoveToEx/LineTo but instead
 	 * we will loop over all pixels of a horizontal line, we need a predefined
@@ -273,9 +258,7 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 	if (slope1 < slope2)
 	{
 		std::swap(slope1, slope2);
-		std::swap(colourSlopeRed1, colourSlopeRed2);
-		std::swap(colourSlopeGreen1, colourSlopeGreen2);
-		std::swap(colourSlopeBlue1, colourSlopeBlue2);
+		std::swap(sourceSlope, targetSlope);
 	}
 
 	for (float scanlineY = v3.GetY(); scanlineY >= v1.GetY(); scanlineY--)
@@ -284,27 +267,19 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 		for (float xPos = std::floorf(x1); xPos <= std::ceilf(x2); xPos++)
 		{
 			float t = (xPos - x1) / (x2 - x1);
+			interpolator = source * (1 - t) + target * t;
 
-			float red = (1 - t) * colourRed1 + t * colourRed2;
-			float green = (1 - t) * colourGreen1 + t * colourGreen2;
-			float blue = (1 - t) * colourBlue1 + t * colourBlue2;
+			COLORREF pixelColour = RGB(interpolator.GetRed() * 255, interpolator.GetGreen() * 255, interpolator.GetBlue() * 255);
 
-			SetPixelV(hdc, static_cast<int>(std::ceilf(xPos)), static_cast<int>(std::floorf(scanlineY)), RGB(red * 255, green * 255, blue * 255));
+			SetPixelV(hdc, static_cast<int>(std::ceilf(xPos)), static_cast<int>(std::floorf(scanlineY)), pixelColour);
 		}
 
 		// Get new x-coordinate of endpoints of horizontal line.
 		x1 -= slope1;
 		x2 -= slope2;
 
-		// Get new colour of left endpoint of horizontal line.
-		colourRed1 -= colourSlopeRed1;
-		colourGreen1 -= colourSlopeGreen1;
-		colourBlue1 -= colourSlopeBlue1;
-
-		// Get new colour of right endpoint of horizontal line.
-		colourRed2 -= colourSlopeRed2;
-		colourGreen2 -= colourSlopeGreen2;
-		colourBlue2 -= colourSlopeBlue2;
+		source -= sourceSlope;
+		target -= targetSlope;
 	}
 }
 

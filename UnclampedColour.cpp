@@ -20,6 +20,12 @@ UnclampedColour::UnclampedColour(const UnclampedColour& copy) : _red{copy._red},
 { }
 
 //
+// Standard colour copy constructor.
+//
+UnclampedColour::UnclampedColour(const Colour& copy) : _red{copy.GetRed()}, _green{copy.GetGreen()}, _blue{copy.GetBlue()}
+{ }
+
+//
 // The red component of this colour, this could be any value but will likely remain within
 // the [0, 1] range.
 //
@@ -158,6 +164,125 @@ const UnclampedColour& UnclampedColour::operator/=(const UnclampedColour& rhs)
 	_red /= rhs._red;
 	_green /= rhs._green;
 	_blue /= rhs._blue;
+
+	return *this;
+}
+
+//
+// Adds a constant value to all components of a colour.
+//
+UnclampedColour UnclampedColour::operator+(const float& rhs)
+{
+	return UnclampedColour(_red + rhs, _green + rhs, _blue + rhs);
+}
+
+//
+// Subtracts a constant value from all components of a colour.
+//
+UnclampedColour UnclampedColour::operator-(const float& rhs)
+{
+	return UnclampedColour(_red - rhs, _green - rhs, _blue - rhs);
+}
+
+//
+// Multiplies all components of a colour by a constant value.
+//
+UnclampedColour UnclampedColour::operator*(const float& rhs)
+{
+	return UnclampedColour(_red * rhs, _green * rhs, _blue * rhs);
+}
+
+//
+// Divides all components of a colour by a constant value.
+//
+UnclampedColour UnclampedColour::operator/(const float& rhs)
+{
+	return UnclampedColour(_red / rhs, _green / rhs, _blue / rhs);
+}
+
+//
+// Adds a constant value to all components of this colour.
+//
+const UnclampedColour& UnclampedColour::operator+=(const float& rhs)
+{
+	_red += rhs;
+	_green += rhs;
+	_blue += rhs;
+
+	return *this;
+}
+
+//
+// Subtracts a constant values from all components of this colour.
+//
+const UnclampedColour& UnclampedColour::operator-=(const float& rhs)
+{
+	_red -= rhs;
+	_green -= rhs;
+	_blue -= rhs;
+
+	return *this;
+}
+
+//
+// Multiplies all components of this colour by a constant value.
+//
+const UnclampedColour& UnclampedColour::operator*=(const float& rhs)
+{
+	_red *= rhs;
+	_green *= rhs;
+	_blue *= rhs;
+
+	return *this;
+}
+
+//
+// Divides all components of this colour by a constant value.
+//
+const UnclampedColour& UnclampedColour::operator/=(const float& rhs)
+{
+	_red /= rhs;
+	_green /= rhs;
+	_blue /= rhs;
+
+	return *this;
+}
+
+//
+// Assigns all values from the provided colour into this colour.
+//
+const UnclampedColour& UnclampedColour::operator=(const UnclampedColour& rhs)
+{
+	if (&rhs != this)
+	{
+		_red = rhs._red;
+		_green = rhs._green;
+		_blue = rhs._blue;
+	}
+
+	return *this;
+}
+
+//
+// Assigns all values from the provided colour into this colour.
+//
+const UnclampedColour& UnclampedColour::operator=(const Colour& rhs)
+{
+	_red = rhs.GetRed();
+	_green = rhs.GetGreen();
+	_blue = rhs.GetBlue();
+
+	return *this;
+}
+
+//
+// Assigns the provided constant value to this colour's components.
+//
+const UnclampedColour& UnclampedColour::operator=(const float& rhs)
+{
+	_red = rhs;
+	_green = rhs;
+	_blue = rhs;
 
 	return *this;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "Colour.h"
 
 //
 // Colour structure that does not clamp any of its values.
@@ -9,6 +10,7 @@ public:
 	UnclampedColour();
 	UnclampedColour(const float& red, const float& green, const float& blue);
 	UnclampedColour(const UnclampedColour& copy);
+	UnclampedColour(const Colour& copy);
 
 	const float& GetRed() const;
 	const float& GetGreen() const;
@@ -19,7 +21,7 @@ public:
 	void SetBlue(const float& blue);
 
 	void Normalise();
-
+	
 	UnclampedColour operator+(const UnclampedColour& rhs);
 	UnclampedColour operator-(const UnclampedColour& rhs);
 	UnclampedColour operator*(const UnclampedColour& rhs);
@@ -29,6 +31,20 @@ public:
 	const UnclampedColour& operator-=(const UnclampedColour& rhs);
 	const UnclampedColour& operator*=(const UnclampedColour& rhs);
 	const UnclampedColour& operator/=(const UnclampedColour& rhs);
+
+	UnclampedColour operator+(const float& rhs);
+	UnclampedColour operator-(const float& rhs);
+	UnclampedColour operator*(const float& rhs);
+	UnclampedColour operator/(const float& rhs);
+
+	const UnclampedColour& operator+=(const float& rhs);
+	const UnclampedColour& operator-=(const float& rhs);
+	const UnclampedColour& operator*=(const float& rhs);
+	const UnclampedColour& operator/=(const float& rhs);
+
+	const UnclampedColour& operator=(const UnclampedColour& rhs);
+	const UnclampedColour& operator=(const Colour& rhs);
+	const UnclampedColour& operator=(const float& rhs);
 
 private:
 	float _red;

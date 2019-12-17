@@ -1,4 +1,5 @@
 #include "TriangleRasteriser.h"
+#include "UnclampedColour.h"
 #include <cmath>
 #include <Windows.h>
 

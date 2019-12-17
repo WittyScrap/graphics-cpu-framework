@@ -87,6 +87,9 @@
     <ClCompile Include="TriangleRasteriser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UnclampedColour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework.h">
@@ -171,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VertexData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UnclampedColour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

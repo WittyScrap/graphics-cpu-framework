@@ -169,6 +169,7 @@
     <ClCompile Include="Square.cpp" />
     <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="TriangleRasteriser.cpp" />
+    <ClCompile Include="UnclampedColour.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
@@ -193,6 +194,7 @@
     <ClInclude Include="SceneObject.h" />
     <ClInclude Include="Transformable.h" />
     <ClInclude Include="TriangleRasteriser.h" />
+    <ClInclude Include="UnclampedColour.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Polygon3D.h" />
     <ClInclude Include="Resource.h" />

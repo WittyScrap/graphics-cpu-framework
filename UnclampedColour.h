@@ -22,20 +22,20 @@ public:
 
 	void Normalise();
 	
-	UnclampedColour operator+(const UnclampedColour& rhs);
-	UnclampedColour operator-(const UnclampedColour& rhs);
-	UnclampedColour operator*(const UnclampedColour& rhs);
-	UnclampedColour operator/(const UnclampedColour& rhs);
+	const UnclampedColour operator+(const UnclampedColour rhs) const;
+	const UnclampedColour operator-(const UnclampedColour rhs) const;
+	const UnclampedColour operator*(const UnclampedColour rhs) const;
+	const UnclampedColour operator/(const UnclampedColour rhs) const;
 
 	const UnclampedColour& operator+=(const UnclampedColour& rhs);
 	const UnclampedColour& operator-=(const UnclampedColour& rhs);
 	const UnclampedColour& operator*=(const UnclampedColour& rhs);
 	const UnclampedColour& operator/=(const UnclampedColour& rhs);
 
-	UnclampedColour operator+(const float& rhs);
-	UnclampedColour operator-(const float& rhs);
-	UnclampedColour operator*(const float& rhs);
-	UnclampedColour operator/(const float& rhs);
+	const UnclampedColour operator+(const float rhs) const;
+	const UnclampedColour operator-(const float rhs) const;
+	const UnclampedColour operator*(const float rhs) const;
+	const UnclampedColour operator/(const float rhs) const;
 
 	const UnclampedColour& operator+=(const float& rhs);
 	const UnclampedColour& operator-=(const float& rhs);
@@ -45,6 +45,8 @@ public:
 	const UnclampedColour& operator=(const UnclampedColour& rhs);
 	const UnclampedColour& operator=(const Colour& rhs);
 	const UnclampedColour& operator=(const float& rhs);
+
+	static UnclampedColour Lerp(const UnclampedColour& lhs, const UnclampedColour& rhs, const float& alpha);
 
 private:
 	float _red;

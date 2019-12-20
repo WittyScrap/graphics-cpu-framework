@@ -38,7 +38,7 @@ void TriangleRasteriser::DrawFlat(const HDC& hdc, const PolygonData& clipSpace)
 	else
 	{
 		// general case - split the triangle in a topflat and bottom-flat one
-		Vertex tempVertex(a.GetX() + (static_cast<float>(b.GetY() - a.GetY()) / static_cast<float>(c.GetY() - a.GetY())) * (c.GetX() - a.GetX()), b.GetY(), 0);
+		Vertex tempVertex(a.GetX() + ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY())) * (c.GetX() - a.GetX()), b.GetY(), 0);
 
 		PolygonData topTriangle{ a, b, tempVertex };
 		PolygonData bottomTriangle{ b, tempVertex, c };
@@ -82,8 +82,8 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 	}
 	else
 	{
-		// general case - split the triangle in a topflat and bottom-flat one
-		Vertex tempVertex(a.GetX() + (static_cast<float>(b.GetY() - a.GetY()) / static_cast<float>(c.GetY() - a.GetY())) * (c.GetX() - a.GetX()), b.GetY(), 0);
+		// General case
+		Vertex tempVertex(GetTemporaryVertex(a, b, c));
 
 		PolygonData topTriangle{ a, b, tempVertex };
 		PolygonData bottomTriangle{ b, tempVertex, c };
@@ -179,9 +179,9 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 		std::swap(v1, v2);
 	}
 
-	UnclampedColour c0(v0.GetVertexData().GetColour());
-	UnclampedColour c1(v1.GetVertexData().GetColour());
-	UnclampedColour c2(v2.GetVertexData().GetColour());
+	const UnclampedColour c0(v0.GetVertexData().GetColour());
+	const UnclampedColour c1(v1.GetVertexData().GetColour());
+	const UnclampedColour c2(v2.GetVertexData().GetColour());
 
 	const float ba = (v1.GetY() - v0.GetY()); // Get the change along edge v2->v1
 	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
@@ -197,20 +197,20 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 
 	for (int y = sourceY; y < targetY; ++y)
 	{
-		const float point0 = slopeSourceY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
-		const float point1 = slopeTargetY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
-
-		int sourceX = static_cast<int>(std::ceil(point0 - 0.5f));
-		int targetX = static_cast<int>(std::ceil(point1 - 0.5f));
+		const float slopeSourceX = slopeSourceY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
+		const float slopeTargetX = slopeTargetY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
 
 		const UnclampedColour colourSlopeSourceX(colourSlopeSourceY * ((float)y + 0.5f - v0.GetY()) + c0);
 		const UnclampedColour colourSlopeTargetX(colourSlopeTargetY * ((float)y + 0.5f - v0.GetY()) + c0);
 
+		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
+		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
+
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			float t = (x - static_cast<float>(sourceX)) / static_cast<float>(targetX - sourceX);
+			const float t = (x - static_cast<float>(sourceX)) / static_cast<float>(targetX - sourceX);
 			const UnclampedColour colour(colourSlopeSourceX * (1 - t) + colourSlopeTargetX * t);
-			COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
+			const COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, x, y, pixelColour);
 		}
@@ -233,9 +233,9 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 		std::swap(v0, v1);
 	}
 
-	UnclampedColour c0(v0.GetVertexData().GetColour());
-	UnclampedColour c1(v1.GetVertexData().GetColour());
-	UnclampedColour c2(v2.GetVertexData().GetColour());
+	const UnclampedColour c0(v0.GetVertexData().GetColour());
+	const UnclampedColour c1(v1.GetVertexData().GetColour());
+	const UnclampedColour c2(v2.GetVertexData().GetColour());
 
 	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v2->v1
 	const float cb = (v2.GetY() - v1.GetY()); // Get the change along edge v3->v1
@@ -254,8 +254,8 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 		const float slopeSourceX = slopeSourceY * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
 		const float slopeTargetX = slopeTargetY * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
 
-		const UnclampedColour colourSlopeSourceX(colourSlopeSourceY * ((float)y + 0.5f - v0.GetY()) + c2);
-		const UnclampedColour colourSlopeTargetX(colourSlopeTargetY * ((float)y + 0.5f - v0.GetY()) + c2);
+		const UnclampedColour colourSlopeSourceX(colourSlopeSourceY * ((float)y + 0.5f - v2.GetY()) + c2);
+		const UnclampedColour colourSlopeTargetX(colourSlopeTargetY * ((float)y + 0.5f - v2.GetY()) + c2);
 
 		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
 		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
@@ -264,11 +264,41 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 		{
 			const float t = (x - static_cast<float>(sourceX)) / (targetX - sourceX);
 			const UnclampedColour colour(colourSlopeSourceX * (1 - t) + colourSlopeTargetX * t);
-			COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
+			const COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, x, y, pixelColour);
 		}
 	}
+}
+
+//
+// Generates a temporary vertex to be placed between the A/B-C diagonal.
+// This method also generates the temporary normal and colour
+// to be used for lighting/smooth shading calculations.
+//
+Vertex TriangleRasteriser::GetTemporaryVertex(const Vertex& a, const Vertex& b, const Vertex& c)
+{
+	// Split the triangle in a topflat and bottom - flat one
+	Vertex tempVertex(a.GetX() + ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY())) * (c.GetX() - a.GetX()), b.GetY(), 0);
+
+	tempVertex.GetVertexData().SetColour(GetTemporaryColour(a, b, c));
+//	tempVertex.GetVertexData().SetNormal(GetTemporaryNormal(a, b, c));
+
+	return tempVertex;
+}
+
+//
+// Given a set of three vertices, generates the temporary colour for the
+// vertex that is generated between the A/B-C diagonal. The source colours
+// are taken from the vertex data.
+//
+Colour TriangleRasteriser::GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c)
+{
+	const Colour& c0 = a.GetVertexData().GetColour();
+	const Colour& c1 = b.GetVertexData().GetColour();
+	const Colour& c2 = c.GetVertexData().GetColour();
+
+	return c0 + (c2 - c0) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
 }
 
 //

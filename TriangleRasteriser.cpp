@@ -88,7 +88,7 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 		PolygonData topTriangle{ a, b, tempVertex };
 		PolygonData bottomTriangle{ b, tempVertex, c };
 
-		TopSmoothShaded(hdc, topTriangle);
+//		TopSmoothShaded(hdc, topTriangle);
 		BottomSmoothShaded(hdc, bottomTriangle);
 	}
 }
@@ -208,7 +208,7 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			const float t = (x - static_cast<float>(sourceX)) / static_cast<float>(targetX - sourceX);
+			const float t = (x - static_cast<float>(sourceX)) / (targetX - sourceX);
 			const UnclampedColour colour(colourSlopeSourceX * (1 - t) + colourSlopeTargetX * t);
 			const COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
@@ -237,8 +237,8 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 	const UnclampedColour c1(v1.GetVertexData().GetColour());
 	const UnclampedColour c2(v2.GetVertexData().GetColour());
 
-	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v2->v1
-	const float cb = (v2.GetY() - v1.GetY()); // Get the change along edge v3->v1
+	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
+	const float cb = (v2.GetY() - v1.GetY()); // Get the change along edge v3->v2
 
 	const float slopeSourceY = (v2.GetX() - v0.GetX()) / ca;
 	const float slopeTargetY = (v2.GetX() - v1.GetX()) / cb;

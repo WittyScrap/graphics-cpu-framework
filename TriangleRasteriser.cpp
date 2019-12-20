@@ -88,7 +88,7 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 		PolygonData topTriangle{ a, b, tempVertex };
 		PolygonData bottomTriangle{ b, tempVertex, c };
 
-//		TopSmoothShaded(hdc, topTriangle);
+		TopSmoothShaded(hdc, topTriangle);
 		BottomSmoothShaded(hdc, bottomTriangle);
 	}
 }

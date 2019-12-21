@@ -178,9 +178,6 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 	UnclampedColour source(c1);
 	UnclampedColour target(source);
 
-	// Interpolator
-	UnclampedColour interpolator;
-
 	/* As we will do not fill in a complete line using MoveToEx/LineTo but instead
 	 * we will loop over all pixels of a horizontal line, we need a predefined
 	 * direction -> choose left to right. This means that x1 must be the smaller
@@ -199,9 +196,8 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 		for (float xPos = std::floorf(x1); xPos <= std::ceilf(x2); xPos++)
 		{
 			float t = (xPos - x1) / (x2 - x1);
-			interpolator = source * (1 - t) + target * t;
-
-			COLORREF pixelColour = RGB(interpolator.GetRed() * 255, interpolator.GetGreen() * 255, interpolator.GetBlue() * 255);
+			UnclampedColour colour(source * (1 - t) + target * t);
+			COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, static_cast<int>(std::floorf(xPos)), static_cast<int>(std::ceilf(scanlineY)), pixelColour);
 		}
@@ -246,9 +242,6 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 	UnclampedColour source(c3);
 	UnclampedColour target(source);
 
-	// Interpolator
-	UnclampedColour interpolator;
-
 	/* As we will do not fill in a complete line using MoveToEx/LineTo but instead
 	 * we will loop over all pixels of a horizontal line, we need a predefined
 	 * direction -> choose left to right. This means that x1 must be the smaller
@@ -267,9 +260,8 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 		for (float xPos = std::floorf(x1); xPos <= std::ceilf(x2); xPos++)
 		{
 			float t = (xPos - x1) / (x2 - x1);
-			interpolator = source * (1 - t) + target * t;
-
-			COLORREF pixelColour = RGB(interpolator.GetRed() * 255, interpolator.GetGreen() * 255, interpolator.GetBlue() * 255);
+			UnclampedColour colour(source * (1 - t) + target * t);
+			COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, static_cast<int>(std::ceilf(xPos)), static_cast<int>(std::floorf(scanlineY)), pixelColour);
 		}

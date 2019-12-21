@@ -27,15 +27,9 @@ class TriangleRasteriser
 
 public:
 	//
-	// Rasterises a triangle using the standard solid rasterisation
-	// technique.
+	// Drawing handlers.
 	//
 	static void DrawFlat(const HDC& hdc, const PolygonData& clipSpace);
-
-	//
-	// Rasterises a triangle using the standard solid rasterisation
-	// technique, shading on a fragment-by-fragment basis.
-	//
 	static void DrawSmooth(const HDC& hdc, const PolygonData& clipSpace);
 
 private:
@@ -47,32 +41,21 @@ private:
 	static void SortVertices(Vertex& a, Vertex& b, Vertex& c);
 
 	//
-	// Fills a triangle whose bottom side is perfectly horizontal.
-	// Precondition is that v2 and v3 perform the flat side and 
-	// that v1.y < v2.y, v3.y.
+	// Flat shading callbacks.
 	//
 	static void TopFlatShaded(const HDC& hdc, const PolygonData& clipSpace);
-	
-	//
-	// Fills a triangle whose top side is perfectly horizontal.
-	// Precondition is that v1 and v2 perform the flat side and 
-	// that v3.y > v1.y, v2.y.
-	//
 	static void BottomFlatShaded(const HDC& hdc, const PolygonData& clipSpace);
 
 	//
-	// Fills a triangle whose bottom side is perfectly horizontal.
-	// Precondition is that v2 and v3 perform the flat side and 
-	// that v1.y < v2.y, v3.y.
+	// Smooth shading callbacks.
 	//
 	static void TopSmoothShaded(const HDC& hdc, const PolygonData& clipSpace);
-
-	//
-	// Fills a triangle whose top side is perfectly horizontal.
-	// Precondition is that v1 and v2 perform the flat side and 
-	// that v3.y > v1.y, v2.y.
-	//
 	static void BottomSmoothShaded(const HDC& hdc, const PolygonData& clipSpace);
 
+	//
+	// Splitting systems.
+	//
+	static Vertex GetTemporaryVertex(const Vertex& a, const Vertex& b, const Vertex& c);
+	static Colour GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c);
 };
 

@@ -225,6 +225,14 @@ const Colour Colour::operator/(const float& rhs) const
 }
 
 //
+// Checks that two colours are the same.
+//
+const bool Colour::operator==(const Colour& rhs) const
+{
+	return _red == rhs._red && _green == rhs._green && _blue == rhs._blue;
+}
+
+//
 // Assigns this colour's properties from the given color ref.
 //
 Colour Colour::FromColor(const COLORREF& rhs)

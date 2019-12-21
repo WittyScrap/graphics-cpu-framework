@@ -11,8 +11,10 @@ Vertex::Vertex(float x, float y, float z) : _x{ x }, _y{ y }, _z{ z }, _w{ 1 }, 
 Vertex::Vertex(float x, float y, float z, float w) : _x{ x }, _y{ y }, _z{ z }, _w{ w }, _depth{ 0 }
 { }
 
-Vertex::Vertex(const Vertex& other) : _x{ other._x }, _y{ other._y }, _z{ other._z }, _w{ other._w }, _depth{ other._depth }, _vertexData{ other._vertexData }
-{ }
+Vertex::Vertex(const Vertex& other) : _x{ other._x }, _y{ other._y }, _z{ other._z }, _w{ other._w }, _depth{ other._depth }
+{ 
+	_vertexData = other._vertexData;
+}
 
 const float& Vertex::GetX() const
 {

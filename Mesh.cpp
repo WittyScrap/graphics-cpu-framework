@@ -164,7 +164,7 @@ void Mesh::Draw(HDC hdc)
 		GenerateVertexNormals();
 	}
 
-	if (_drawMode == DrawMode::DRAW_FRAGMENT && _shadeMode == ShadeMode::SHADE_SMOOTH)
+	if (_drawMode == DrawMode::DRAW_FRAGMENT && _shadeMode == ShadeMode::SHADE_GOURAUD)
 	{
 		ComputeVertexLighting();
 	}
@@ -343,7 +343,7 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 
 		break;
 	}
-	case ShadeMode::SHADE_SMOOTH:
+	case ShadeMode::SHADE_GOURAUD:
 		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
 		TriangleRasteriser::DrawSmooth(hdc, { clipA, clipB, clipC });
 		break;

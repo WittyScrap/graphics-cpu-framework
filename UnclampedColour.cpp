@@ -91,7 +91,7 @@ void UnclampedColour::Normalise()
 //
 // Adds two colours together.
 //
-UnclampedColour UnclampedColour::operator+(const UnclampedColour& rhs)
+const UnclampedColour UnclampedColour::operator+(const UnclampedColour rhs) const
 {
 	return UnclampedColour(_red + rhs._red, _green + rhs._green, _blue + rhs._blue);
 }
@@ -99,7 +99,7 @@ UnclampedColour UnclampedColour::operator+(const UnclampedColour& rhs)
 //
 // Substracts one colour from another.
 //
-UnclampedColour UnclampedColour::operator-(const UnclampedColour& rhs)
+const UnclampedColour UnclampedColour::operator-(const UnclampedColour rhs) const
 {
 	return UnclampedColour(_red - rhs._red, _green - rhs._green, _blue - rhs._blue);
 }
@@ -107,7 +107,7 @@ UnclampedColour UnclampedColour::operator-(const UnclampedColour& rhs)
 //
 // Multiplies two colours together.
 //
-UnclampedColour UnclampedColour::operator*(const UnclampedColour& rhs)
+const UnclampedColour UnclampedColour::operator*(const UnclampedColour rhs) const
 {
 	return UnclampedColour(_red * rhs._red, _green * rhs._green, _blue * rhs._blue);
 }
@@ -115,7 +115,7 @@ UnclampedColour UnclampedColour::operator*(const UnclampedColour& rhs)
 //
 // Divides a colour by another.
 //
-UnclampedColour UnclampedColour::operator/(const UnclampedColour& rhs)
+const UnclampedColour UnclampedColour::operator/(const UnclampedColour rhs) const
 {
 	return UnclampedColour(_red / rhs._red, _green / rhs._green, _blue / rhs._blue);
 }
@@ -171,7 +171,7 @@ const UnclampedColour& UnclampedColour::operator/=(const UnclampedColour& rhs)
 //
 // Adds a constant value to all components of a colour.
 //
-UnclampedColour UnclampedColour::operator+(const float& rhs)
+const UnclampedColour UnclampedColour::operator+(const float rhs) const
 {
 	return UnclampedColour(_red + rhs, _green + rhs, _blue + rhs);
 }
@@ -179,7 +179,7 @@ UnclampedColour UnclampedColour::operator+(const float& rhs)
 //
 // Subtracts a constant value from all components of a colour.
 //
-UnclampedColour UnclampedColour::operator-(const float& rhs)
+const UnclampedColour UnclampedColour::operator-(const float rhs) const
 {
 	return UnclampedColour(_red - rhs, _green - rhs, _blue - rhs);
 }
@@ -187,7 +187,7 @@ UnclampedColour UnclampedColour::operator-(const float& rhs)
 //
 // Multiplies all components of a colour by a constant value.
 //
-UnclampedColour UnclampedColour::operator*(const float& rhs)
+const UnclampedColour UnclampedColour::operator*(const float rhs) const
 {
 	return UnclampedColour(_red * rhs, _green * rhs, _blue * rhs);
 }
@@ -195,7 +195,7 @@ UnclampedColour UnclampedColour::operator*(const float& rhs)
 //
 // Divides all components of a colour by a constant value.
 //
-UnclampedColour UnclampedColour::operator/(const float& rhs)
+const UnclampedColour UnclampedColour::operator/(const float rhs) const
 {
 	return UnclampedColour(_red / rhs, _green / rhs, _blue / rhs);
 }
@@ -285,4 +285,20 @@ const UnclampedColour& UnclampedColour::operator=(const float& rhs)
 	_blue = rhs;
 
 	return *this;
+}
+
+//
+// Linearly interpolates between two unclamped colours.
+//
+UnclampedColour UnclampedColour::Lerp(const UnclampedColour& lhs, const UnclampedColour& rhs, const float& alpha)
+{
+	return rhs * alpha + lhs * (1 - alpha);
+}
+
+//
+// Transforms an unclamped colour into a clamped colour.
+//
+const Colour UnclampedColour::AsColour() const
+{
+	return Colour(_red, _green, _blue);
 }

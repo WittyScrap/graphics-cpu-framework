@@ -30,6 +30,11 @@ Polygon3D::Polygon3D(const Polygon3D& other) : _indices{ 0 }
 	_indices[0] = other._indices[0];
 	_indices[1] = other._indices[1];
 	_indices[2] = other._indices[2];
+	_depth = other._depth;
+	_finalColour = other._finalColour;
+	_objectNormal = other._objectNormal;
+	_worldNormal = other._worldNormal;
+	_clipNormal = other._clipNormal;
 }
 
 //

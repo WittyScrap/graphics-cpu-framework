@@ -202,14 +202,14 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 
 		const UnclampedColour colourSlopeSourceX(colourSlopeSourceY * ((float)y + 0.5f - v0.GetY()) + c0);
 		const UnclampedColour colourSlopeTargetX(colourSlopeTargetY * ((float)y + 0.5f - v0.GetY()) + c0);
+		const UnclampedColour colourSlope((colourSlopeTargetX - colourSlopeSourceX) / (slopeTargetX - slopeSourceX));
 
 		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
 		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
 
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			const float t = (x - static_cast<float>(sourceX)) / (targetX - sourceX);
-			const UnclampedColour colour(colourSlopeSourceX * (1 - t) + colourSlopeTargetX * t);
+			const UnclampedColour colour(colourSlopeSourceX + colourSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			const COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, x, y, pixelColour);
@@ -256,14 +256,14 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 
 		const UnclampedColour colourSlopeSourceX(colourSlopeSourceY * ((float)y + 0.5f - v2.GetY()) + c2);
 		const UnclampedColour colourSlopeTargetX(colourSlopeTargetY * ((float)y + 0.5f - v2.GetY()) + c2);
+		const UnclampedColour colourSlope((colourSlopeTargetX - colourSlopeSourceX) / (slopeTargetX - slopeSourceX));
 
 		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
 		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
 
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			const float t = (x - static_cast<float>(sourceX)) / (targetX - sourceX);
-			const UnclampedColour colour(colourSlopeSourceX * (1 - t) + colourSlopeTargetX * t);
+			const UnclampedColour colour(colourSlopeSourceX + colourSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			const COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, x, y, pixelColour);

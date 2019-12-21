@@ -34,6 +34,8 @@ public:
 	const Colour operator*(const float& rhs) const;
 	const Colour operator/(const float& rhs) const;
 
+	const bool operator==(const Colour& rhs) const;
+
 	static Colour FromColor(const COLORREF& rhs);
 	const COLORREF AsColor() const;
 

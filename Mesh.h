@@ -28,7 +28,8 @@ public:
 	enum class ShadeMode
 	{
 		SHADE_FLAT,
-		SHADE_SMOOTH
+		SHADE_GOURAUD,
+		SHADE_PHONG
 	};
 
 
@@ -54,6 +55,10 @@ public:
 	// Draw operation
 	//
 	void Draw(HDC hdc);
+
+	//
+	// Drawming modes.
+	//
 	void Mode(const DrawMode& mode);
 	void Shade(const ShadeMode& mode);
 

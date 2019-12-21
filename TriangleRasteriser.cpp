@@ -50,7 +50,7 @@ void TriangleRasteriser::DrawFlat(const HDC& hdc, const PolygonData& clipSpace)
 
 //
 // Rasterises a triangle using the standard solid rasterisation
-// technique, shading on a fragment-by-fragment basis.
+// technique, shading on a vertex-by-vertex basis.
 //
 void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace)
 {
@@ -58,6 +58,55 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 	Vertex a = clipSpace.a;
 	Vertex b = clipSpace.b;
 	Vertex c = clipSpace.c;
+
+	SortVertices(a, b, c);
+
+	// Construct copied structure
+	PolygonData data
+	{
+		a,
+		b,
+		c
+	};
+
+	/* here we know that v1.y <= v2.y <= v3.y
+	 * check for trivial case of bottom-flat triangle
+	 * or that of a top-flat triangle. */
+	if (b.GetY() == c.GetY())
+	{
+		TopSmoothShaded(hdc, data);
+	}
+	else if (a.GetY() == b.GetY())
+	{
+		BottomSmoothShaded(hdc, data);
+	}
+	else
+	{
+		// General case
+		Vertex tempVertex(GetTemporaryVertex(a, b, c));
+
+		PolygonData topTriangle{ a, b, tempVertex };
+		PolygonData bottomTriangle{ b, tempVertex, c };
+
+		TopSmoothShaded(hdc, topTriangle);
+		BottomSmoothShaded(hdc, bottomTriangle);
+	}
+}
+
+//
+// Rasterises a triangle using the standard solid rasterisation
+// technique, shading on a fragment-by-fragment basis.
+//
+void TriangleRasteriser::DrawPhong(const HDC& hdc, const PolygonData& clipSpace, const PolygonData& worldSpace, const FragmentFunction& frag)
+{
+	// Make copies of the vertices (not references) as we'll need to sort them and replace their normals.
+	Vertex a = clipSpace.a;
+	Vertex b = clipSpace.b;
+	Vertex c = clipSpace.c;
+
+	a.GetVertexData().SetNormal(worldSpace.a.GetVertexData().GetNormal());
+	b.GetVertexData().SetNormal(worldSpace.b.GetVertexData().GetNormal());
+	c.GetVertexData().SetNormal(worldSpace.c.GetVertexData().GetNormal());
 
 	SortVertices(a, b, c);
 
@@ -272,17 +321,35 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 }
 
 //
+// Fills a triangle whose bottom side is perfectly horizontal.
+// Precondition is that v2 and v3 perform the flat side and 
+// that v1.y < v2.y, v3.y.
+//
+void TriangleRasteriser::TopPhongShaded(const HDC& hdc, const PolygonData& clipSpace, const PolygonData& worldSpace, const FragmentFunction& frag)
+{
+}
+
+//
+// Fills a triangle whose top side is perfectly horizontal.
+// Precondition is that v1 and v2 perform the flat side and 
+// that v3.y > v1.y, v2.y.
+//
+void TriangleRasteriser::BottomPhongShaded(const HDC& hdc, const PolygonData& clipSpace, const PolygonData& worldSpace, const FragmentFunction& frag)
+{
+}
+
+//
 // Generates a temporary vertex to be placed between the A/B-C diagonal.
 // This method also generates the temporary normal and colour
 // to be used for lighting/smooth shading calculations.
 //
-Vertex TriangleRasteriser::GetTemporaryVertex(const Vertex& a, const Vertex& b, const Vertex& c)
+const Vertex TriangleRasteriser::GetTemporaryVertex(const Vertex& a, const Vertex& b, const Vertex& c)
 {
 	// Split the triangle in a topflat and bottom - flat one
 	Vertex tempVertex(a.GetX() + ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY())) * (c.GetX() - a.GetX()), b.GetY(), 0);
 
 	tempVertex.GetVertexData().SetColour(GetTemporaryColour(a, b, c));
-//	tempVertex.GetVertexData().SetNormal(GetTemporaryNormal(a, b, c));
+	tempVertex.GetVertexData().SetNormal(GetTemporaryNormal(a, b, c));
 
 	return tempVertex;
 }
@@ -292,13 +359,24 @@ Vertex TriangleRasteriser::GetTemporaryVertex(const Vertex& a, const Vertex& b, 
 // vertex that is generated between the A/B-C diagonal. The source colours
 // are taken from the vertex data.
 //
-Colour TriangleRasteriser::GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c)
+const Colour TriangleRasteriser::GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c)
 {
-	const Colour& c0 = a.GetVertexData().GetColour();
-	const Colour& c1 = b.GetVertexData().GetColour();
-	const Colour& c2 = c.GetVertexData().GetColour();
+	const UnclampedColour c0(a.GetVertexData().GetColour());
+	const UnclampedColour c2(c.GetVertexData().GetColour());
 
-	return c0 + (c2 - c0) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
+	return (c0 + (c2 - c0) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()))).AsColour();
+}
+
+//
+// Given a set of three vertices, generates a temporary normal to interpolate
+// between the three vertices' normals stored within their vertex data.
+//
+const Vector3 TriangleRasteriser::GetTemporaryNormal(const Vertex& a, const Vertex& b, const Vertex& c)
+{
+	const Vector3& n0(a.GetVertexData().GetNormal());
+	const Vector3& n2(c.GetVertexData().GetNormal());
+
+	return n0 + (n2 - n0) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
 }
 
 //

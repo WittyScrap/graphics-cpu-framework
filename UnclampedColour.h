@@ -47,6 +47,7 @@ public:
 	const UnclampedColour& operator=(const float& rhs);
 
 	static UnclampedColour Lerp(const UnclampedColour& lhs, const UnclampedColour& rhs, const float& alpha);
+	const Colour AsColour() const;
 
 private:
 	float _red;

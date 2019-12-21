@@ -294,3 +294,11 @@ UnclampedColour UnclampedColour::Lerp(const UnclampedColour& lhs, const Unclampe
 {
 	return rhs * alpha + lhs * (1 - alpha);
 }
+
+//
+// Transforms an unclamped colour into a clamped colour.
+//
+const Colour UnclampedColour::AsColour() const
+{
+	return Colour(_red, _green, _blue);
+}

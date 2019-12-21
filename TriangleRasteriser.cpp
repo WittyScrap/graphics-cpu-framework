@@ -38,7 +38,7 @@ void TriangleRasteriser::DrawFlat(const HDC& hdc, const PolygonData& clipSpace)
 	else
 	{
 		// general case - split the triangle in a topflat and bottom-flat one
-		Vertex tempVertex = Vertex::Lerp(a, c, 0.5f);
+		Vertex tempVertex(GetTemporaryVertex(a, b, c));
 
 		PolygonData topTriangle{ a, b, tempVertex };
 		PolygonData bottomTriangle{ b, tempVertex, c };
@@ -83,7 +83,7 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 	else
 	{
 		// general case - split the triangle in a topflat and bottom-flat one
-		Vertex tempVertex = Vertex::Lerp(a, c, 0.5f);
+		Vertex tempVertex(GetTemporaryVertex(a, b, c));
 
 		PolygonData topTriangle{ a, b, tempVertex };
 		PolygonData bottomTriangle{ b, tempVertex, c };
@@ -273,6 +273,36 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 		source -= sourceSlope;
 		target -= targetSlope;
 	}
+}
+
+//
+// Generates a temporary vertex to be placed between the A/B-C diagonal.
+// This method also generates the temporary normal and colour
+// to be used for lighting/smooth shading calculations.
+//
+Vertex TriangleRasteriser::GetTemporaryVertex(const Vertex& a, const Vertex& b, const Vertex& c)
+{
+	// Split the triangle in a topflat and bottom - flat one
+	Vertex tempVertex(a.GetX() + ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY())) * (c.GetX() - a.GetX()), b.GetY(), 0);
+
+	tempVertex.GetVertexData().SetColour(GetTemporaryColour(a, b, c));
+//	tempVertex.GetVertexData().SetNormal(GetTemporaryNormal(a, b, c));
+
+	return tempVertex;
+}
+
+//
+// Given a set of three vertices, generates the temporary colour for the
+// vertex that is generated between the A/B-C diagonal. The source colours
+// are taken from the vertex data.
+//
+Colour TriangleRasteriser::GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c)
+{
+	const Colour& c0 = a.GetVertexData().GetColour();
+	const Colour& c1 = b.GetVertexData().GetColour();
+	const Colour& c2 = c.GetVertexData().GetColour();
+
+	return c0 + (c2 - c0) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
 }
 
 //

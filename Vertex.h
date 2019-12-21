@@ -12,7 +12,9 @@ public:
 	Vertex();
 	Vertex(float x, float y, float z);
 	Vertex(float x, float y, float z, float w);
+	Vertex(float x, float y, float z, float w, const Vector3& normal);
 	Vertex(const Vertex& other);
+	Vertex(const Vector3& copy);
 
 	const float& GetX() const;
 	const float& GetY() const;

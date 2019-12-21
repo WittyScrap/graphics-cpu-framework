@@ -13,6 +13,6 @@ public:
 	//
 	// Return the intensity value as a constant for all polygons.
 	//
-	Colour CalculateContribution(const Vertex& position, const Vector3& normal) override;
+	Colour CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness) override;
 };
 

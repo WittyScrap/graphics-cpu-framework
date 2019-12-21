@@ -58,7 +58,7 @@ const float& Colour::GetBlue() const
 //
 void Colour::SetRed(const float& red)
 {
-	_red = std::clamp(red, 0.f, 1.f);
+	_red = Clamp(red, 0.f, 1.f);
 }
 
 //
@@ -66,7 +66,7 @@ void Colour::SetRed(const float& red)
 //
 void Colour::SetGreen(const float& green)
 {
-	_green = std::clamp(green, 0.f, 1.f);
+	_green = Clamp(green, 0.f, 1.f);
 }
 
 //
@@ -74,7 +74,7 @@ void Colour::SetGreen(const float& green)
 //
 void Colour::SetBlue(const float& blue)
 {
-	_blue = std::clamp(blue, 0.f, 1.f);
+	_blue = Clamp(blue, 0.f, 1.f);
 }
 
 //
@@ -97,9 +97,9 @@ const Colour& Colour::operator=(const Colour& rhs)
 //
 const Colour& Colour::operator+=(const Colour& rhs)
 {
-	_red = std::clamp(rhs._red + _red, 0.f, 1.f);
-	_green = std::clamp(rhs._green + _green, 0.f, 1.f);
-	_blue = std::clamp(rhs._blue + _blue, 0.f, 1.f);
+	_red = Clamp(rhs._red + _red, 0.f, 1.f);
+	_green = Clamp(rhs._green + _green, 0.f, 1.f);
+	_blue = Clamp(rhs._blue + _blue, 0.f, 1.f);
 
 	return *this;
 }
@@ -109,9 +109,9 @@ const Colour& Colour::operator+=(const Colour& rhs)
 //
 const Colour& Colour::operator-=(const Colour& rhs)
 {
-	_red = std::clamp(rhs._red - _red, 0.f, 1.f);
-	_green = std::clamp(rhs._green - _green, 0.f, 1.f);
-	_blue = std::clamp(rhs._blue - _blue, 0.f, 1.f);
+	_red = Clamp(rhs._red - _red, 0.f, 1.f);
+	_green = Clamp(rhs._green - _green, 0.f, 1.f);
+	_blue = Clamp(rhs._blue - _blue, 0.f, 1.f);
 
 	return *this;
 }
@@ -121,9 +121,9 @@ const Colour& Colour::operator-=(const Colour& rhs)
 //
 const Colour& Colour::operator*=(const Colour& rhs)
 {
-	_red = std::clamp(rhs._red * _red, 0.f, 1.f);
-	_green = std::clamp(rhs._green * _green, 0.f, 1.f);
-	_blue = std::clamp(rhs._blue * _blue, 0.f, 1.f);
+	_red = Clamp(rhs._red * _red, 0.f, 1.f);
+	_green = Clamp(rhs._green * _green, 0.f, 1.f);
+	_blue = Clamp(rhs._blue * _blue, 0.f, 1.f);
 
 	return *this;
 }
@@ -133,9 +133,9 @@ const Colour& Colour::operator*=(const Colour& rhs)
 //
 const Colour& Colour::operator/=(const Colour& rhs)
 {
-	_red = std::clamp(rhs._red / _red, 0.f, 1.f);
-	_green = std::clamp(rhs._green / _green, 0.f, 1.f);
-	_blue = std::clamp(rhs._blue / _blue, 0.f, 1.f);
+	_red = Clamp(rhs._red / _red, 0.f, 1.f);
+	_green = Clamp(rhs._green / _green, 0.f, 1.f);
+	_blue = Clamp(rhs._blue / _blue, 0.f, 1.f);
 
 	return *this;
 }
@@ -147,9 +147,9 @@ const Colour Colour::operator+(const Colour& rhs) const
 {
 	Colour add;
 
-	add._red = std::clamp(rhs._red + _red, 0.f, 1.f);
-	add._green = std::clamp(rhs._green + _green, 0.f, 1.f);
-	add._blue = std::clamp(rhs._blue + _blue, 0.f, 1.f);
+	add._red = Clamp(rhs._red + _red, 0.f, 1.f);
+	add._green = Clamp(rhs._green + _green, 0.f, 1.f);
+	add._blue = Clamp(rhs._blue + _blue, 0.f, 1.f);
 
 	return add;
 }
@@ -161,9 +161,9 @@ const Colour Colour::operator-(const Colour& rhs) const
 {
 	Colour subtract;
 
-	subtract._red = std::clamp(_red - rhs._red, 0.f, 1.f);
-	subtract._green = std::clamp(_green - rhs._green, 0.f, 1.f);
-	subtract._blue = std::clamp(_blue - rhs._blue, 0.f, 1.f);
+	subtract._red = Clamp(_red - rhs._red, 0.f, 1.f);
+	subtract._green = Clamp(_green - rhs._green, 0.f, 1.f);
+	subtract._blue = Clamp(_blue - rhs._blue, 0.f, 1.f);
 
 	return subtract;
 }
@@ -175,9 +175,9 @@ const Colour Colour::operator*(const Colour& rhs) const
 {
 	Colour multiply;
 
-	multiply._red = std::clamp(rhs._red * _red, 0.f, 1.f);
-	multiply._green = std::clamp(rhs._green * _green, 0.f, 1.f);
-	multiply._blue = std::clamp(rhs._blue * _blue, 0.f, 1.f);
+	multiply._red = Clamp(rhs._red * _red, 0.f, 1.f);
+	multiply._green = Clamp(rhs._green * _green, 0.f, 1.f);
+	multiply._blue = Clamp(rhs._blue * _blue, 0.f, 1.f);
 
 	return multiply;
 }
@@ -189,9 +189,9 @@ const Colour Colour::operator/(const Colour& rhs) const
 {
 	Colour divide;
 
-	divide._red = std::clamp(_red / rhs._red, 0.f, 1.f);
-	divide._green = std::clamp(_green / rhs._green, 0.f, 1.f);
-	divide._blue = std::clamp(_blue / rhs._blue, 0.f, 1.f);
+	divide._red = Clamp(_red / rhs._red, 0.f, 1.f);
+	divide._green = Clamp(_green / rhs._green, 0.f, 1.f);
+	divide._blue = Clamp(_blue / rhs._blue, 0.f, 1.f);
 
 	return divide;
 }
@@ -203,9 +203,9 @@ const Colour Colour::operator*(const float& rhs) const
 {
 	Colour multiplied;
 
-	multiplied._red = std::clamp(_red * rhs, 0.f, 1.f);
-	multiplied._green = std::clamp(_green * rhs, 0.f, 1.f);
-	multiplied._blue = std::clamp(_blue * rhs, 0.f, 1.f);
+	multiplied._red = Clamp(_red * rhs, 0.f, 1.f);
+	multiplied._green = Clamp(_green * rhs, 0.f, 1.f);
+	multiplied._blue = Clamp(_blue * rhs, 0.f, 1.f);
 
 	return multiplied;
 }
@@ -217,9 +217,9 @@ const Colour Colour::operator/(const float& rhs) const
 {
 	Colour divided;
 
-	divided._red = std::clamp(_red / rhs, 0.f, 1.f);
-	divided._green = std::clamp(_green / rhs, 0.f, 1.f);
-	divided._blue = std::clamp(_blue / rhs, 0.f, 1.f);
+	divided._red = Clamp(_red / rhs, 0.f, 1.f);
+	divided._green = Clamp(_green / rhs, 0.f, 1.f);
+	divided._blue = Clamp(_blue / rhs, 0.f, 1.f);
 
 	return divided;
 }
@@ -254,4 +254,25 @@ const COLORREF Colour::AsColor() const
 Colour Colour::Lerp(const Colour& lhs, const Colour& rhs, const float& alpha)
 {
 	return rhs * alpha + lhs * (1 - alpha);
+}
+
+//
+// Clamps a value between a and b.
+// Note: This implementation is needed since std::clamp seems to use a module 
+// operation to clamp its values, which results in undesired values outside of
+// the a-b range.
+//
+float Colour::Clamp(const float& value, const float& a, const float& b)
+{
+	if (value < a)
+	{
+		return a;
+	}
+
+	if (value > b)
+	{
+		return b;
+	}
+
+	return value;
 }

@@ -4,6 +4,7 @@
 #include "Polygon3D.h"
 #include "Colour.h"
 #include "TriangleRasteriser.h"
+#include "Texture.h"
 
 
 //
@@ -17,6 +18,7 @@ public:
 	//
 	enum class DrawMode
 	{
+		DRAW_NONE,
 		DRAW_WIREFRAME,
 		DRAW_SOLID,
 		DRAW_FRAGMENT
@@ -37,7 +39,7 @@ public:
 	~Mesh();
 
 	// Loads the mesh data from a file.
-	void LoadFromFile(const char* const fileName);
+	void LoadFromFile(const char* const fileName, const char* texture);
 
 	//
 	// Accessors
@@ -49,7 +51,8 @@ public:
 	// Modifiers
 	//
 	void AddVertex(float x, float y, float z);
-	void AddPolygon(int i0, int i1, int i2);
+	void AddPolygon(int i0, int i1, int i2, int u0, int u1, int u2);
+	void AddUVcoord(float u, float v);
 
 	//
 	// Draw operation
@@ -61,6 +64,24 @@ public:
 	//
 	void Mode(const DrawMode& mode);
 	void Shade(const ShadeMode& mode);
+
+	//
+	// Shading information.
+	//
+	const float& GetRoughness() const;
+	void SetRoughness(const float& value);
+
+	//
+	// Lighting tools
+	//
+	static Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices);
+	static Colour ComputeLighting(const Vertex& vertex, const float& roughness);
+
+	//
+	// Texturing
+	//
+	const Texture& GetTexture() const;
+	Texture& GetTexture();
 
 private:
 	//
@@ -93,19 +114,21 @@ private:
 	//
 	// Lighting tools
 	//
-	Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices) const;
-	Colour ComputeLighting(const Vertex& vertex) const;
-
 	void ComputeVertexLighting(); // Computes the lighting for all vertices.
 
 private:
 	std::vector<Polygon3D> _polygons;
 	std::vector<Polygon3D*> _visiblePolygons;
+	std::vector<Point<float>> _uv;
 
 	HPEN _previousPen;
 	HBRUSH _previousBrush;
 
 	DrawMode _drawMode;
 	ShadeMode _shadeMode;
+
+	Texture _texture;
+
+	float _roughness;
 };
 

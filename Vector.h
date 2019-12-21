@@ -82,6 +82,8 @@ public:
 	bool operator==(const Vector3& rhs) const;
 	bool operator!=(const Vector3& rhs) const;
 
+	const Vertex ToVertex() const;
+
 private:
 	//
 	// Main member variables.

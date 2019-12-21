@@ -17,7 +17,7 @@ public:
 	//
 	// Contribution calculator.
 	//
-	virtual Colour CalculateContribution(const Vertex& position, const Vector3& normal) = 0;
+	virtual Colour CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness) = 0;
 
 private:
 	Colour _intensity;

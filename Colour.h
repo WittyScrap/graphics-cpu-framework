@@ -41,6 +41,9 @@ public:
 
 	static Colour Lerp(const Colour& lhs, const Colour& rhs, const float& alpha);
 
+protected:
+	static float Clamp(const float& value, const float& a, const float& b);
+
 private:
 	float _red;
 	float _green;

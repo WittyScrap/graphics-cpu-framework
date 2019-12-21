@@ -14,20 +14,20 @@ void DefaultObject::OnInit()
 	_figurine = CreateShape<Mesh>();
 
 	// Actually load the meshes because you haven't yet
-	_pedistal->LoadFromFile("Meshes/cube.md2");
-	_figurine->LoadFromFile("Meshes/marvin.md2");
+	_pedistal->LoadFromFile("Meshes/cube.md2", "lines.pcx");
+	_figurine->LoadFromFile("Meshes/marvin.md2", "marvin.pcx");
 
 	// Set colour
 	_pedistal->SetColour(Colour(.5f, .5f, 1.f));
 	_figurine->SetColour(Colour(1.f, .5f, .5f));
 
 	// Set draw modes
-	_pedistal->Mode(Mesh::DrawMode::DRAW_SOLID);
+	_pedistal->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
 	_figurine->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
 
 	// Set shade modes
-	_pedistal->Shade(Mesh::ShadeMode::SHADE_GOURAUD);
-	_figurine->Shade(Mesh::ShadeMode::SHADE_GOURAUD);
+	_pedistal->Shade(Mesh::ShadeMode::SHADE_PHONG);
+	_figurine->Shade(Mesh::ShadeMode::SHADE_PHONG);
 
 	// Place the cube underneath
 	_pedistal->SetPosition({ 0, -43.f, 0 });

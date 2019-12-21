@@ -90,6 +90,12 @@
     <ClCompile Include="UnclampedColour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawString.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework.h">
@@ -179,6 +185,9 @@
     <ClInclude Include="UnclampedColour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Rasteriser.ico">
@@ -252,6 +261,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Meshes\van.md2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lines.pcx">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="marvin.pcx">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

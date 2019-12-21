@@ -20,14 +20,16 @@ public:
 	// Constructors, destructors
 	//
 	Polygon3D();
-	Polygon3D(const int& index0, const int& index1, const int& index2);
+	Polygon3D(const int& p0, const int& p1, const int& p2, const int& u0, const int& u1, const int u2);
 	virtual ~Polygon3D();
 
 	//
 	// Copy constructor.
 	//
 	Polygon3D(const Polygon3D& other);
-	int GetIndex(const int& i) const;
+
+	int GetVertex(const int& i) const;
+	int GetUVCoord(const int& i) const;
 
 	const Vector3& GetObjectNormal() const;
 	const Vector3& GetWorldNormal() const;
@@ -49,7 +51,9 @@ public:
 	bool operator>(const Polygon3D& rhs);
 
 private:
-	int _indices[INDICES_COUNT];
+	int _vertices[INDICES_COUNT];
+	int _uvcoords[INDICES_COUNT];
+
 	float _depth;
 	Colour _finalColour;
 

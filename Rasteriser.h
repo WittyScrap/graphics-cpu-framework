@@ -27,6 +27,8 @@ public:
 
 	const float& GetTimeElapsed() const;
 
+	static void DrawString(Bitmap& bitmap, LPCTSTR text);
+
 protected:
 	//
 	// Shape generation and handling.

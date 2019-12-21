@@ -389,3 +389,11 @@ bool Vector3::operator!=(const Vector3& rhs) const
 {
 	return !(*this == rhs);
 }
+
+//
+// Converts this vector to a vertex.
+//
+const Vertex Vector3::ToVertex() const
+{
+	return Vertex(_x, _y, _z, 0);
+}

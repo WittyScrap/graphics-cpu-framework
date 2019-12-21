@@ -28,6 +28,16 @@ class TriangleRasteriser
 		const Vertex& c;
 	};
 
+	//
+	// Raw modifiable polygon data structure.
+	//
+	struct Vertices
+	{
+		Vertex a;
+		Vertex b;
+		Vertex c;
+	};
+
 public:
 	//
 	// Drawing handlers.
@@ -43,6 +53,7 @@ private:
 	// and C has the largest Y value.
 	//
 	static void SortVertices(Vertex& a, Vertex& b, Vertex& c);
+	static void SortVertices(Vertices& clipSpace, Vertices& worldSpace);
 
 	//
 	// Flat shading callbacks.
@@ -59,14 +70,16 @@ private:
 	//
 	// Phong shading callbacks.
 	//
-	static void TopPhongShaded(const HDC& hdc, const PolygonData& clipSpace, const PolygonData& worldSpace, const FragmentFunction& frag);
-	static void BottomPhongShaded(const HDC& hdc, const PolygonData& clipSpace, const PolygonData& worldSpace, const FragmentFunction& frag);
+	static void TopPhongShaded(const HDC& hdc, const Vertices& clipSpace, const Vertices& worldSpace, const FragmentFunction& frag);
+	static void BottomPhongShaded(const HDC& hdc, const Vertices& clipSpace, const Vertices& worldSpace, const FragmentFunction& frag);
 
 	//
 	// Splitting systems.
 	//
-	static const Vertex  GetTemporaryVertex(const Vertex& a, const Vertex& b, const Vertex& c);
-	static const Colour  GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c);
+	static const Vertex GetTemporaryVertex(const Vertex& a, const Vertex& b, const Vertex& c);
+	static const Colour GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c);
 	static const Vector3 GetTemporaryNormal(const Vertex& a, const Vertex& b, const Vertex& c);
+	static const Vertex GetTemporaryWorldVertex(const Vertices& clipSpace, const Vertices& worldSpace);
+	static const void GetTemporaryUV(Vertex& tmp, const Vertices& clipSpace);
 };
 

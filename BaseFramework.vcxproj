@@ -153,6 +153,7 @@
     <ClCompile Include="Colour.cpp" />
     <ClCompile Include="DefaultObject.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="DrawString.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Square.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="TriangleRasteriser.cpp" />
     <ClCompile Include="UnclampedColour.cpp" />
@@ -192,6 +194,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Rasteriser.h" />
     <ClInclude Include="SceneObject.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Transformable.h" />
     <ClInclude Include="TriangleRasteriser.h" />
     <ClInclude Include="UnclampedColour.h" />
@@ -212,6 +215,8 @@
     <ResourceCompile Include="Rasteriser.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lines.pcx" />
+    <None Include="marvin.pcx" />
     <None Include="Meshes\car.md2" />
     <None Include="Meshes\cartman.md2" />
     <None Include="Meshes\chef.md2" />

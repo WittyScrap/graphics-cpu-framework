@@ -18,6 +18,9 @@ public:
 	inline const Colour& GetColour() const;
 	inline void SetColour(const Colour& value);
 
+	inline const Point<float>& GetUV() const;
+	inline void SetUV(const Point<float>& uv);
+
 	inline const float& GetContribution() const;
 	inline void SetContribution(const float& value);
 	inline void AddContribution(const float& value);
@@ -29,6 +32,7 @@ public:
 private:
 	Vector3 _normal;
 	Colour _colour;
+	Point<float> _uv;
 
 	float _contribution;
 };
@@ -36,13 +40,13 @@ private:
 //
 // Empty constructor.
 //
-inline VertexData::VertexData() : _normal{ 0, 0, 0 }, _colour{ 0, 0, 0 }, _contribution{ 0 }
+inline VertexData::VertexData() : _normal{ 0, 0, 0 }, _colour{ 0, 0, 0 }, _uv{ 0, 0 }, _contribution{ 0 }
 { }
 
 //
 // Copy constructor.
 //
-inline VertexData::VertexData(const VertexData& copy) : _normal(copy.GetNormal()), _colour(copy.GetColour()), _contribution(copy.GetContribution())
+inline VertexData::VertexData(const VertexData& copy) : _normal(copy.GetNormal()), _colour(copy.GetColour()), _uv(copy.GetUV()), _contribution(copy.GetContribution())
 { }
 
 //
@@ -83,6 +87,22 @@ inline const Colour& VertexData::GetColour() const
 inline void VertexData::SetColour(const Colour& value)
 {
 	_colour = value;
+}
+
+//
+// Returns the UV coordinates for this vertex.
+//
+inline const Point<float>& VertexData::GetUV() const
+{
+	return _uv;
+}
+
+//
+// Sets the UV coordinates for this vertex.
+//
+inline void VertexData::SetUV(const Point<float>& uv)
+{
+	_uv = uv;
 }
 
 //

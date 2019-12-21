@@ -11,10 +11,16 @@ Vertex::Vertex(float x, float y, float z) : _x{ x }, _y{ y }, _z{ z }, _w{ 1 }, 
 Vertex::Vertex(float x, float y, float z, float w) : _x{ x }, _y{ y }, _z{ z }, _w{ w }, _depth{ 0 }
 { }
 
-Vertex::Vertex(const Vertex& other) : _x{ other._x }, _y{ other._y }, _z{ other._z }, _w{ other._w }, _depth{ other._depth }
-{ 
-	_vertexData = other._vertexData;
+Vertex::Vertex(float x, float y, float z, float w, const Vector3& normal) : _x{ x }, _y{ y }, _z{ z }, _w{ w }, _depth{ 0 }, _vertexData{ VertexData() }
+{
+	_vertexData.SetNormal(normal);
 }
+
+Vertex::Vertex(const Vertex& other) : _x{ other._x }, _y{ other._y }, _z{ other._z }, _w{ other._w }, _depth{ other._depth }, _vertexData{ other._vertexData }
+{ }
+
+Vertex::Vertex(const Vector3& copy) : _x{ copy.GetX() }, _y{ copy.GetY() }, _z{ copy.GetZ() }, _w { 0 }, _depth { 0 }, _vertexData { VertexData() }
+{ }
 
 const float& Vertex::GetX() const
 {

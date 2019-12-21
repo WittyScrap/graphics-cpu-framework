@@ -7,9 +7,69 @@
 #include "Environment.h"
 
 //
+// Implements a basic unlit fragment function.
+//
+struct Unlit : public FragmentFunction
+{
+private:
+	const Texture& _texture;
+
+public:
+	inline Unlit(const Texture& texture) : _texture(texture)
+	{ }
+
+	inline const Colour operator()(const Vertex& v) const override
+	{
+		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().X, (int)v.GetVertexData().GetUV().Y);
+
+		return Colour(sample);
+	}
+};
+
+//
+// Implements a simple screen space gradient effect.
+//
+struct Gradient : public FragmentFunction
+{
+	inline const Colour operator()(const Vertex& v) const override
+	{
+		return Colour(v.GetY(), v.GetY(), v.GetY());
+	}
+};
+
+//
+// Displays the world space normals on each point on the mesh.
+//
+struct Normal : public FragmentFunction
+{
+	inline const Colour operator()(const Vertex& v) const override
+	{
+		return Colour(v.GetVertexData().GetNormal().GetX(), v.GetVertexData().GetNormal().GetY(), v.GetVertexData().GetNormal().GetZ());
+	}
+};
+
+//
+// Implementation of phong shading.
+//
+struct Phong : public FragmentFunction
+{
+private:
+	float _roughness;
+
+public:
+	inline Phong(const float& roughness) : _roughness{ roughness }
+	{ }
+
+	inline const Colour operator()(const Vertex& v) const override
+	{
+		return Mesh::ComputeLighting(v, _roughness);
+	}
+};
+
+//
 // Default constructor.
 //
-Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DrawMode::DRAW_SOLID }, _shadeMode { ShadeMode::SHADE_FLAT }
+Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DrawMode::DRAW_SOLID }, _shadeMode { ShadeMode::SHADE_FLAT }, _roughness{ 0.f }
 { }
 
 //
@@ -21,12 +81,12 @@ Mesh::~Mesh()
 //
 // Loads the mesh data from a file.
 //
-void Mesh::LoadFromFile(const char* const fileName)
+void Mesh::LoadFromFile(const char* const fileName, const char* texture)
 {
 	ClearVertices();
 	_polygons.clear();
 
-	if (!MD2Loader::LoadModel(fileName, *this, &Mesh::AddPolygon, &Mesh::AddVertex))
+	if (!MD2Loader::LoadModel(fileName, texture, *this, &Mesh::AddPolygon, &Mesh::AddVertex, &Mesh::AddUVcoord))
 	{
 		throw ModelLoadingException(fileName);
 	}
@@ -61,9 +121,17 @@ void Mesh::AddVertex(float x, float y, float z)
 //
 // Adds a new polygon.
 //
-void Mesh::AddPolygon(int i0, int i1, int i2)
+void Mesh::AddPolygon(int i0, int i1, int i2, int u0, int u1, int u2)
 {
-	_polygons.push_back(Polygon3D(i0, i1, i2));
+	_polygons.push_back(Polygon3D(i0, i1, i2, u0, u1, u2));
+}
+
+//
+// Adds a new set of UV coordinates.
+//
+void Mesh::AddUVcoord(float u, float v)
+{
+	_uv.push_back({ u, v });
 }
 
 //
@@ -120,9 +188,9 @@ void Mesh::GenerateVertexNormals()
 
 	for (const Polygon3D& polygon : _polygons)
 	{
-		Vertex& a = worldVertices[polygon.GetIndex(0)];
-		Vertex& b = worldVertices[polygon.GetIndex(1)];
-		Vertex& c = worldVertices[polygon.GetIndex(2)];
+		Vertex& a = worldVertices[polygon.GetVertex(0)];
+		Vertex& b = worldVertices[polygon.GetVertex(1)];
+		Vertex& c = worldVertices[polygon.GetVertex(2)];
 
 		const Vector3& normal = polygon.GetWorldNormal();
 
@@ -147,6 +215,11 @@ void Mesh::GenerateVertexNormals()
 //
 void Mesh::Draw(HDC hdc)
 {
+	if (_drawMode == DrawMode::DRAW_NONE)
+	{
+		return;
+	}
+
 	CalculateTransformations();
 
 	// Calculate transformed vertices
@@ -200,6 +273,22 @@ void Mesh::Mode(const DrawMode& mode)
 void Mesh::Shade(const ShadeMode& mode)
 {
 	_shadeMode = mode;
+}
+
+//
+// How rough the material is, higher values will result in a more spread out specular reflection.
+//
+const float& Mesh::GetRoughness() const
+{
+	return _roughness;
+}
+
+//
+// Sets how rough the material is, higher values will result in a more spread out specular reflection.
+//
+void Mesh::SetRoughness(const float& value)
+{
+	_roughness = value;
 }
 
 //
@@ -272,9 +361,9 @@ void Mesh::CalculateDepthSorting(const std::vector<Vertex>& vertices)
 //
 void Mesh::DrawSolidPolygon(const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace, const HDC& hdc)
 {
-	Vertex a = clipSpace[polygon.GetIndex(0)];
-	Vertex b = clipSpace[polygon.GetIndex(1)];
-	Vertex c = clipSpace[polygon.GetIndex(2)];
+	Vertex a = clipSpace[polygon.GetVertex(0)];
+	Vertex b = clipSpace[polygon.GetVertex(1)];
+	Vertex c = clipSpace[polygon.GetVertex(2)];
 
 	POINT points[3]
 	{ 
@@ -297,9 +386,9 @@ void Mesh::DrawSolidPolygon(const Polygon3D& polygon, const std::vector<Vertex>&
 //
 void Mesh::DrawWirePolygon(const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace, const HDC& hdc)
 {
-	Vertex a = clipSpace[polygon.GetIndex(0)];
-	Vertex b = clipSpace[polygon.GetIndex(1)];
-	Vertex c = clipSpace[polygon.GetIndex(2)];
+	Vertex a = clipSpace[polygon.GetVertex(0)];
+	Vertex b = clipSpace[polygon.GetVertex(1)];
+	Vertex c = clipSpace[polygon.GetVertex(2)];
 
 	// Compute final colour
 	Colour lighting = ComputeLighting(polygon, worldSpace);
@@ -321,13 +410,25 @@ void Mesh::DrawWirePolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 //
 void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& clipSpace, const std::vector<Vertex>& worldSpace, const HDC& hdc)
 {
-	const int& index0 = polygon.GetIndex(0);
-	const int& index1 = polygon.GetIndex(1);
-	const int& index2 = polygon.GetIndex(2);
+	const int& posIndex0 = polygon.GetVertex(0);
+	const int& posIndex1 = polygon.GetVertex(1);
+	const int& posIndex2 = polygon.GetVertex(2);
 
-	const Vertex& clipA = clipSpace[index0];
-	const Vertex& clipB = clipSpace[index1];
-	const Vertex& clipC = clipSpace[index2];
+	const int& uvsIndex0 = polygon.GetUVCoord(0);
+	const int& uvsIndex1 = polygon.GetUVCoord(1);
+	const int& uvsIndex2 = polygon.GetUVCoord(0);
+
+	Vertex clipA(clipSpace[posIndex0]);
+	Vertex clipB(clipSpace[posIndex1]);
+	Vertex clipC(clipSpace[posIndex2]);
+
+	const Vertex& worldA = worldSpace[posIndex0];
+	const Vertex& worldB = worldSpace[posIndex1];
+	const Vertex& worldC = worldSpace[posIndex2];
+
+	clipA.GetVertexData().SetUV(_uv[uvsIndex0]);
+	clipB.GetVertexData().SetUV(_uv[uvsIndex1]);
+	clipC.GetVertexData().SetUV(_uv[uvsIndex2]);
 
 	// Draw using custom rasterizing system.
 	switch (_shadeMode)
@@ -344,16 +445,27 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 		break;
 	}
 	case ShadeMode::SHADE_GOURAUD:
-		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
+		// Lighting per-vertex was calculated before this function was called.
 		TriangleRasteriser::DrawSmooth(hdc, { clipA, clipB, clipC });
 		break;
+
+	case ShadeMode::SHADE_PHONG:
+	{
+		Unlit frag(_texture);
+
+		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
+		TriangleRasteriser::DrawPhong(hdc, { clipA, clipB, clipC }, { worldA, worldB, worldC }, frag);
+	}
+	default:
+		// Invalid operation.
+		return;
 	}
 }
 
 //
 // Computes all lighting to be applied to the polygon.
 //
-Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices) const
+Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices)
 {
 	const Vertex position = polygon.CalculateCenter(vertices);
 	const Vector3& normal = polygon.GetWorldNormal();
@@ -363,7 +475,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 
 	for (const LightPtr& light : sceneLights)
 	{
-		totalLightContributions += light->CalculateContribution(position, normal);
+		totalLightContributions += light->CalculateContribution(position, normal, 0.f); // Flat shading
 	}
 
 	return totalLightContributions;
@@ -372,7 +484,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 //
 // Computes the lighting for a single vertex.
 //
-Colour Mesh::ComputeLighting(const Vertex& vertex) const
+Colour Mesh::ComputeLighting(const Vertex& vertex, const float& roughness)
 {
 	const Vector3& normal = vertex.GetVertexData().GetNormal();
 
@@ -381,10 +493,26 @@ Colour Mesh::ComputeLighting(const Vertex& vertex) const
 
 	for (const LightPtr& light : sceneLights)
 	{
-		totalLightContributions += light->CalculateContribution(vertex, normal);
+		totalLightContributions += light->CalculateContribution(vertex, normal, roughness);
 	}
 
 	return totalLightContributions;
+}
+
+//
+// The texture of this mesh.
+//
+const Texture& Mesh::GetTexture() const
+{
+	return _texture;
+}
+
+//
+// The modifiable reference to the texture for this mesh.
+//
+Texture& Mesh::GetTexture()
+{
+	return _texture;
 }
 
 //
@@ -397,7 +525,7 @@ void Mesh::ComputeVertexLighting()
 
 	for (const Vertex& vertex : worldVertices)
 	{
-		vertexColours.push_back(GetColour() * ComputeLighting(vertex));
+		vertexColours.push_back(GetColour() * ComputeLighting(vertex, _roughness));
 	}
 
 	// Apply vertex colours to clip-space vertices.

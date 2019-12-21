@@ -1,4 +1,6 @@
 #include "DirectionalLight.h"
+#include "Camera.h"
+#include <cmath>
 
 //
 // Creates a directional light with a default DOWN orientation.
@@ -33,7 +35,7 @@ void DirectionalLight::SetDirection(const Vector3& vector)
 //
 // Calculates the overall contribution this light is maing on the given polygon.
 //
-Colour DirectionalLight::CalculateContribution(const Vertex& position, const Vector3& normal)
+Colour DirectionalLight::CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness)
 {
 	const Vector3 inverseDirection = -_direction;
 	float normalDotDirection = Vector3::Dot(normal, inverseDirection);
@@ -42,6 +44,17 @@ Colour DirectionalLight::CalculateContribution(const Vertex& position, const Vec
 	{
 		normalDotDirection = 0;
 	}
+
+	float lightValue = normalDotDirection;
+
+	if (roughness > 0)
+	{
+		// Assume Ks = 1.
+		Vector3 eye(Camera::GetMainCamera()->GetPosition() - position);
+		Vector3 r = normal * (normalDotDirection) * 2 - inverseDirection;
+
+		lightValue += pow(Vector3::Dot(r, eye), 1 / roughness);
+	}
 	
-	return GetIntensity() * normalDotDirection;
+	return GetIntensity() * lightValue;
 }

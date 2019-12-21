@@ -59,6 +59,7 @@ void SimpleDemo::OnTick(const float& deltaTime)
 
 	// A nice spinning animation!
 	_figurine->Rotate(angle);
+	_pedistal->Rotate(-angle);
 
 	// Move the camera, hurray!
 	Vector3 cameraMovement{ 0, 0, 0 };

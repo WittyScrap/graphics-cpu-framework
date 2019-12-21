@@ -119,7 +119,7 @@ private:
 private:
 	std::vector<Polygon3D> _polygons;
 	std::vector<Polygon3D*> _visiblePolygons;
-	std::vector<Point<float>> _uv;
+	std::vector<Vector3> _uv;
 
 	HPEN _previousPen;
 	HBRUSH _previousBrush;

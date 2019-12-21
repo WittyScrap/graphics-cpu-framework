@@ -20,7 +20,7 @@ public:
 
 	inline const Colour operator()(const Vertex& v) const override
 	{
-		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().X, (int)v.GetVertexData().GetUV().Y);
+		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().GetX(), (int)v.GetVertexData().GetUV().GetY());
 
 		return Colour(sample);
 	}
@@ -63,7 +63,7 @@ public:
 
 	inline const Colour operator()(const Vertex& v) const override
 	{
-		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().X, (int)v.GetVertexData().GetUV().Y);
+		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().GetX(), (int)v.GetVertexData().GetUV().GetY());
 		Colour tex(sample);
 
 		return tex * Mesh::ComputeLighting(v, _roughness);
@@ -135,7 +135,7 @@ void Mesh::AddPolygon(int i0, int i1, int i2, int u0, int u1, int u2)
 //
 void Mesh::AddUVcoord(float u, float v)
 {
-	_uv.push_back({ u, v });
+	_uv.push_back(Vector3(u, v, 0));
 }
 
 //

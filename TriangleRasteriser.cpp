@@ -349,9 +349,22 @@ void TriangleRasteriser::TopPhongShaded(const HDC& hdc, const Vertices& clipSpac
 	const Vector3 p2(w2);
 
 	// Here, UVs will be converted to a Vector3 structure to simplify mathematics
-	const Vector3 u0(v0.GetVertexData().GetUV().X, v0.GetVertexData().GetUV().Y, 0);
-	const Vector3 u1(v1.GetVertexData().GetUV().X, v1.GetVertexData().GetUV().Y, 0);
-	const Vector3 u2(v2.GetVertexData().GetUV().X, v2.GetVertexData().GetUV().Y, 0);
+	Vector3 u0(v0.GetVertexData().GetUV());
+	Vector3 u1(v1.GetVertexData().GetUV());
+	Vector3 u2(v2.GetVertexData().GetUV());
+
+	// Prepare UV sets for projection transformation.
+	u0.SetX(u0.GetX() / w0.GetZ());
+	u0.SetY(u0.GetY() / w0.GetZ());
+	u0.SetZ(        1 / w0.GetZ());
+
+	u1.SetX(u1.GetX() / w1.GetZ());
+	u1.SetY(u1.GetY() / w1.GetZ());
+	u1.SetZ(        1 / w1.GetZ());
+
+	u2.SetX(u2.GetX() / w2.GetZ());
+	u2.SetY(u2.GetY() / w2.GetZ());
+	u2.SetZ(        1 / w2.GetZ());
 
 	const float ba = (v1.GetY() - v0.GetY()); // Get the change along edge v2->v1
 	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
@@ -394,9 +407,11 @@ void TriangleRasteriser::TopPhongShaded(const HDC& hdc, const Vertices& clipSpac
 		for (int x = sourceX; x < targetX; ++x)
 		{
 			const Vector3 normal(Vector3::NormaliseVector(normalSlopeSourceX + normalSlope * (static_cast<float>(x) + 0.5f - sourceX)));
-			const Vector3 uvVec3(texcoordSlopeSourceX + texcoordSlope * (static_cast<float>(x) + 0.5f - sourceX));
+			Vector3 uv(texcoordSlopeSourceX + texcoordSlope * (static_cast<float>(x) + 0.5f - sourceX));
 
-			const Point<float> uv{ uvVec3.GetX(), uvVec3.GetY() };
+			// Unpack perspective distortion from UVs
+			uv.SetX(uv.GetX() / uv.GetZ());
+			uv.SetY(uv.GetY() / uv.GetZ());
 
 			Vertex fragment(worldSlopeSourceX + worldSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			fragment.GetVertexData().SetNormal(normal);
@@ -440,9 +455,22 @@ void TriangleRasteriser::BottomPhongShaded(const HDC& hdc, const Vertices& clipS
 	const Vector3 p2(w2);
 
 	// Here, UVs will be converted to a Vector3 structure to simplify mathematics
-	const Vector3 u0(v0.GetVertexData().GetUV().X, v0.GetVertexData().GetUV().Y, 0);
-	const Vector3 u1(v1.GetVertexData().GetUV().X, v1.GetVertexData().GetUV().Y, 0);
-	const Vector3 u2(v2.GetVertexData().GetUV().X, v2.GetVertexData().GetUV().Y, 0);
+	Vector3 u0(v0.GetVertexData().GetUV());
+	Vector3 u1(v1.GetVertexData().GetUV());
+	Vector3 u2(v2.GetVertexData().GetUV());
+
+	// Prepare UV sets for projection transformation.
+	u0.SetX(u0.GetX() / w0.GetZ());
+	u0.SetY(u0.GetY() / w0.GetZ());
+	u0.SetZ(1 / w0.GetZ());
+
+	u1.SetX(u1.GetX() / w1.GetZ());
+	u1.SetY(u1.GetY() / w1.GetZ());
+	u1.SetZ(1 / w1.GetZ());
+
+	u2.SetX(u2.GetX() / w2.GetZ());
+	u2.SetY(u2.GetY() / w2.GetZ());
+	u2.SetZ(1 / w2.GetZ());
 
 	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
 	const float cb = (v2.GetY() - v1.GetY()); // Get the change along edge v3->v2
@@ -485,9 +513,11 @@ void TriangleRasteriser::BottomPhongShaded(const HDC& hdc, const Vertices& clipS
 		for (int x = sourceX; x < targetX; ++x)
 		{
 			const Vector3 normal(Vector3::NormaliseVector(normalSlopeSourceX + normalSlope * (static_cast<float>(x) + 0.5f - sourceX)));
-			const Vector3 uvVec3(texcoordSlopeSourceX + texcoordSlope * (static_cast<float>(x) + 0.5f - sourceX));
+			Vector3 uv(texcoordSlopeSourceX + texcoordSlope * (static_cast<float>(x) + 0.5f - sourceX));
 
-			const Point<float> uv{ uvVec3.GetX(), uvVec3.GetY() };
+			// Unpack perspective distortion from UVs
+			uv.SetX(uv.GetX() / uv.GetZ());
+			uv.SetY(uv.GetY() / uv.GetZ());
 
 			Vertex fragment(worldSlopeSourceX + worldSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			fragment.GetVertexData().SetNormal(normal);
@@ -567,15 +597,12 @@ const Vertex TriangleRasteriser::GetTemporaryWorldVertex(const Vertices& clipSpa
 // the provided temporary vertex, which sits between the A/B - C slopes of the
 // triangle to rasterize.
 //
-const Point<float> TriangleRasteriser::GetTemporaryUV(const Vertex& a, const Vertex& b, const Vertex& c)
+const Vector3 TriangleRasteriser::GetTemporaryUV(const Vertex& a, const Vertex& b, const Vertex& c)
 {
-	const Point<float>& uv0 = a.GetVertexData().GetUV();
-	const Point<float>& uv2 = c.GetVertexData().GetUV();
+	const Vector3& uv0 = a.GetVertexData().GetUV();
+	const Vector3& uv2 = c.GetVertexData().GetUV();
 
-	const float uvX = uv0.X + (uv2.X - uv0.X) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
-	const float uvY = uv0.Y + (uv2.Y - uv0.Y) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
-
-	return { uvX, uvY };
+	return uv0 + (uv2 - uv0) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
 }
 
 //

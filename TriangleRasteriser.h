@@ -80,6 +80,6 @@ private:
 	static const Colour GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c);
 	static const Vector3 GetTemporaryNormal(const Vertex& a, const Vertex& b, const Vertex& c);
 	static const Vertex GetTemporaryWorldVertex(const Vertices& clipSpace, const Vertices& worldSpace);
-	static const Point<float> GetTemporaryUV(const Vertex& a, const Vertex& b, const Vertex& c);
+	static const Vector3 GetTemporaryUV(const Vertex& a, const Vertex& b, const Vertex& c);
 };
 

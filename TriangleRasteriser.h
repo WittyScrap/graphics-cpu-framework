@@ -33,9 +33,9 @@ class TriangleRasteriser
 	//
 	struct Vertices
 	{
-		Vertex a;
-		Vertex b;
-		Vertex c;
+		Vertex& a;
+		Vertex& b;
+		Vertex& c;
 	};
 
 public:
@@ -80,6 +80,6 @@ private:
 	static const Colour GetTemporaryColour(const Vertex& a, const Vertex& b, const Vertex& c);
 	static const Vector3 GetTemporaryNormal(const Vertex& a, const Vertex& b, const Vertex& c);
 	static const Vertex GetTemporaryWorldVertex(const Vertices& clipSpace, const Vertices& worldSpace);
-	static const void GetTemporaryUV(Vertex& tmp, const Vertices& clipSpace);
+	static const Point<float> GetTemporaryUV(const Vertex& a, const Vertex& b, const Vertex& c);
 };
 

@@ -147,6 +147,7 @@ inline const VertexData& VertexData::operator=(const VertexData& rhs)
 		_normal = rhs._normal;
 		_colour = rhs._colour;
 		_contribution = rhs._contribution;
+		_uv = rhs._uv;
 	}
 
 	return *this;

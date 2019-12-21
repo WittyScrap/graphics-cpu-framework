@@ -55,14 +55,18 @@ struct Phong : public FragmentFunction
 {
 private:
 	float _roughness;
+	const Texture& _texture;
 
 public:
-	inline Phong(const float& roughness) : _roughness{ roughness }
+	inline Phong(const float& roughness, const Texture& texture) : _roughness{ roughness }, _texture{ texture }
 	{ }
 
 	inline const Colour operator()(const Vertex& v) const override
 	{
-		return Mesh::ComputeLighting(v, _roughness);
+		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().X, (int)v.GetVertexData().GetUV().Y);
+		Colour tex(sample);
+
+		return tex * Mesh::ComputeLighting(v, _roughness);
 	}
 };
 
@@ -416,7 +420,7 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 
 	const int& uvsIndex0 = polygon.GetUVCoord(0);
 	const int& uvsIndex1 = polygon.GetUVCoord(1);
-	const int& uvsIndex2 = polygon.GetUVCoord(0);
+	const int& uvsIndex2 = polygon.GetUVCoord(2);
 
 	Vertex clipA(clipSpace[posIndex0]);
 	Vertex clipB(clipSpace[posIndex1]);
@@ -451,7 +455,7 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 
 	case ShadeMode::SHADE_PHONG:
 	{
-		Unlit frag(_texture);
+		Phong frag(_roughness, _texture);
 
 		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
 		TriangleRasteriser::DrawPhong(hdc, { clipA, clipB, clipC }, { worldA, worldB, worldC }, frag);
@@ -470,7 +474,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 	const Vertex position = polygon.CalculateCenter(vertices);
 	const Vector3& normal = polygon.GetWorldNormal();
 
-	const std::vector<LightPtr> sceneLights = Environment::GetActive().GetSceneLights();
+	const std::vector<LightPtr>& sceneLights = Environment::GetActive().GetSceneLights();
 	Colour totalLightContributions;
 
 	for (const LightPtr& light : sceneLights)
@@ -488,7 +492,7 @@ Colour Mesh::ComputeLighting(const Vertex& vertex, const float& roughness)
 {
 	const Vector3& normal = vertex.GetVertexData().GetNormal();
 
-	const std::vector<LightPtr> sceneLights = Environment::GetActive().GetSceneLights();
+	const std::vector<LightPtr>& sceneLights = Environment::GetActive().GetSceneLights();
 	Colour totalLightContributions;
 
 	for (const LightPtr& light : sceneLights)

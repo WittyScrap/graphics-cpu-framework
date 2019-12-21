@@ -99,20 +99,17 @@ void TriangleRasteriser::DrawSmooth(const HDC& hdc, const PolygonData& clipSpace
 //
 void TriangleRasteriser::DrawPhong(const HDC& hdc, const PolygonData& clipSpace, const PolygonData& worldSpace, const FragmentFunction& frag)
 {
-	// Make copies of the vertices (not references) as we'll need to sort them.
-	Vertices clipData
-	{
-		clipSpace.a,
-		clipSpace.b,
-		clipSpace.c
-	};
+	Vertex c0(clipSpace.a);
+	Vertex c1(clipSpace.b);
+	Vertex c2(clipSpace.c);
 
-	Vertices worldData
-	{
-		worldSpace.a,
-		worldSpace.b,
-		worldSpace.c
-	};
+	Vertex w0(worldSpace.a);
+	Vertex w1(worldSpace.b);
+	Vertex w2(worldSpace.c);
+
+	// Make copies of the vertices (not references) as we'll need to sort them.
+	Vertices clipData{ c0, c1, c2 };
+	Vertices worldData{ w0, w1, w2 };
 
 	SortVertices(clipData, worldData);
 
@@ -368,8 +365,8 @@ void TriangleRasteriser::TopPhongShaded(const HDC& hdc, const Vertices& clipSpac
 	const Vector3 worldSlopeSourceY((p1 - p0) / ba);
 	const Vector3 worldSlopeTargetY((p2 - p0) / ca);
 
-	const Vector3 texcoordSlopeSourceY((u2 - u0) / ba);
-	const Vector3 texcoordSlopeTargetY((u2 - u1) / ca);
+	const Vector3 texcoordSlopeSourceY((u1 - u0) / ba);
+	const Vector3 texcoordSlopeTargetY((u2 - u0) / ca);
 
 	const int sourceY = static_cast<int>(std::ceil(v0.GetY() - 0.5f));
 	const int targetY = static_cast<int>(std::ceil(v2.GetY() - 0.5f));
@@ -516,6 +513,7 @@ const Vertex TriangleRasteriser::GetTemporaryVertex(const Vertex& a, const Verte
 
 	tempVertex.GetVertexData().SetColour(GetTemporaryColour(a, b, c));
 	tempVertex.GetVertexData().SetNormal(GetTemporaryNormal(a, b, c));
+	tempVertex.GetVertexData().SetUV(GetTemporaryUV(a, b, c));
 
 	return tempVertex;
 }
@@ -569,15 +567,15 @@ const Vertex TriangleRasteriser::GetTemporaryWorldVertex(const Vertices& clipSpa
 // the provided temporary vertex, which sits between the A/B - C slopes of the
 // triangle to rasterize.
 //
-const void TriangleRasteriser::GetTemporaryUV(Vertex& tmp, const Vertices& clipSpace)
+const Point<float> TriangleRasteriser::GetTemporaryUV(const Vertex& a, const Vertex& b, const Vertex& c)
 {
-	Point<float> uv0 = clipSpace.a.GetVertexData().GetUV();
-	Point<float> uv2 = clipSpace.b.GetVertexData().GetUV();
+	const Point<float>& uv0 = a.GetVertexData().GetUV();
+	const Point<float>& uv2 = c.GetVertexData().GetUV();
 
-	float uvX = uv0.X + (uv2.X - uv0.X) * ((clipSpace.b.GetY() - clipSpace.a.GetY()) / (clipSpace.c.GetY() - clipSpace.a.GetY()));
-	float uvY = uv0.Y + (uv2.Y - uv0.Y) * ((clipSpace.b.GetY() - clipSpace.a.GetY()) / (clipSpace.c.GetY() - clipSpace.a.GetY()));
+	const float uvX = uv0.X + (uv2.X - uv0.X) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
+	const float uvY = uv0.Y + (uv2.Y - uv0.Y) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY()));
 
-	tmp.GetVertexData().SetUV({ uvX, uvY });
+	return { uvX, uvY };
 }
 
 //

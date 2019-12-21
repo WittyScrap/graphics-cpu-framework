@@ -6,6 +6,16 @@
 #include "Mesh.h"
 #include <string>
 
+#define MODE_SIMPLE 0xFF
+#define MODE_PRESENTATION 0xFE
+#define DEMO_TYPE MODE_SIMPLE
+
+#if DEMO_TYPE == MODE_SIMPLE
+#include "SimpleDemo.h"
+#elif DEMO_TYPE == MODE_PRESENTATION
+#include "Presentation.h"
+#endif
+
 //
 // Default entry point object.
 //
@@ -15,17 +25,12 @@ public:
 	// Initialisation...
 	void OnInit() override;
 
-	// On tick...
-	void OnTick(const float& deltaTime) override;
-
 private:
-	// Pedistal and figurine (don't shame me).
-	Mesh* _pedistal = nullptr;
-	Mesh* _figurine = nullptr;
-
-	// Light
-	DirectionalLight* _directional = nullptr;
-	AmbientLight* _ambient = nullptr;
-	PointLight* _point = nullptr;
+	// Demo/presentation objects.
+#if DEMO_TYPE == MODE_SIMPLE
+	SimpleDemo* _demo;
+#elif DEMO_TYPE == MODE_PRESENTATION
+	Presentation* _demo;
+#endif
 };
 

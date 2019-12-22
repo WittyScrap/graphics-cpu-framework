@@ -1,5 +1,4 @@
 #include "TriangleRasteriser.h"
-#include "UnclampedColour.h"
 #include <cmath>
 #include <Windows.h>
 
@@ -152,16 +151,16 @@ void TriangleRasteriser::TopFlatShaded(const HDC& hdc, const PolygonData& clipSp
 	const Vertex& v1 = clipSpace.b;
 	const Vertex& v2 = clipSpace.c;
 
-	float slope0 = (v1.GetX() - v0.GetX()) / (v1.GetY() - v0.GetY());
-	float slope1 = (v2.GetX() - v0.GetX()) / (v2.GetY() - v0.GetY());
+	float slope0 = GetSlope(v0, v1);
+	float slope1 = GetSlope(v0, v2);
 
 	const int sourceY = static_cast<int>(std::ceil(v0.GetY() - 0.5f));
 	const int targetY = static_cast<int>(std::ceil(v2.GetY() - 0.5f));
 
 	for (int y = sourceY; y < targetY; ++y)
 	{
-		const float point0 = slope0 * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
-		const float point1 = slope1 * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
+		const float point0 = GetHorizontalGradient(slope0, y, v0.GetY(), v0.GetX());
+		const float point1 = GetHorizontalGradient(slope1, y, v0.GetY(), v0.GetX());
 
 		int sourceX = static_cast<int>(std::ceil(point0 - 0.5f));
 		int targetX = static_cast<int>(std::ceil(point1 - 0.5f));
@@ -187,16 +186,16 @@ void TriangleRasteriser::BottomFlatShaded(const HDC& hdc, const PolygonData& cli
 	const Vertex& v1 = clipSpace.b;
 	const Vertex& v2 = clipSpace.c;
 
-	const float slope0 = (v2.GetX() - v0.GetX()) / (v2.GetY() - v0.GetY());
-	const float slope1 = (v2.GetX() - v1.GetX()) / (v2.GetY() - v1.GetY());
+	const float slope0 = GetSlope(v0, v2);
+	const float slope1 = GetSlope(v1, v2);
 
 	const int sourceY = static_cast<int>(std::ceil(v0.GetY() - 0.5f));
 	const int targetY = static_cast<int>(std::ceil(v2.GetY() - 0.5f));
 
 	for (int y = sourceY; y < targetY; ++y)
 	{
-		const float point0 = slope0 * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
-		const float point1 = slope1 * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
+		const float point0 = GetHorizontalGradient(slope0, y, v2.GetY(), v2.GetX());
+		const float point1 = GetHorizontalGradient(slope1, y, v2.GetY(), v2.GetX());
 
 		int sourceX = static_cast<int>(std::ceil(point0 - 0.5f));
 		int targetX = static_cast<int>(std::ceil(point1 - 0.5f));
@@ -227,37 +226,22 @@ void TriangleRasteriser::TopSmoothShaded(const HDC& hdc, const PolygonData& clip
 		std::swap(v1, v2);
 	}
 
-	const UnclampedColour c0(v0.GetVertexData().GetColour());
-	const UnclampedColour c1(v1.GetVertexData().GetColour());
-	const UnclampedColour c2(v2.GetVertexData().GetColour());
-
-	const float ba = (v1.GetY() - v0.GetY()); // Get the change along edge v2->v1
-	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
-
-	const float slopeSourceY = (v1.GetX() - v0.GetX()) / ba;
-	const float slopeTargetY = (v2.GetX() - v0.GetX()) / ca;
-
-	const UnclampedColour colourSlopeSourceY((c1 - c0) / ba);
-	const UnclampedColour colourSlopeTargetY((c2 - c0) / ca);
+	const PolygonData sortedClipSpace{ v0, v1, v2 };
+	const SmoothShadeData shadeData = GetSmoothDataTop(sortedClipSpace);
 
 	const int sourceY = static_cast<int>(std::ceil(v0.GetY() - 0.5f));
 	const int targetY = static_cast<int>(std::ceil(v2.GetY() - 0.5f));
 
 	for (int y = sourceY; y < targetY; ++y)
 	{
-		const float slopeSourceX = slopeSourceY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
-		const float slopeTargetX = slopeTargetY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
+		const SmoothLineData lineData = GetSmoothLineTop(shadeData, y);
 
-		const UnclampedColour colourSlopeSourceX(colourSlopeSourceY * ((float)y + 0.5f - v0.GetY()) + c0);
-		const UnclampedColour colourSlopeTargetX(colourSlopeTargetY * ((float)y + 0.5f - v0.GetY()) + c0);
-		const UnclampedColour colourSlope((colourSlopeTargetX - colourSlopeSourceX) / (slopeTargetX - slopeSourceX));
-
-		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
-		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
+		const int sourceX = static_cast<int>(std::ceil(lineData.sourceSlope - 0.5f));
+		const int targetX = static_cast<int>(std::ceil(lineData.targetSlope - 0.5f));
 
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			const UnclampedColour colour(colourSlopeSourceX + colourSlope * (static_cast<float>(x) + 0.5f - sourceX));
+			const UnclampedColour colour(lineData.sourceColourSlope + lineData.horizontalColourSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			const COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, x, y, pixelColour);
@@ -281,37 +265,22 @@ void TriangleRasteriser::BottomSmoothShaded(const HDC& hdc, const PolygonData& c
 		std::swap(v0, v1);
 	}
 
-	const UnclampedColour c0(v0.GetVertexData().GetColour());
-	const UnclampedColour c1(v1.GetVertexData().GetColour());
-	const UnclampedColour c2(v2.GetVertexData().GetColour());
-
-	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
-	const float cb = (v2.GetY() - v1.GetY()); // Get the change along edge v3->v2
-
-	const float slopeSourceY = (v2.GetX() - v0.GetX()) / ca;
-	const float slopeTargetY = (v2.GetX() - v1.GetX()) / cb;
-
-	const UnclampedColour colourSlopeSourceY((c2 - c0) / ca);
-	const UnclampedColour colourSlopeTargetY((c2 - c1) / cb);
+	const PolygonData sortedClipSpace{ v0, v1, v2 };
+	const SmoothShadeData shadeData = GetSmoothDataBottom(sortedClipSpace);
 
 	const int sourceY = static_cast<int>(std::ceil(v0.GetY() - 0.5f));
 	const int targetY = static_cast<int>(std::ceil(v2.GetY() - 0.5f));
 
 	for (int y = sourceY; y < targetY; ++y)
 	{
-		const float slopeSourceX = slopeSourceY * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
-		const float slopeTargetX = slopeTargetY * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
+		const SmoothLineData lineData = GetSmoothLineBottom(shadeData, y);
 
-		const UnclampedColour colourSlopeSourceX(colourSlopeSourceY * ((float)y + 0.5f - v2.GetY()) + c2);
-		const UnclampedColour colourSlopeTargetX(colourSlopeTargetY * ((float)y + 0.5f - v2.GetY()) + c2);
-		const UnclampedColour colourSlope((colourSlopeTargetX - colourSlopeSourceX) / (slopeTargetX - slopeSourceX));
-
-		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
-		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
+		const int sourceX = static_cast<int>(std::ceil(lineData.sourceSlope - 0.5f));
+		const int targetX = static_cast<int>(std::ceil(lineData.targetSlope - 0.5f));
 
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			const UnclampedColour colour(colourSlopeSourceX + colourSlope * (static_cast<float>(x) + 0.5f - sourceX));
+			const UnclampedColour colour(lineData.sourceColourSlope + lineData.horizontalColourSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			const COLORREF pixelColour = RGB(colour.GetRed() * 255, colour.GetGreen() * 255, colour.GetBlue() * 255);
 
 			SetPixelV(hdc, x, y, pixelColour);
@@ -340,80 +309,29 @@ void TriangleRasteriser::TopPhongShaded(const HDC& hdc, const Vertices& clipSpac
 		std::swap(w1, w2);
 	}
 
-	const Vector3 n0(w0.GetVertexData().GetNormal());
-	const Vector3 n1(w1.GetVertexData().GetNormal());
-	const Vector3 n2(w2.GetVertexData().GetNormal());
+	const PolygonData sortedClip{ v0, v1, v2 };
+	const PolygonData sortedWorld{ w0, w1, w2 };
+	const PhongShadeInput input{ sortedClip, sortedWorld };
 
-	const Vector3 p0(w0);
-	const Vector3 p1(w1);
-	const Vector3 p2(w2);
-
-	// Here, UVs will be converted to a Vector3 structure to simplify mathematics
-	Vector3 u0(v0.GetVertexData().GetUV());
-	Vector3 u1(v1.GetVertexData().GetUV());
-	Vector3 u2(v2.GetVertexData().GetUV());
-
-	// Prepare UV sets for projection transformation.
-	u0.SetX(u0.GetX() / w0.GetZ());
-	u0.SetY(u0.GetY() / w0.GetZ());
-	u0.SetZ(        1 / w0.GetZ());
-
-	u1.SetX(u1.GetX() / w1.GetZ());
-	u1.SetY(u1.GetY() / w1.GetZ());
-	u1.SetZ(        1 / w1.GetZ());
-
-	u2.SetX(u2.GetX() / w2.GetZ());
-	u2.SetY(u2.GetY() / w2.GetZ());
-	u2.SetZ(        1 / w2.GetZ());
-
-	const float ba = (v1.GetY() - v0.GetY()); // Get the change along edge v2->v1
-	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
-
-	const float slopeSourceY = (v1.GetX() - v0.GetX()) / ba;
-	const float slopeTargetY = (v2.GetX() - v0.GetX()) / ca;
-
-	const Vector3 normalSlopeSourceY((n1 - n0) / ba);
-	const Vector3 normalSlopeTargetY((n2 - n0) / ca);
-
-	const Vector3 worldSlopeSourceY((p1 - p0) / ba);
-	const Vector3 worldSlopeTargetY((p2 - p0) / ca);
-
-	const Vector3 texcoordSlopeSourceY((u1 - u0) / ba);
-	const Vector3 texcoordSlopeTargetY((u2 - u0) / ca);
+	const PhongShadeData data = GetPhongDataTop(input);
 
 	const int sourceY = static_cast<int>(std::ceil(v0.GetY() - 0.5f));
 	const int targetY = static_cast<int>(std::ceil(v2.GetY() - 0.5f));
 
 	for (int y = sourceY; y < targetY; ++y)
 	{
-		const float slopeSourceX = slopeSourceY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
-		const float slopeTargetX = slopeTargetY * ((float)y + 0.5f - v0.GetY()) + v0.GetX();
+		const PhongLineData lineData = GetPhongLineTop(data, y);
 
-		const Vector3 normalSlopeSourceX(normalSlopeSourceY * ((float)y + 0.5f - v0.GetY()) + n0);
-		const Vector3 normalSlopeTargetX(normalSlopeTargetY * ((float)y + 0.5f - v0.GetY()) + n0);
-		const Vector3 normalSlope((normalSlopeTargetX - normalSlopeSourceX) / (slopeTargetX - slopeSourceX));
-
-		const Vector3 worldSlopeSourceX(worldSlopeSourceY * ((float)y + 0.5f - v0.GetY()) + p0);
-		const Vector3 worldSlopeTargetX(worldSlopeTargetY * ((float)y + 0.5f - v0.GetY()) + p0);
-		const Vector3 worldSlope((worldSlopeTargetX - worldSlopeSourceX) / (slopeTargetX - slopeSourceX));
-		
-		const Vector3 texcoordSlopeSourceX(texcoordSlopeSourceY * ((float)y + 0.5f - v0.GetY()) + u0);
-		const Vector3 texcoordSlopeTargetX(texcoordSlopeTargetY * ((float)y + 0.5f - v0.GetY()) + u0);
-		const Vector3 texcoordSlope((texcoordSlopeTargetX - texcoordSlopeSourceX) / (slopeTargetX - slopeSourceX));
-
-		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
-		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
+		const int sourceX = static_cast<int>(std::ceil(lineData.sourceSlope - 0.5f));
+		const int targetX = static_cast<int>(std::ceil(lineData.targetSlope - 0.5f));
 
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			const Vector3 normal(Vector3::NormaliseVector(normalSlopeSourceX + normalSlope * (static_cast<float>(x) + 0.5f - sourceX)));
-			Vector3 uv(texcoordSlopeSourceX + texcoordSlope * (static_cast<float>(x) + 0.5f - sourceX));
+			const Vector3 normal(Vector3::NormaliseVector(lineData.sourceNormalSlope + lineData.horizontalNormalSlope * (static_cast<float>(x) + 0.5f - sourceX)));
+			const Vector3 uv(lineData.sourceUVSlope + lineData.horizontalUVSlope * (static_cast<float>(x) + 0.5f - sourceX));
 
-			// Unpack perspective distortion from UVs
-			uv.SetX(uv.GetX() / uv.GetZ());
-			uv.SetY(uv.GetY() / uv.GetZ());
+			Vertex fragment(lineData.sourceWorldSlope + lineData.horizontalWorldSlope * (static_cast<float>(x) + 0.5f - sourceX));
 
-			Vertex fragment(worldSlopeSourceX + worldSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			fragment.GetVertexData().SetNormal(normal);
 			fragment.GetVertexData().SetUV(uv);
 
@@ -446,80 +364,29 @@ void TriangleRasteriser::BottomPhongShaded(const HDC& hdc, const Vertices& clipS
 		std::swap(w0, w1);
 	}
 
-	const Vector3 n0(w0.GetVertexData().GetNormal());
-	const Vector3 n1(w1.GetVertexData().GetNormal());
-	const Vector3 n2(w2.GetVertexData().GetNormal());
+	const PolygonData sortedClip{ v0, v1, v2 };
+	const PolygonData sortedWorld{ w0, w1, w2 };
+	const PhongShadeInput input{ sortedClip, sortedWorld };
 
-	const Vector3 p0(w0);
-	const Vector3 p1(w1);
-	const Vector3 p2(w2);
-
-	// Here, UVs will be converted to a Vector3 structure to simplify mathematics
-	Vector3 u0(v0.GetVertexData().GetUV());
-	Vector3 u1(v1.GetVertexData().GetUV());
-	Vector3 u2(v2.GetVertexData().GetUV());
-
-	// Prepare UV sets for projection transformation.
-	u0.SetX(u0.GetX() / w0.GetZ());
-	u0.SetY(u0.GetY() / w0.GetZ());
-	u0.SetZ(1 / w0.GetZ());
-
-	u1.SetX(u1.GetX() / w1.GetZ());
-	u1.SetY(u1.GetY() / w1.GetZ());
-	u1.SetZ(1 / w1.GetZ());
-
-	u2.SetX(u2.GetX() / w2.GetZ());
-	u2.SetY(u2.GetY() / w2.GetZ());
-	u2.SetZ(1 / w2.GetZ());
-
-	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1
-	const float cb = (v2.GetY() - v1.GetY()); // Get the change along edge v3->v2
-
-	const float slopeSourceY = (v2.GetX() - v0.GetX()) / ca;
-	const float slopeTargetY = (v2.GetX() - v1.GetX()) / cb;
-
-	const Vector3 normalSlopeSourceY((n2 - n0) / ca);
-	const Vector3 normalSlopeTargetY((n2 - n1) / cb);
-
-	const Vector3 worldSlopeSourceY((p2 - p0) / ca);
-	const Vector3 worldSlopeTargetY((p2 - p1) / cb);
-
-	const Vector3 texcoordSlopeSourceY((u2 - u0) / ca);
-	const Vector3 texcoordSlopeTargetY((u2 - u1) / cb);
+	const PhongShadeData data = GetPhongDataBottom(input);
 
 	const int sourceY = static_cast<int>(std::ceil(v0.GetY() - 0.5f));
 	const int targetY = static_cast<int>(std::ceil(v2.GetY() - 0.5f));
 
 	for (int y = sourceY; y < targetY; ++y)
 	{
-		const float slopeSourceX = slopeSourceY * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
-		const float slopeTargetX = slopeTargetY * ((float)y + 0.5f - v2.GetY()) + v2.GetX();
+		const PhongLineData lineData = GetPhongLineBottom(data, y);
 
-		const Vector3 normalSlopeSourceX(normalSlopeSourceY * ((float)y + 0.5f - v2.GetY()) + n2);
-		const Vector3 normalSlopeTargetX(normalSlopeTargetY * ((float)y + 0.5f - v2.GetY()) + n2);
-		const Vector3 normalSlope((normalSlopeTargetX - normalSlopeSourceX) / (slopeTargetX - slopeSourceX));
-
-		const Vector3 worldSlopeSourceX(worldSlopeSourceY * ((float)y + 0.5f - v2.GetY()) + p2);
-		const Vector3 worldSlopeTargetX(worldSlopeTargetY * ((float)y + 0.5f - v2.GetY()) + p2);
-		const Vector3 worldSlope((worldSlopeTargetX - worldSlopeSourceX) / (slopeTargetX - slopeSourceX));
-
-		const Vector3 texcoordSlopeSourceX(texcoordSlopeSourceY * ((float)y + 0.5f - v2.GetY()) + u2);
-		const Vector3 texcoordSlopeTargetX(texcoordSlopeTargetY * ((float)y + 0.5f - v2.GetY()) + u2);
-		const Vector3 texcoordSlope((texcoordSlopeTargetX - texcoordSlopeSourceX) / (slopeTargetX - slopeSourceX));
-
-		const int sourceX = static_cast<int>(std::ceil(slopeSourceX - 0.5f));
-		const int targetX = static_cast<int>(std::ceil(slopeTargetX - 0.5f));
+		const int sourceX = static_cast<int>(std::ceil(lineData.sourceSlope - 0.5f));
+		const int targetX = static_cast<int>(std::ceil(lineData.targetSlope - 0.5f));
 
 		for (int x = sourceX; x < targetX; ++x)
 		{
-			const Vector3 normal(Vector3::NormaliseVector(normalSlopeSourceX + normalSlope * (static_cast<float>(x) + 0.5f - sourceX)));
-			Vector3 uv(texcoordSlopeSourceX + texcoordSlope * (static_cast<float>(x) + 0.5f - sourceX));
+			const Vector3 normal(Vector3::NormaliseVector(lineData.sourceNormalSlope + lineData.horizontalNormalSlope * (static_cast<float>(x) + 0.5f - sourceX)));
+			const Vector3 uv(lineData.sourceUVSlope + lineData.horizontalUVSlope * (static_cast<float>(x) + 0.5f - sourceX));
 
-			// Unpack perspective distortion from UVs
-			uv.SetX(uv.GetX() / uv.GetZ());
-			uv.SetY(uv.GetY() / uv.GetZ());
+			Vertex fragment(lineData.sourceWorldSlope + lineData.horizontalWorldSlope * (static_cast<float>(x) + 0.5f - sourceX));
 
-			Vertex fragment(worldSlopeSourceX + worldSlope * (static_cast<float>(x) + 0.5f - sourceX));
 			fragment.GetVertexData().SetNormal(normal);
 			fragment.GetVertexData().SetUV(uv);
 

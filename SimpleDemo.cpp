@@ -46,7 +46,7 @@ void SimpleDemo::OnInit()
 	_point->SetPosition(Vector3(0, 50, -50.f));
 	_point->SetIntensity(Colour(.5f, .5f, 1.f));
 
-	Camera::GetMainCamera()->SetPosition({ 0, 0, -50 });
+	Camera::GetMainCamera()->SetPosition({ 0, -20, -150 });
 	Camera::GetMainCamera()->SetRotation({ 0, 0, 0 });
 }
 

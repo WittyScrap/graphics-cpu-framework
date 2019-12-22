@@ -13,5 +13,6 @@ class MD2Loader
 public:
 	MD2Loader();
 	~MD2Loader();
+
 	static bool LoadModel(const char* md2Filename, const char* textureFilename, Mesh& model, AddPolygon addPolygon, AddVertex addVertex, AddTextureUV addTextureUV);
 };

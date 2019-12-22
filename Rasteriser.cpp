@@ -41,7 +41,7 @@ void Rasteriser::Render(const Bitmap& bitmap)
 		return;
 	}
 
-	COLORREF clearColour = GetBackgroundColour();
+	COLORREF clearColour = _environment.GetBackgroundColour();
 	HDC hdc = bitmap.GetDC();
 
 	Clear(clearColour, bitmap);
@@ -55,14 +55,6 @@ void Rasteriser::Tick(const Bitmap& bitmap, const float& deltaTime)
 {
 	_timeElapsed += deltaTime;
 	_environment.OnTick(deltaTime);
-}
-
-//
-// The window (bitmap)'s background colour.
-//
-const COLORREF Rasteriser::GetBackgroundColour() const
-{
-	return _background;
 }
 
 //

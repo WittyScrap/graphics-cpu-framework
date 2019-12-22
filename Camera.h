@@ -7,7 +7,7 @@
 //
 // Scene camera.
 //
-class Camera
+class Camera : public Transformable
 {
 public:
 	Camera();
@@ -47,8 +47,11 @@ public:
 	//
 	// Allows the camera to be placed in a certain position and rotation
 	//
-	void SetPosition(const Vector3& position);
-	void SetRotation(const Vector3& rotation);
+	void SetPosition(const Vector3& position) override;
+	void SetRotation(const Vector3& rotation) override;
+
+	void Translate(const Vector3& amount) override;
+	void Rotate(const Vector3& amount) override;
 
 	const Vector3 GetPosition() const;
 	const Vector3 GetRotation() const;

@@ -54,9 +54,15 @@ public:
 	//
 	// Operators on scalars
 	//
+	Vector3& operator= (const float& rhs);
+
+	Vector3  operator+ (const float& rhs) const;
+	Vector3  operator- (const float& rhs) const;
 	Vector3  operator* (const float& rhs) const;
 	Vector3  operator/ (const float& rhs) const;
 
+	Vector3& operator+=(const float& rhs);
+	Vector3& operator-=(const float& rhs);
 	Vector3& operator*=(const float& rhs);
 	Vector3& operator/=(const float& rhs);
 

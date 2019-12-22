@@ -22,6 +22,7 @@ public:
 	const float& GetW() const;
 
 	const float& GetDepth() const;
+	void SetDepth(const float& value);
 
 	void SetX(const float& x);
 	void SetY(const float& x);

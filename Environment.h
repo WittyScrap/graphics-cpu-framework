@@ -37,6 +37,9 @@ public:
 	void OnTick(const float& deltaTime);
 	void OnRender(const HDC& hdc);
 
+	const COLORREF GetBackgroundColour() const;
+	void SetBackgroundColour(const COLORREF& colour);
+
 	static Environment& GetActive();
 
 private:
@@ -44,6 +47,9 @@ private:
 
 	std::vector<SceneObjectPtr> _sceneObjects;
 	std::vector<LightPtr> _sceneLights;
+
+	// Colours
+	COLORREF _background = RGB(0x75, 0x75, 0x75);
 };
 
 //

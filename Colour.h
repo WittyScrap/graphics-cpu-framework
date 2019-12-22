@@ -41,6 +41,14 @@ public:
 
 	static Colour Lerp(const Colour& lhs, const Colour& rhs, const float& alpha);
 
+	// Simple colour presets
+	static const Colour Black;
+	static const Colour White;
+	static const Colour Red;
+	static const Colour Green;
+	static const Colour Blue;
+	static const Colour Magenta;
+
 protected:
 	static float Clamp(const float& value, const float& a, const float& b);
 

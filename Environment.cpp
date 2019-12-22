@@ -143,3 +143,19 @@ Environment& Environment::GetActive()
 		throw std::exception("No active environment was present, but one was requested!");
 	}
 }
+
+//
+// The window (bitmap)'s background colour.
+//
+const COLORREF Environment::GetBackgroundColour() const
+{
+	return _background;
+}
+
+//
+// Updates the background colour.
+//
+void Environment::SetBackgroundColour(const COLORREF& colour)
+{
+	_background = colour;
+}

@@ -39,7 +39,7 @@ public:
 	~Mesh();
 
 	// Loads the mesh data from a file.
-	void LoadFromFile(const char* const fileName, const char* texture);
+	void LoadFromFile(const char* const fileName, const char* texture = nullptr);
 
 	//
 	// Accessors
@@ -64,6 +64,7 @@ public:
 	//
 	void Mode(const DrawMode& mode);
 	void Shade(const ShadeMode& mode);
+	void Cull(const bool& mode);
 
 	//
 	// Shading information.
@@ -130,5 +131,6 @@ private:
 	Texture _texture;
 
 	float _roughness;
+	bool _doBackfaceCulling{ true };
 };
 

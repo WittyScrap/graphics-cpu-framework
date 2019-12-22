@@ -6,7 +6,7 @@
 //
 PointLight::PointLight() : Light()
 {
-	_attenuation = .05f;
+	_attenuation = .01f;
 }
 
 //

@@ -40,6 +40,11 @@ void Texture::SetTextureSize(int width, int height)
 
 COLORREF Texture::GetTextureValue(int u, int v) const
 {
+	if (!_paletteIndices)
+	{
+		return RGB(255, 255, 255); // Default to white if no texture can be sampled.
+	}
+
 	if (v < 0)
 	{
 		v = 0;

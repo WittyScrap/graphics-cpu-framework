@@ -47,6 +47,11 @@ const float& Vertex::GetDepth() const
 	return _depth;
 }
 
+void Vertex::SetDepth(const float& value)
+{
+	_depth = value;
+}
+
 void Vertex::SetX(const float& x)
 {
 	_x = x;

@@ -22,12 +22,11 @@ public:
 	virtual void Render(const Bitmap& bitmap) override;
 	virtual void Tick(const Bitmap& bitmap, const float& deltaTime) override;
 
-	const COLORREF GetBackgroundColour() const;
 	void Log(const char* const message) const;
 
 	const float& GetTimeElapsed() const;
 
-	static void DrawString(Bitmap& bitmap, LPCTSTR text);
+	static void DrawString(HDC hdc, LPCTSTR text, COLORREF colour, COLORREF back);
 
 protected:
 	//
@@ -42,9 +41,6 @@ protected:
 
 private:
 	Camera _camera;
-
-	// Colours
-	COLORREF _background = RGB(0x75, 0x75, 0x75);
 	float _timeElapsed = 0;
 
 	// Scene objects and render objects

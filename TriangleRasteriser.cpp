@@ -1,4 +1,5 @@
 #include "TriangleRasteriser.h"
+#include "Camera.h"
 #include <cmath>
 #include <Windows.h>
 
@@ -359,6 +360,7 @@ const Vertex TriangleRasteriser::GetSplitVertex(const Vertex& a, const Vertex& b
 	// Split the triangle in a topflat and bottomflat one
 	Vertex tempVertex(a.GetX() + ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY())) * (c.GetX() - a.GetX()), b.GetY(), 0);
 
+	tempVertex.SetDepth(a.GetDepth() + (c.GetDepth() - a.GetDepth()) * ((b.GetY() - a.GetY()) / (c.GetY() - a.GetY())));
 	tempVertex.GetVertexData().SetColour(GetSplitColour(a, b, c));
 	tempVertex.GetVertexData().SetNormal(GetSplitNormal(a, b, c));
 	tempVertex.GetVertexData().SetUV(GetSplitUV(a, b, c));
@@ -596,9 +598,9 @@ const TriangleRasteriser::PhongShadeData TriangleRasteriser::GetPhongDataTop(con
 	Vector3 u1(v1.GetVertexData().GetUV());
 	Vector3 u2(v2.GetVertexData().GetUV());
 
-	AdjustUV(u0, w0.GetZ());
-	AdjustUV(u1, w1.GetZ());
-	AdjustUV(u2, w2.GetZ());
+	AdjustUV(u0, v0.GetDepth());
+	AdjustUV(u1, v1.GetDepth());
+	AdjustUV(u2, v2.GetDepth());
 
 	const float ba = (v1.GetY() - v0.GetY()); // Get the change along edge v2->v1
 	const float ca = (v2.GetY() - v0.GetY()); // Get the change along edge v3->v1

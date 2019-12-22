@@ -56,9 +56,10 @@ struct Phong : public FragmentFunction
 private:
 	float _roughness;
 	const Texture& _texture;
+	const Colour& _albedo;
 
 public:
-	inline Phong(const float& roughness, const Texture& texture) : _roughness{ roughness }, _texture{ texture }
+	inline Phong(const float& roughness, const Texture& texture, const Colour& albedo) : _roughness{ roughness }, _texture{ texture }, _albedo{ albedo }
 	{ }
 
 	inline const Colour operator()(const Vertex& v) const override
@@ -66,7 +67,7 @@ public:
 		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().GetX(), (int)v.GetVertexData().GetUV().GetY());
 		Colour tex(sample);
 
-		return tex * Mesh::ComputeLighting(v, _roughness);
+		return (tex * _albedo) + Mesh::ComputeLighting(v, _roughness);
 	}
 };
 
@@ -280,6 +281,14 @@ void Mesh::Shade(const ShadeMode& mode)
 }
 
 //
+// Sets whether or not this mesh should perform backface culling.
+//
+void Mesh::Cull(const bool& mode)
+{
+	_doBackfaceCulling = mode;
+}
+
+//
 // How rough the material is, higher values will result in a more spread out specular reflection.
 //
 const float& Mesh::GetRoughness() const
@@ -328,19 +337,25 @@ void Mesh::ResetActiveColour(const HDC& hdc)
 //
 void Mesh::CalculateBackfaceCulling(const std::vector<Vertex>& vertices)
 {
-	Matrix transform = GetMVP(MVP);
-
+	Matrix transform = _doBackfaceCulling ? GetMVP(MVP) : Matrix::IdentityMatrix();
 	_visiblePolygons.clear();
+
 	for (Polygon3D& polygon : _polygons)
 	{
-		Vector3 normal = polygon.GetClipNormal();
-		Vector3 view = polygon.CalculateCenter(vertices).AsVector();
+		if (_doBackfaceCulling)
+		{
+			Vector3 normal = polygon.GetClipNormal();
+			Vector3 view = polygon.CalculateCenter(vertices).AsVector();
 
-		normal.Normalise();
-		view.Normalise();
+			normal.Normalise();
+			view.Normalise();
 
-		float normalDotView = Vector3::Dot(normal, view);
-		if (normalDotView > 0)
+			if (Vector3::Dot(normal, view) > 0)
+			{
+				_visiblePolygons.push_back(&polygon);
+			}
+		}
+		else
 		{
 			_visiblePolygons.push_back(&polygon);
 		}
@@ -430,9 +445,12 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 	const Vertex& worldB = worldSpace[posIndex1];
 	const Vertex& worldC = worldSpace[posIndex2];
 
-	clipA.GetVertexData().SetUV(_uv[uvsIndex0]);
-	clipB.GetVertexData().SetUV(_uv[uvsIndex1]);
-	clipC.GetVertexData().SetUV(_uv[uvsIndex2]);
+	if (_uv.size())
+	{
+		clipA.GetVertexData().SetUV(_uv[uvsIndex0]);
+		clipB.GetVertexData().SetUV(_uv[uvsIndex1]);
+		clipC.GetVertexData().SetUV(_uv[uvsIndex2]);
+	}
 
 	// Draw using custom rasterizing system.
 	switch (_shadeMode)
@@ -455,7 +473,7 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 
 	case ShadeMode::SHADE_PHONG:
 	{
-		Phong frag(_roughness, _texture);
+		Phong frag(_roughness, _texture, GetColour());
 
 		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
 		TriangleRasteriser::DrawPhong(hdc, { clipA, clipB, clipC }, { worldA, worldB, worldC }, frag);

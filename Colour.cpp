@@ -2,6 +2,16 @@
 #include <algorithm>
 
 //
+// Colour samples.
+//
+const Colour Colour::Black(0, 0, 0);
+const Colour Colour::White(1, 1, 1);
+const Colour Colour::Red(1, 0, 0);
+const Colour Colour::Green(0, 1, 0);
+const Colour Colour::Blue(0, 0, 1);
+const Colour Colour::Magenta(1, 0, 1);
+
+//
 // Colour default constructor.
 //
 Colour::Colour() : _red{ 0 }, _green{ 0 }, _blue{ 0 }

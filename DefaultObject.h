@@ -8,7 +8,10 @@
 
 #define MODE_SIMPLE 0xFF
 #define MODE_PRESENTATION 0xFE
-#define DEMO_TYPE MODE_SIMPLE
+
+// ------
+#define DEMO_TYPE MODE_PRESENTATION	// Defines which kind of demo will play
+// ------
 
 #if DEMO_TYPE == MODE_SIMPLE
 #include "SimpleDemo.h"

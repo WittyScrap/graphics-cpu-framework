@@ -242,6 +242,34 @@ Vector3& Vector3::operator/=(const Vertex& rhs)
 }
 
 //
+// Assigns a scalar to all components of the vector.
+//
+Vector3& Vector3::operator=(const float& rhs)
+{
+	_x = rhs;
+	_y = rhs;
+	_z = rhs;
+
+	return *this;
+}
+
+//
+// Adds a scalar to each component of the vector.
+//
+Vector3 Vector3::operator+(const float& rhs) const
+{
+	return Vector3(_x + rhs, _y + rhs, _z + rhs);
+}
+
+//
+// Subtracts a scalar from all components of the vector;
+//
+Vector3 Vector3::operator-(const float& rhs) const
+{
+	return Vector3(_x - rhs, _y - rhs, _z - rhs);
+}
+
+//
 // Multiplies each component of a copy of this vector by a scalar.
 //
 Vector3 Vector3::operator* (const float& rhs) const
@@ -267,6 +295,30 @@ Vector3 Vector3::operator/ (const float& rhs) const
 	div._z /= rhs;
 
 	return div;
+}
+
+//
+// Adds a scalar to each component of the vector.
+//
+Vector3& Vector3::operator+=(const float& rhs)
+{
+	_x += rhs;
+	_y += rhs;
+	_z += rhs;
+
+	return *this;
+}
+
+//
+// Subtracts a scalar from all components of the vector;
+//
+Vector3& Vector3::operator-=(const float& rhs)
+{
+	_x -= rhs;
+	_y -= rhs;
+	_z -= rhs;
+
+	return *this;
 }
 
 //

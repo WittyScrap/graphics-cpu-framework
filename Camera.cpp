@@ -194,6 +194,22 @@ void Camera::SetRotation(const Vector3& rotation)
 }
 
 //
+// Moves this camera by the given amount.
+//
+void Camera::Translate(const Vector3& amount)
+{
+	SetPosition(GetPosition() + amount);
+}
+
+//
+// Rotates this camera by the given amount.
+//
+void Camera::Rotate(const Vector3& amount)
+{
+	SetRotation(GetRotation() + amount);
+}
+
+//
 // The position of this camera
 //
 const Vector3 Camera::GetPosition() const

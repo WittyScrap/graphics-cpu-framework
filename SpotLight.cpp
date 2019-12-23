@@ -4,7 +4,7 @@
 //
 // Default constructor
 //
-SpotLight::SpotLight() : Light(), _attenuation{ 0.01f }, _innerAngle{ PI * 2 / 9 }, _outerAngle{ PI / 2 }
+SpotLight::SpotLight() : Light(), _attenuation{ 0.01f }, _innerAngle{ 0.5f }, _outerAngle{ 1.f }
 { }
 
 //
@@ -88,6 +88,38 @@ const Vector3& SpotLight::GetDirection() const
 void SpotLight::SetDirection(const Vector3& vector)
 {
 	_direction = Vector3::NormaliseVector(vector);
+}
+
+//
+// The angle of the inner radius of this spotlight.
+//
+const float& SpotLight::GetInnerAngle() const
+{
+	return _innerAngle;
+}
+
+//
+// Allows to set the angle of the inner radius of this spotlight.
+//
+void SpotLight::SetInnerAngle(const float& value)
+{
+	_innerAngle = value;
+}
+
+//
+// The angle of the outer radius of this spotlight.
+//
+const float& SpotLight::GetOuterAngle() const
+{
+	return _outerAngle;
+}
+
+//
+// Allows to set the angle of the outer radius of this spotlight.
+//
+void SpotLight::SetOuterAngle(const float& value)
+{
+	_outerAngle = value;
 }
 
 //

@@ -384,6 +384,8 @@ void Presentation::SpotPhase(const float& deltaTime)
 	_spot->SetPosition(Vector3(70.f, 70.f, 10.f));
 	_spot->SetIntensity(Colour::White * 0.5f);
 	_spot->SetDirection(Vector3(-1, -1, 0));
+	_spot->SetInnerAngle(0.10f);
+	_spot->SetOuterAngle(0.90f);
 
 	_state = PresentationStage::PHASE_POINT;
 	_delay = 5.f;

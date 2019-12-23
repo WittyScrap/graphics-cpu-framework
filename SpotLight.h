@@ -34,6 +34,18 @@ public:
 	const Vector3& GetDirection() const;
 	void SetDirection(const Vector3& vector);
 
+	//
+	// The angle of the inner radius for the spotlight.
+	//
+	const float& GetInnerAngle() const;
+	void SetInnerAngle(const float& value);
+
+	//
+	// The angle of the outer radius for the spotlight.
+	//
+	const float& GetOuterAngle() const;
+	void SetOuterAngle(const float& value);
+
 private:
 	//
 	// Smoothstep implementation.

@@ -23,7 +23,7 @@ SpotLight::~SpotLight()
 //
 // Calculates the overall contribution of this light on the given vertex at the given normal.
 //
-Colour SpotLight::CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness, const float& specular)
+Colour SpotLight::CalculateContribution(const Vertex& position, const Vector3& normal, const Colour& ambient, const float& roughness, const float& specular)
 {
 	constexpr float a = 0.f;
 	constexpr float c = 0.f;

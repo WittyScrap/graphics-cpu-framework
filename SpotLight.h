@@ -14,7 +14,7 @@ public:
 	//
 	// Calculates the overall contribution of this light on the given vertex and normal.
 	//
-	Colour CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness, const float& specular) override;
+	Colour CalculateContribution(const Vertex& position, const Vector3& normal, const Colour& ambient, const float& roughness, const float& specular) override;
 
 	//
 	// Light position

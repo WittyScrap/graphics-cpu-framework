@@ -76,13 +76,19 @@ public:
 	// Specular information.
 	//
 	const float& GetSpecularCoefficient() const;
-	const void SetSpecularCoefficient(const float& value);
+	void SetSpecularCoefficient(const float& value);
+
+	//
+	// Ambient coefficient
+	//
+	const Colour& GetAmbientCoefficient() const;
+	void SetAmbientCoefficient(const Colour& value);
 
 	//
 	// Lighting tools
 	//
 	static Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices);
-	static Colour ComputeLighting(const Vertex& vertex, const float& roughness, const float& specular);
+	static Colour ComputeLighting(const Vertex& vertex, const Colour& ambient, const float& roughness, const float& specular);
 
 	//
 	// Texturing
@@ -136,8 +142,11 @@ private:
 
 	Texture _texture;
 
-	float _roughness;
-	float _specular;
+	float _roughness;	// Alpha
+	float _specular;	// Ks
+	Colour _ambient;	// Ka
+//	Colour _colour;		// Kd, this is included in Shape and it is essentially its functionality.
+
 	bool _doBackfaceCulling{ true };
 };
 

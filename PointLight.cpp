@@ -63,7 +63,7 @@ void PointLight::SetAttenuation(const float& value)
 //
 // Calculates the overall contribution of the point light.
 //
-Colour PointLight::CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness, const float& specular)
+Colour PointLight::CalculateContribution(const Vertex& position, const Vector3& normal, const Colour& ambient, const float& roughness, const float& specular)
 {
 	constexpr float a = 0.f;
 	constexpr float c = 0.f;

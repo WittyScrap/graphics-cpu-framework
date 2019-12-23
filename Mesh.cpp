@@ -36,9 +36,10 @@ private:
 	const float& _specular;
 	const Texture& _texture;
 	const Colour& _albedo;
+	const Colour& _ambient;
 
 public:
-	inline Phong(const float& roughness, const float& specular, const Texture& texture, const Colour& albedo) : _roughness{ roughness }, _specular{ specular }, _texture{ texture }, _albedo{ albedo }
+	inline Phong(const Colour& ambient, const float& roughness, const float& specular, const Texture& texture, const Colour& albedo) : _ambient{ ambient }, _roughness { roughness }, _specular{ specular }, _texture{ texture }, _albedo{ albedo }
 	{ }
 
 	inline const Colour operator()(const Vertex& v) const override
@@ -46,14 +47,14 @@ public:
 		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().GetX(), (int)v.GetVertexData().GetUV().GetY());
 		Colour tex(sample);
 
-		return tex * _albedo * Mesh::ComputeLighting(v, _roughness, _specular);
+		return tex * _albedo * Mesh::ComputeLighting(v, _ambient, _roughness, _specular);
 	}
 };
 
 //
 // Default constructor.
 //
-Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DrawMode::DRAW_SOLID }, _shadeMode { ShadeMode::SHADE_FLAT }, _roughness{ 10.f }, _specular{ 1.f }
+Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DrawMode::DRAW_SOLID }, _shadeMode { ShadeMode::SHADE_FLAT }, _roughness{ 10.f }, _specular{ 1.f }, _ambient{ Colour::White }
 { }
 
 //
@@ -294,9 +295,25 @@ const float& Mesh::GetSpecularCoefficient() const
 //
 // Sets the specular coefficient for this mesh.
 //
-const void Mesh::SetSpecularCoefficient(const float& value)
+void Mesh::SetSpecularCoefficient(const float& value)
 {
 	_specular = value;
+}
+
+//
+// The ambient coefficient (AKA how much of the ambient light is reflected) of this mesh.
+//
+const Colour& Mesh::GetAmbientCoefficient() const
+{
+	return _ambient;
+}
+
+//
+// Allows to set the ambient coefficient (AKA how much of the ambient light is reflected) of this mesh.
+//
+void Mesh::SetAmbientCoefficient(const Colour& value)
+{
+	_ambient = value;
 }
 
 //
@@ -468,7 +485,8 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 
 	case ShadeMode::SHADE_PHONG:
 	{
-		Phong frag(_roughness, _specular, _texture, GetColour());
+		Phong frag(_ambient, _roughness, _specular, _texture, GetColour());
+//		Unlit frag(_texture);	// <- Use this for unlit graphics (faster).
 
 		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
 		TriangleRasteriser::DrawPhong(hdc, { clipA, clipB, clipC }, { worldA, worldB, worldC }, frag);
@@ -492,7 +510,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 
 	for (const LightPtr& light : sceneLights)
 	{
-		totalLightContributions += light->CalculateContribution(position, normal, 0.f, 1.f); // Flat shading
+		totalLightContributions += light->CalculateContribution(position, normal, Colour::White, 0.f, 1.f); // Flat shading
 	}
 
 	return totalLightContributions;
@@ -501,7 +519,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 //
 // Computes the lighting for a single vertex.
 //
-Colour Mesh::ComputeLighting(const Vertex& vertex, const float& roughness, const float& specular)
+Colour Mesh::ComputeLighting(const Vertex& vertex, const Colour& ambient, const float& roughness, const float& specular)
 {
 	const Vector3& normal = vertex.GetVertexData().GetNormal();
 
@@ -510,7 +528,7 @@ Colour Mesh::ComputeLighting(const Vertex& vertex, const float& roughness, const
 
 	for (const LightPtr& light : sceneLights)
 	{
-		totalLightContributions += light->CalculateContribution(vertex, normal, roughness, specular);
+		totalLightContributions += light->CalculateContribution(vertex, normal, ambient, roughness, specular);
 	}
 
 	return totalLightContributions;
@@ -542,7 +560,7 @@ void Mesh::ComputeVertexLighting()
 
 	for (const Vertex& vertex : worldVertices)
 	{
-		vertexColours.push_back(GetColour() * ComputeLighting(vertex, _roughness, _specular));
+		vertexColours.push_back(GetColour() * ComputeLighting(vertex, _ambient, _roughness, _specular));
 	}
 
 	// Apply vertex colours to clip-space vertices.

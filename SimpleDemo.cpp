@@ -9,28 +9,18 @@
 //
 void SimpleDemo::OnInit()
 {
-	// Create a cube mesh for the pedistal and a marvin mesh for reasons.
 	_pedistal = CreateShape<Mesh>();
-	_figurine = CreateShape<Mesh>();
-
-	// Actually load the meshes because you haven't yet
 	_pedistal->LoadFromFile("Meshes/cube.md2", "lines.pcx");
-	_figurine->LoadFromFile("Meshes/marvin.md2", "marvin.pcx");
-
-	// Set colour
-	_pedistal->SetColour(Colour(.5f, .5f, 1.f));
-	_figurine->SetColour(Colour(.1f, .05f, .05f));
-
-	// Set draw modes
-	_pedistal->Mode(Mesh::DrawMode::DRAW_NONE);
-	_figurine->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
-
-	// Set shade modes
+	_pedistal->SetColour(Colour::White);
+	_pedistal->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
 	_pedistal->Shade(Mesh::ShadeMode::SHADE_PHONG);
-	_figurine->Shade(Mesh::ShadeMode::SHADE_PHONG);
-
-	// Place the cube underneath
 	_pedistal->SetPosition({ 0, -43.f, 0 });
+
+	_figurine = CreateShape<Mesh>();
+	_figurine->LoadFromFile("Meshes/marvin.md2", "marvin.pcx");
+	_figurine->SetColour(Colour::White);
+	_figurine->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
+	_figurine->Shade(Mesh::ShadeMode::SHADE_PHONG);
 
 	// Create light
 	_directional = Environment::GetActive().CreateLight<DirectionalLight>().get();
@@ -59,6 +49,7 @@ void SimpleDemo::OnTick(const float& deltaTime)
 
 	// A nice spinning animation!
 	_figurine->Rotate(angle);
+	_pedistal->Rotate(-angle);
 
 	// Move the camera, hurray!
 	Vector3 cameraMovement{ 0, 0, 0 };

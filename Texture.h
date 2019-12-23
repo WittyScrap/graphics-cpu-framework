@@ -10,6 +10,12 @@
 *
 *	This issue obviously does not apply in Debug mode.
 *
+*	NOTE:
+*	The aforementioned issue existed before I changed the SetTextureSize argument types
+*	and the GetWidth/GetHeight (as well as _width/_height) variables to size_t from their
+*	previous type int, this was to prevent Visual Studio from warning me about a potential
+*	operator overflow.
+*
 */
 class Texture
 {

@@ -28,6 +28,7 @@ class Presentation : public SceneObject
 		PHASE_VERTEX,
 		PHASE_FRAGMENT,
 		PHASE_POINT,
+		PHASE_SPOT,
 		PHASE_END
 	};
 
@@ -57,6 +58,7 @@ private:
 	void VertexPhase(const float& deltaTime);
 	void FragmentPhase(const float& deltaTime);
 	void PointPhase(const float& deltaTime);
+	void SpotPhase(const float& deltaTime);
 	void EndPhase(const float& deltaTime);
 
 private:

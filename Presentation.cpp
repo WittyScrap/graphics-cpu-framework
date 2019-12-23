@@ -76,6 +76,9 @@ void Presentation::OnTick(const float& deltaTime)
 	case PresentationStage::PHASE_FRAGMENT:
 		FragmentPhase(deltaTime);
 		break;
+	case PresentationStage::PHASE_SPOT:
+		SpotPhase(deltaTime);
+		break;
 	case PresentationStage::PHASE_POINT:
 		PointPhase(deltaTime);
 		break;
@@ -332,7 +335,7 @@ void Presentation::DirectionalPhase(const float& deltaTime)
 //
 void Presentation::FlatPhase(const float& deltaTime)
 {
-	_displayText->SetValue(L"The next features will now be showcased. (State: Cull + Flat (custom) + Directional/Ambient)");
+	_displayText->SetValue(L"The next features will now be showcased. (State: Cull + Flat (custom) + Ambient + Directional)");
 
 	_figurine->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
 	_pedistal->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
@@ -346,7 +349,7 @@ void Presentation::FlatPhase(const float& deltaTime)
 //
 void Presentation::VertexPhase(const float& deltaTime)
 {
-	_displayText->SetValue(L"State: Cull + Gouraud + Directional/Ambient");
+	_displayText->SetValue(L"State: Cull + Gouraud + Ambient + Directional");
 
 	_figurine->Shade(Mesh::ShadeMode::SHADE_GOURAUD);
 	_pedistal->Shade(Mesh::ShadeMode::SHADE_GOURAUD);
@@ -360,26 +363,21 @@ void Presentation::VertexPhase(const float& deltaTime)
 //
 void Presentation::FragmentPhase(const float& deltaTime)
 {
-	_displayText->SetValue(L"State: Cull + Phong + Textures + Directional/Ambient");
+	_displayText->SetValue(L"State: Cull + Phong + Textures + Ambient + Directional");
 
 	_figurine->Shade(Mesh::ShadeMode::SHADE_PHONG);
 	_pedistal->Shade(Mesh::ShadeMode::SHADE_PHONG);
 
-	_state = PresentationStage::PHASE_POINT;
+	_state = PresentationStage::PHASE_SPOT;
 	_delay = 5.f;
 }
 
 //
-// Adds a point and spot light to the scene.
+// Adds a spot light to the scene.
 //
-void Presentation::PointPhase(const float& deltaTime)
+void Presentation::SpotPhase(const float& deltaTime)
 {
-	_displayText->SetValue(L"State: Cull + Phong + Textures + Directional/Ambient + Point light + Spot light");
-
-	// Create point light
-	_point = Environment::GetActive().CreateLight<PointLight>().get();
-	_point->SetPosition(Vector3(0, 50.f, -50.f));
-	_point->SetIntensity(Colour(.25f, .25f, .5f));
+	_displayText->SetValue(L"State: Cull + Phong + Textures + Ambient + Directional + Spot light");
 
 	// Create spot light
 	_spot = Environment::GetActive().CreateLight<SpotLight>().get();
@@ -387,11 +385,27 @@ void Presentation::PointPhase(const float& deltaTime)
 	_spot->SetIntensity(Colour::White * 0.5f);
 	_spot->SetDirection(Vector3(-1, -1, 0));
 
+	_state = PresentationStage::PHASE_POINT;
+	_delay = 5.f;
+}
+
+//
+// Adds a point light to the scene.
+//
+void Presentation::PointPhase(const float& deltaTime)
+{
+	_displayText->SetValue(L"State: Cull + Phong + Textures + Ambient + Directional + Spot light + Point light");
+
+	// Create point light
+	_point = Environment::GetActive().CreateLight<PointLight>().get();
+	_point->SetPosition(Vector3(0, 50.f, -50.f));
+	_point->SetIntensity(Colour(.25f, .25f, .5f));
+
 	_state = PresentationStage::PHASE_END;
 	_delay = 5.f;
 }
 
 void Presentation::EndPhase(const float& deltaTime)
 {
-	_displayText->SetValue(L"This concludes the presentation! (State: Cull + Phong + Textures + Directional/Ambient + Point light + Spot light)");
+	_displayText->SetValue(L"This concludes the presentation! (State: Cull + Phong + Textures + Ambient + Directional + Point light + Spot light)");
 }

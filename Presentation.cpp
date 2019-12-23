@@ -99,7 +99,7 @@ void Presentation::BeginPhase(const float& deltaTime)
 	{
 		_pedistal = CreateShape<Mesh>();
 		_pedistal->LoadFromFile("Meshes/cube.md2", "lines.pcx");
-		_pedistal->SetColour(Colour(.5f, .5f, 1.f));
+		_pedistal->SetColour(Colour::White);
 		_pedistal->Mode(Mesh::DrawMode::DRAW_WIREFRAME);
 		_pedistal->Shade(Mesh::ShadeMode::SHADE_FLAT); // For later...
 		_pedistal->SetPosition({ 0, -43.f, 0 });
@@ -150,7 +150,7 @@ void Presentation::MarvinPhase(const float& deltaTime)
 	{
 		_figurine = CreateShape<Mesh>();
 		_figurine->LoadFromFile("Meshes/marvin.md2", "marvin.pcx");
-		_figurine->SetColour(Colour(1.f, .5f, .5f));
+		_figurine->SetColour(Colour::White);
 		_figurine->Mode(Mesh::DrawMode::DRAW_WIREFRAME);
 		_figurine->Shade(Mesh::ShadeMode::SHADE_FLAT); // For later...
 		_figurine->SetPosition({ 0, 100.f, 0 });
@@ -370,16 +370,22 @@ void Presentation::FragmentPhase(const float& deltaTime)
 }
 
 //
-// Adds a point light to the scene.
+// Adds a point and spot light to the scene.
 //
 void Presentation::PointPhase(const float& deltaTime)
 {
-	_displayText->SetValue(L"State: Cull + Phong + Textures + Directional/Ambient + Point light");
+	_displayText->SetValue(L"State: Cull + Phong + Textures + Directional/Ambient + Point light + Spot light");
 
 	// Create point light
 	_point = Environment::GetActive().CreateLight<PointLight>().get();
-	_point->SetPosition(Vector3(0, 50, -50.f));
-	_point->SetIntensity(Colour(.5f, .5f, 1.f));
+	_point->SetPosition(Vector3(0, 50.f, -50.f));
+	_point->SetIntensity(Colour(.25f, .25f, .5f));
+
+	// Create spot light
+	_spot = Environment::GetActive().CreateLight<SpotLight>().get();
+	_spot->SetPosition(Vector3(70.f, 70.f, 10.f));
+	_spot->SetIntensity(Colour::White * 0.5f);
+	_spot->SetDirection(Vector3(-1, -1, 0));
 
 	_state = PresentationStage::PHASE_END;
 	_delay = 5.f;
@@ -387,5 +393,5 @@ void Presentation::PointPhase(const float& deltaTime)
 
 void Presentation::EndPhase(const float& deltaTime)
 {
-	_displayText->SetValue(L"This concludes the presentation! (State: Cull + Phong + Textures + Directional/Ambient + Point light)");
+	_displayText->SetValue(L"This concludes the presentation! (State: Cull + Phong + Textures + Directional/Ambient + Point light + Spot light)");
 }

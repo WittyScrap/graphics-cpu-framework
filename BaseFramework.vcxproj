@@ -169,6 +169,7 @@
     <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="SimpleDemo.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Square.cpp" />
     <ClCompile Include="TextShape.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Rasteriser.h" />
     <ClInclude Include="SceneObject.h" />
     <ClInclude Include="SimpleDemo.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="TextShape.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transformable.h" />

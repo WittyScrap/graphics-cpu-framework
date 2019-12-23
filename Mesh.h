@@ -73,10 +73,16 @@ public:
 	void SetRoughness(const float& value);
 
 	//
+	// Specular information.
+	//
+	const float& GetSpecularCoefficient() const;
+	const void SetSpecularCoefficient(const float& value);
+
+	//
 	// Lighting tools
 	//
 	static Colour ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>& vertices);
-	static Colour ComputeLighting(const Vertex& vertex, const float& roughness);
+	static Colour ComputeLighting(const Vertex& vertex, const float& roughness, const float& specular);
 
 	//
 	// Texturing
@@ -131,6 +137,7 @@ private:
 	Texture _texture;
 
 	float _roughness;
+	float _specular;
 	bool _doBackfaceCulling{ true };
 };
 

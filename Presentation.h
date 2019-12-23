@@ -5,6 +5,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "AmbientLight.h"
+#include "SpotLight.h"
 
 //
 // Starts a presentation to showcase all features of the framework.
@@ -59,16 +60,17 @@ private:
 	void EndPhase(const float& deltaTime);
 
 private:
-	TextShape* _displayText;
+	TextShape* _displayText{ nullptr };
 	PresentationStage _state;
 
 	// Scene objects
-	Mesh* _pedistal;
-	Mesh* _figurine;
+	Mesh* _pedistal{ nullptr };
+	Mesh* _figurine{ nullptr };
 
-	AmbientLight* _ambient;
-	DirectionalLight* _directional;
-	PointLight* _point;
+	AmbientLight* _ambient{ nullptr };
+	DirectionalLight* _directional{ nullptr };
+	PointLight* _point{ nullptr };
+	SpotLight* _spot{ nullptr };
 
 	float _delay{ 0 };
 	bool _doRotateFigurine{ false };

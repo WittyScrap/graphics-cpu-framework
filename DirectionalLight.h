@@ -14,7 +14,7 @@ public:
 	const Vector3& GetDirection() const;
 	void SetDirection(const Vector3& vector);
 
-	Colour CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness) override;
+	Colour CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness, const float& specular) override;
 
 private:
 	Vector3 _direction;

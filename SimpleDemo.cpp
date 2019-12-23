@@ -19,10 +19,10 @@ void SimpleDemo::OnInit()
 
 	// Set colour
 	_pedistal->SetColour(Colour(.5f, .5f, 1.f));
-	_figurine->SetColour(Colour(1.f, .5f, .5f));
+	_figurine->SetColour(Colour(.1f, .05f, .05f));
 
 	// Set draw modes
-	_pedistal->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
+	_pedistal->Mode(Mesh::DrawMode::DRAW_NONE);
 	_figurine->Mode(Mesh::DrawMode::DRAW_FRAGMENT);
 
 	// Set shade modes
@@ -59,7 +59,6 @@ void SimpleDemo::OnTick(const float& deltaTime)
 
 	// A nice spinning animation!
 	_figurine->Rotate(angle);
-	_pedistal->Rotate(-angle);
 
 	// Move the camera, hurray!
 	Vector3 cameraMovement{ 0, 0, 0 };

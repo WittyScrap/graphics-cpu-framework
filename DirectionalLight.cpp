@@ -35,7 +35,7 @@ void DirectionalLight::SetDirection(const Vector3& vector)
 //
 // Calculates the overall contribution this light is maing on the given polygon.
 //
-Colour DirectionalLight::CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness)
+Colour DirectionalLight::CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness, const float& specular)
 {
 	const Vector3 inverseDirection = -_direction;
 	float normalDotDirection = Vector3::Dot(normal, inverseDirection);
@@ -47,14 +47,11 @@ Colour DirectionalLight::CalculateContribution(const Vertex& position, const Vec
 
 	float lightValue = normalDotDirection;
 
-	if (roughness > 0)
-	{
-		// Assume Ks = 1.
-		Vector3 eye(Camera::GetMainCamera()->GetPosition() - position);
-		Vector3 r = normal * (normalDotDirection) * 2 - inverseDirection;
+	Vector3 eye(Camera::GetMainCamera()->GetPosition() - position);
+	eye.Normalise();
 
-		lightValue += pow(Vector3::Dot(r, eye), 1 / roughness);
-	}
+	Vector3 h((inverseDirection + eye) / (inverseDirection + eye).GetMagnitude());
+	float phongHighlights = specular * pow(Vector3::Dot(normal, h), roughness);
 	
-	return GetIntensity() * lightValue;
+	return GetIntensity() * lightValue * phongHighlights;
 }

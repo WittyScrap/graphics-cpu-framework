@@ -26,7 +26,7 @@ public:
 	//
 	// Point light formula here.
 	//
-	Colour CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness) override;
+	Colour CalculateContribution(const Vertex& position, const Vector3& normal, const float& roughness, const float& specular) override;
 
 private:
 	Vector3 _position;

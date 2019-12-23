@@ -1,4 +1,4 @@
-#include "Mesh.h"
+﻿#include "Mesh.h"
 #include "ModelLoadingException.h"
 #include "MD2Loader.h"
 #include <algorithm>
@@ -27,39 +27,18 @@ public:
 };
 
 //
-// Implements a simple screen space gradient effect.
-//
-struct Gradient : public FragmentFunction
-{
-	inline const Colour operator()(const Vertex& v) const override
-	{
-		return Colour(v.GetY(), v.GetY(), v.GetY());
-	}
-};
-
-//
-// Displays the world space normals on each point on the mesh.
-//
-struct Normal : public FragmentFunction
-{
-	inline const Colour operator()(const Vertex& v) const override
-	{
-		return Colour(v.GetVertexData().GetNormal().GetX(), v.GetVertexData().GetNormal().GetY(), v.GetVertexData().GetNormal().GetZ());
-	}
-};
-
-//
 // Implementation of phong shading.
 //
 struct Phong : public FragmentFunction
 {
 private:
-	float _roughness;
+	const float& _roughness;
+	const float& _specular;
 	const Texture& _texture;
 	const Colour& _albedo;
 
 public:
-	inline Phong(const float& roughness, const Texture& texture, const Colour& albedo) : _roughness{ roughness }, _texture{ texture }, _albedo{ albedo }
+	inline Phong(const float& roughness, const float& specular, const Texture& texture, const Colour& albedo) : _roughness{ roughness }, _specular{ specular }, _texture{ texture }, _albedo{ albedo }
 	{ }
 
 	inline const Colour operator()(const Vertex& v) const override
@@ -67,14 +46,14 @@ public:
 		COLORREF sample = _texture.GetTextureValue((int)v.GetVertexData().GetUV().GetX(), (int)v.GetVertexData().GetUV().GetY());
 		Colour tex(sample);
 
-		return (tex * _albedo) + Mesh::ComputeLighting(v, _roughness);
+		return tex * _albedo * Mesh::ComputeLighting(v, _roughness, _specular);
 	}
 };
 
 //
 // Default constructor.
 //
-Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DrawMode::DRAW_SOLID }, _shadeMode { ShadeMode::SHADE_FLAT }, _roughness{ 0.f }
+Mesh::Mesh() : _previousPen{ 0 }, _previousBrush{ 0 }, _drawMode{ DrawMode::DRAW_SOLID }, _shadeMode { ShadeMode::SHADE_FLAT }, _roughness{ 10.f }, _specular{ 1.f }
 { }
 
 //
@@ -289,7 +268,7 @@ void Mesh::Cull(const bool& mode)
 }
 
 //
-// How rough the material is, higher values will result in a more spread out specular reflection.
+// How rough the material is, lower values will result in a more spread out specular reflection.
 //
 const float& Mesh::GetRoughness() const
 {
@@ -297,11 +276,27 @@ const float& Mesh::GetRoughness() const
 }
 
 //
-// Sets how rough the material is, higher values will result in a more spread out specular reflection.
+// Sets how rough the material is, lower values will result in a more spread out specular reflection.
 //
 void Mesh::SetRoughness(const float& value)
 {
 	_roughness = value;
+}
+
+//
+// The specular coefficient for this mesh.
+//
+const float& Mesh::GetSpecularCoefficient() const
+{
+	return _specular;
+}
+
+//
+// Sets the specular coefficient for this mesh.
+//
+const void Mesh::SetSpecularCoefficient(const float& value)
+{
+	_specular = value;
 }
 
 //
@@ -473,7 +468,7 @@ void Mesh::DrawFragPolygon(const Polygon3D& polygon, const std::vector<Vertex>& 
 
 	case ShadeMode::SHADE_PHONG:
 	{
-		Phong frag(_roughness, _texture, GetColour());
+		Phong frag(_roughness, _specular, _texture, GetColour());
 
 		// Lighting will be calculated per-fragment, so we do not need to compute the lighting here.
 		TriangleRasteriser::DrawPhong(hdc, { clipA, clipB, clipC }, { worldA, worldB, worldC }, frag);
@@ -497,7 +492,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 
 	for (const LightPtr& light : sceneLights)
 	{
-		totalLightContributions += light->CalculateContribution(position, normal, 0.f); // Flat shading
+		totalLightContributions += light->CalculateContribution(position, normal, 0.f, 1.f); // Flat shading
 	}
 
 	return totalLightContributions;
@@ -506,7 +501,7 @@ Colour Mesh::ComputeLighting(const Polygon3D& polygon, const std::vector<Vertex>
 //
 // Computes the lighting for a single vertex.
 //
-Colour Mesh::ComputeLighting(const Vertex& vertex, const float& roughness)
+Colour Mesh::ComputeLighting(const Vertex& vertex, const float& roughness, const float& specular)
 {
 	const Vector3& normal = vertex.GetVertexData().GetNormal();
 
@@ -515,7 +510,7 @@ Colour Mesh::ComputeLighting(const Vertex& vertex, const float& roughness)
 
 	for (const LightPtr& light : sceneLights)
 	{
-		totalLightContributions += light->CalculateContribution(vertex, normal, roughness);
+		totalLightContributions += light->CalculateContribution(vertex, normal, roughness, specular);
 	}
 
 	return totalLightContributions;
@@ -547,7 +542,7 @@ void Mesh::ComputeVertexLighting()
 
 	for (const Vertex& vertex : worldVertices)
 	{
-		vertexColours.push_back(GetColour() * ComputeLighting(vertex, _roughness));
+		vertexColours.push_back(GetColour() * ComputeLighting(vertex, _roughness, _specular));
 	}
 
 	// Apply vertex colours to clip-space vertices.

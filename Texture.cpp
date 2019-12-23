@@ -22,7 +22,7 @@ Texture::~Texture()
 	}
 }
 
-void Texture::SetTextureSize(int width, int height)
+void Texture::SetTextureSize(size_t width, size_t height)
 {
 	_width = width;
 	_height = height;
@@ -51,7 +51,7 @@ COLORREF Texture::GetTextureValue(int u, int v) const
 	}
 	if (v >= _height)
 	{
-		v = _height - 1;
+		v = static_cast<int>(_height - 1);
 	}
 	if (u < 0)
 	{
@@ -59,9 +59,9 @@ COLORREF Texture::GetTextureValue(int u, int v) const
 	}
 	if (u >= _width)
 	{
-		u = _width - 1;
+		u = static_cast<int>(_width - 1);
 	}
-	return _palette[_paletteIndices[v * _width + u]];
+	return _palette[_paletteIndices[v * static_cast<int>(_width) + u]];
 }
 
 BYTE * Texture::GetPaletteIndices()
@@ -74,12 +74,12 @@ COLORREF * Texture::GetPalette()
 	return _palette;
 }
 
-int Texture::GetWidth() const
+size_t Texture::GetWidth() const
 {
 	return _width;
 }
 
-int Texture::GetHeight() const
+size_t Texture::GetHeight() const
 {
 	return _height;
 }
